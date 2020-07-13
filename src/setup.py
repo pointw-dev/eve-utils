@@ -4,8 +4,8 @@ from setuptools import setup
 bin = glob('bin/*')
 
 setup(
-    name='eve_utils',
-    version='0.6.0',
+    name='eve-utils',
+    version='0.6.1',
     description='Utilities to create and manage eve APIs',
     long_description=open('README.rst').read(),
     license='MIT',

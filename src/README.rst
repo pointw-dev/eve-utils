@@ -1,3 +1,3 @@
-eve_utils
+eve-utils
 =========
-Utilities to create and manage APIs based on eve.
+Templates and scripts to rapidly spin up an Eve-based API.

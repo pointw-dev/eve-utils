@@ -29,6 +29,11 @@ This package will provide utilities to create and manage APIs based on [Eve](htt
   
   `mkrel people cars`
 
+* mkdocker - adds dev-ready Dockerfile, docker-compose.yml, and image build scripts
+  * feature
+  * feature
+  
+  `mkdocker my-api`
   
 * command
 * command

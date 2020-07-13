@@ -1,0 +1,18 @@
+version: '3'
+services:
+  {$project_name}:
+    image: {$project_name}
+    container_name: {$project_name}
+    ports:
+      - "2112:80"
+    environment:
+      - ES_INSTANCE_NAME={$project_name} development container
+      
+    depends_on:
+      - {$project_name}-mongo
+
+  {$project_name}-mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    container_name: {$project_name}-mongo
