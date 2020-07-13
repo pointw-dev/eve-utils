@@ -5,8 +5,8 @@ bin = glob('bin/*')
 
 setup(
     name='eve-utils',
-    version='0.6.1',
-    description='Utilities to create and manage eve APIs',
+    version='0.6.2',
+    description='Templates and scripts to rapidly spin up an Eve-based API.',
     long_description=open('README.rst').read(),
     license='MIT',
     classifiers=[
