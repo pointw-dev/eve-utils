@@ -9,7 +9,7 @@ bin = glob('bin/*')
 
 setup(
     name='eve-utils',
-    version='0.6.4',
+    version='0.6.5',
     description='Templates and scripts to rapidly spin up an Eve-based API.',
     long_description=open('README.rst').read(),
     license='MIT',

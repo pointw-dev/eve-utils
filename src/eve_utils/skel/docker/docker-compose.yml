@@ -7,6 +7,7 @@ services:
       - "2112:80"
     environment:
       - ES_INSTANCE_NAME={$project_name} development container
+      - ES_MONGO_HOST={$project_name}-mongo
       
     depends_on:
       - {$project_name}-mongo
