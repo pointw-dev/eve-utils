@@ -1,0 +1,61 @@
+version: 1
+formatters:
+    simple:
+        format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    detail:
+        format: '%(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s'
+    email:
+        format: '%(levelname)s sent from {$project_name} %(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s'
+
+loggers:
+    all:
+        handlers: [all]
+        propagate: true
+    warn:
+        handlers: [warn, smtp]
+        propagate: true
+    error:
+        handlers: [error, smtp]
+        propagate: true
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        level: INFO
+        formatter: simple
+        stream: ext://sys.stdout
+    smtp: # TODO: integrate with QueueHandler so email doesn't block (look at http://flask-logconfig.readthedocs.io/en/latest/ ?)
+        # TODO: replace cri.com with some setting or something (or remove it from here and put it in config.py
+        class: logging.handlers.SMTPHandler
+        level: ERROR
+        formatter: email
+        mailhost: [internalmail.cri.com, 25]
+        fromaddr: {$project_name} <{$project_name}@cri.com>  
+        toaddrs: [michael.ottoson@cri.com]
+        subject: 'Problem encountered with {$project_name}'
+    all:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: DEBUG
+        formatter: simple
+        when: midnight
+        backupCount: 4
+        filename: /var/log/{$project_name}/all.log
+    warn:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: WARNING
+        formatter: detail
+        when: midnight
+        backupCount: 4
+        filename: /var/log/{$project_name}/warn.log
+    error:
+        class: logging.handlers.TimedRotatingFileHandler
+        level: ERROR
+        formatter: detail
+        when: midnight
+        backupCount: 4
+        filename: /var/log/{$project_name}/error.log
+
+root:
+  level: DEBUG
+  handlers: [console, all, warn, error, smtp]
+  propagate: true
