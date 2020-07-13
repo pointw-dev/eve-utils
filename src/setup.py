@@ -5,7 +5,7 @@ bin = glob('bin/*')
 
 setup(
     name='eve_utils',
-    version='0.5.9',
+    version='0.6.0',
     description='Utilities to create and manage eve APIs',
     long_description=open('README.rst').read(),
     license='MIT',

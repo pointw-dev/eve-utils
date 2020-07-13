@@ -18,11 +18,17 @@ This package will provide utilities to create and manage APIs based on [Eve](htt
   * feature
   
   `mkresource cars`
+  
   `mkresource people --no_common`
 
-* mkrel - creates link relation between two resources (incomplete)
+* mkrel - creates link relation between two resources (works, but needs major refactoring!)
   * feature
   * feature
+
+  mkrel _parent_ _child_
+  
+  `mkrel people cars`
+
   
 * command
 * command

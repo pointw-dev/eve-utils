@@ -1,10 +1,1644 @@
 #!/usr/bin/env python
+# xcopy ..\back . /sY && upd.bat && mkrel venue devices
 
 import os
 import argparse
 import itertools
 from libcst import *
 from singplu import get_pair
+
+def get_comma():
+    return Comma(
+        whitespace_before=SimpleWhitespace(
+            value='',
+        ),
+        whitespace_after=ParenthesizedWhitespace(
+            first_line=TrailingWhitespace(
+                whitespace=SimpleWhitespace(
+                    value='',
+                ),
+                comment=None,
+                newline=Newline(
+                    value=None,
+                ),
+            ),
+            empty_lines=[],
+            indent=True,
+            last_line=SimpleWhitespace(
+                value='    ',
+            ),
+        ),
+    )
+
+
+class ChildLinksInserter(CSTTransformer):
+    def __init__(self, parent, child, parents, children):
+        self.parent = parent
+        self.child = child
+        self.parents = parents
+        self.children = children
+
+    def leave_FunctionDef(self, original_node, updated_node):
+        if not original_node.name.value == f'_add_links_to_{self.child}':
+            return original_node
+            
+        new_body = []
+        for item in original_node.body.body:
+            new_body.append(item)
+        new_body.append(self.make_parent_link())    
+
+        return updated_node.with_changes(
+            body=updated_node.body.with_changes(
+                body=new_body
+            )
+        )        
+
+    def make_parent_link(self):
+        return If(
+            test=Call(
+                func=Attribute(
+                    value=Name(
+                        value=f'{self.child}',
+                        lpar=[],
+                        rpar=[],
+                    ),
+                    attr=Name(
+                        value='get',
+                        lpar=[],
+                        rpar=[],
+                    ),
+                    dot=Dot(
+                        whitespace_before=SimpleWhitespace(
+                            value='',
+                        ),
+                        whitespace_after=SimpleWhitespace(
+                            value='',
+                        ),
+                    ),
+                    lpar=[],
+                    rpar=[],
+                ),
+                args=[
+                    Arg(
+                        value=SimpleString(
+                            value=f"'_{self.parent}_ref'",
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        keyword=None,
+                        equal=MaybeSentinel.DEFAULT,
+                        comma=MaybeSentinel.DEFAULT,
+                        star='',
+                        whitespace_after_star=SimpleWhitespace(
+                            value='',
+                        ),
+                        whitespace_after_arg=SimpleWhitespace(
+                            value='',
+                        ),
+                    ),
+                ],
+                lpar=[],
+                rpar=[],
+                whitespace_after_func=SimpleWhitespace(
+                    value='',
+                ),
+                whitespace_before_args=SimpleWhitespace(
+                    value='',
+                ),
+            ),
+            body=IndentedBlock(
+                body=[
+                    SimpleStatementLine(
+                        body=[
+                            Assign(
+                                targets=[
+                                    AssignTarget(
+                                        target=Subscript(
+                                            value=Subscript(
+                                                value=Name(
+                                                    value=f'{self.child}',
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                slice=[
+                                                    SubscriptElement(
+                                                        slice=Index(
+                                                            value=SimpleString(
+                                                                value="'_links'",
+                                                                lpar=[],
+                                                                rpar=[],
+                                                            ),
+                                                        ),
+                                                        comma=MaybeSentinel.DEFAULT,
+                                                    ),
+                                                ],
+                                                lbracket=LeftSquareBracket(
+                                                    whitespace_after=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                rbracket=RightSquareBracket(
+                                                    whitespace_before=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                lpar=[],
+                                                rpar=[],
+                                                whitespace_after_value=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            slice=[
+                                                SubscriptElement(
+                                                    slice=Index(
+                                                        value=SimpleString(
+                                                            value="'parent'",
+                                                            lpar=[],
+                                                            rpar=[],
+                                                        ),
+                                                    ),
+                                                    comma=MaybeSentinel.DEFAULT,
+                                                ),
+                                            ],
+                                            lbracket=LeftSquareBracket(
+                                                whitespace_after=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            rbracket=RightSquareBracket(
+                                                whitespace_before=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            lpar=[],
+                                            rpar=[],
+                                            whitespace_after_value=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                        ),
+                                        whitespace_before_equal=SimpleWhitespace(
+                                            value=' ',
+                                        ),
+                                        whitespace_after_equal=SimpleWhitespace(
+                                            value=' ',
+                                        ),
+                                    ),
+                                ],
+                                value=Dict(
+                                    elements=[
+                                        DictElement(
+                                            key=SimpleString(
+                                                value="'href'",
+                                                lpar=[],
+                                                rpar=[],
+                                            ),
+                                            value=Call(
+                                                func=Attribute(
+                                                    value=SimpleString(
+                                                        value=f"'/{self.parents}/{{0}}'",
+                                                        lpar=[],
+                                                        rpar=[],
+                                                    ),
+                                                    attr=Name(
+                                                        value='format',
+                                                        lpar=[],
+                                                        rpar=[],
+                                                    ),
+                                                    dot=Dot(
+                                                        whitespace_before=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                        whitespace_after=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                args=[
+                                                    Arg(
+                                                        value=Subscript(
+                                                            value=Name(
+                                                                value=f'{self.child}',
+                                                                lpar=[],
+                                                                rpar=[],
+                                                            ),
+                                                            slice=[
+                                                                SubscriptElement(
+                                                                    slice=Index(
+                                                                        value=SimpleString(
+                                                                            value=f"'_{self.parent}_ref'",
+                                                                            lpar=[],
+                                                                            rpar=[],
+                                                                        ),
+                                                                    ),
+                                                                    comma=MaybeSentinel.DEFAULT,
+                                                                ),
+                                                            ],
+                                                            lbracket=LeftSquareBracket(
+                                                                whitespace_after=SimpleWhitespace(
+                                                                    value='',
+                                                                ),
+                                                            ),
+                                                            rbracket=RightSquareBracket(
+                                                                whitespace_before=SimpleWhitespace(
+                                                                    value='',
+                                                                ),
+                                                            ),
+                                                            lpar=[],
+                                                            rpar=[],
+                                                            whitespace_after_value=SimpleWhitespace(
+                                                                value='',
+                                                            ),
+                                                        ),
+                                                        keyword=None,
+                                                        equal=MaybeSentinel.DEFAULT,
+                                                        comma=MaybeSentinel.DEFAULT,
+                                                        star='',
+                                                        whitespace_after_star=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                        whitespace_after_arg=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                ],
+                                                lpar=[],
+                                                rpar=[],
+                                                whitespace_after_func=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_before_args=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            comma=Comma(
+                                                whitespace_before=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_after=ParenthesizedWhitespace(
+                                                    first_line=TrailingWhitespace(
+                                                        whitespace=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                        comment=None,
+                                                        newline=Newline(
+                                                            value=None,
+                                                        ),
+                                                    ),
+                                                    empty_lines=[],
+                                                    indent=True,
+                                                    last_line=SimpleWhitespace(
+                                                        value='    ',
+                                                    ),
+                                                ),
+                                            ),
+                                            whitespace_before_colon=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                            whitespace_after_colon=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                        ),
+                                        DictElement(
+                                            key=SimpleString(
+                                                value="'title'",
+                                                lpar=[],
+                                                rpar=[],
+                                            ),
+                                            value=SimpleString(
+                                                value=f"'{self.parents}'",
+                                                lpar=[],
+                                                rpar=[],
+                                            ),
+                                            comma=MaybeSentinel.DEFAULT,
+                                            whitespace_before_colon=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                            whitespace_after_colon=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                        ),
+                                    ],
+                                    lbrace=LeftCurlyBrace(
+                                        whitespace_after=ParenthesizedWhitespace(
+                                            first_line=TrailingWhitespace(
+                                                whitespace=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                comment=None,
+                                                newline=Newline(
+                                                    value=None,
+                                                ),
+                                            ),
+                                            empty_lines=[],
+                                            indent=True,
+                                            last_line=SimpleWhitespace(
+                                                value='    ',
+                                            ),
+                                        ),
+                                    ),
+                                    rbrace=RightCurlyBrace(
+                                        whitespace_before=ParenthesizedWhitespace(
+                                            first_line=TrailingWhitespace(
+                                                whitespace=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                comment=None,
+                                                newline=Newline(
+                                                    value=None,
+                                                ),
+                                            ),
+                                            empty_lines=[],
+                                            indent=True,
+                                            last_line=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                        ),
+                                    ),
+                                    lpar=[],
+                                    rpar=[],
+                                ),
+                                semicolon=MaybeSentinel.DEFAULT,
+                            ),
+                        ],
+                        leading_lines=[],
+                        trailing_whitespace=TrailingWhitespace(
+                            whitespace=SimpleWhitespace(
+                                value='',
+                            ),
+                            comment=None,
+                            newline=Newline(
+                                value=None,
+                            ),
+                        ),
+                    ),
+                    SimpleStatementLine(
+                        body=[
+                            Assign(
+                                targets=[
+                                    AssignTarget(
+                                        target=Subscript(
+                                            value=Subscript(
+                                                value=Name(
+                                                    value=f'{self.child}',
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                slice=[
+                                                    SubscriptElement(
+                                                        slice=Index(
+                                                            value=SimpleString(
+                                                                value="'_links'",
+                                                                lpar=[],
+                                                                rpar=[],
+                                                            ),
+                                                        ),
+                                                        comma=MaybeSentinel.DEFAULT,
+                                                    ),
+                                                ],
+                                                lbracket=LeftSquareBracket(
+                                                    whitespace_after=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                rbracket=RightSquareBracket(
+                                                    whitespace_before=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                lpar=[],
+                                                rpar=[],
+                                                whitespace_after_value=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            slice=[
+                                                SubscriptElement(
+                                                    slice=Index(
+                                                        value=SimpleString(
+                                                            value="'collection'",
+                                                            lpar=[],
+                                                            rpar=[],
+                                                        ),
+                                                    ),
+                                                    comma=MaybeSentinel.DEFAULT,
+                                                ),
+                                            ],
+                                            lbracket=LeftSquareBracket(
+                                                whitespace_after=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            rbracket=RightSquareBracket(
+                                                whitespace_before=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            lpar=[],
+                                            rpar=[],
+                                            whitespace_after_value=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                        ),
+                                        whitespace_before_equal=SimpleWhitespace(
+                                            value=' ',
+                                        ),
+                                        whitespace_after_equal=SimpleWhitespace(
+                                            value=' ',
+                                        ),
+                                    ),
+                                ],
+                                value=Dict(
+                                    elements=[
+                                        DictElement(
+                                            key=SimpleString(
+                                                value="'href'",
+                                                lpar=[],
+                                                rpar=[],
+                                            ),
+                                            value=Call(
+                                                func=Attribute(
+                                                    value=SimpleString(
+                                                        value=f"'/{self.parents}/{{0}}/{self.children}'",
+                                                        lpar=[],
+                                                        rpar=[],
+                                                    ),
+                                                    attr=Name(
+                                                        value='format',
+                                                        lpar=[],
+                                                        rpar=[],
+                                                    ),
+                                                    dot=Dot(
+                                                        whitespace_before=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                        whitespace_after=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                args=[
+                                                    Arg(
+                                                        value=Subscript(
+                                                            value=Name(
+                                                                value=f'{self.child}',
+                                                                lpar=[],
+                                                                rpar=[],
+                                                            ),
+                                                            slice=[
+                                                                SubscriptElement(
+                                                                    slice=Index(
+                                                                        value=SimpleString(
+                                                                            value=f"'_{self.parent}_ref'",
+                                                                            lpar=[],
+                                                                            rpar=[],
+                                                                        ),
+                                                                    ),
+                                                                    comma=MaybeSentinel.DEFAULT,
+                                                                ),
+                                                            ],
+                                                            lbracket=LeftSquareBracket(
+                                                                whitespace_after=SimpleWhitespace(
+                                                                    value='',
+                                                                ),
+                                                            ),
+                                                            rbracket=RightSquareBracket(
+                                                                whitespace_before=SimpleWhitespace(
+                                                                    value='',
+                                                                ),
+                                                            ),
+                                                            lpar=[],
+                                                            rpar=[],
+                                                            whitespace_after_value=SimpleWhitespace(
+                                                                value='',
+                                                            ),
+                                                        ),
+                                                        keyword=None,
+                                                        equal=MaybeSentinel.DEFAULT,
+                                                        comma=MaybeSentinel.DEFAULT,
+                                                        star='',
+                                                        whitespace_after_star=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                        whitespace_after_arg=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                ],
+                                                lpar=[],
+                                                rpar=[],
+                                                whitespace_after_func=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_before_args=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            comma=Comma(
+                                                whitespace_before=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_after=ParenthesizedWhitespace(
+                                                    first_line=TrailingWhitespace(
+                                                        whitespace=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                        comment=None,
+                                                        newline=Newline(
+                                                            value=None,
+                                                        ),
+                                                    ),
+                                                    empty_lines=[],
+                                                    indent=True,
+                                                    last_line=SimpleWhitespace(
+                                                        value='    ',
+                                                    ),
+                                                ),
+                                            ),
+                                            whitespace_before_colon=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                            whitespace_after_colon=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                        ),
+                                        DictElement(
+                                            key=SimpleString(
+                                                value="'title'",
+                                                lpar=[],
+                                                rpar=[],
+                                            ),
+                                            value=SimpleString(
+                                                value=f"'{self.parent}_{self.children}'",
+                                                lpar=[],
+                                                rpar=[],
+                                            ),
+                                            comma=MaybeSentinel.DEFAULT,
+                                            whitespace_before_colon=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                            whitespace_after_colon=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                        ),
+                                    ],
+                                    lbrace=LeftCurlyBrace(
+                                        whitespace_after=ParenthesizedWhitespace(
+                                            first_line=TrailingWhitespace(
+                                                whitespace=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                comment=None,
+                                                newline=Newline(
+                                                    value=None,
+                                                ),
+                                            ),
+                                            empty_lines=[],
+                                            indent=True,
+                                            last_line=SimpleWhitespace(
+                                                value='    ',
+                                            ),
+                                        ),
+                                    ),
+                                    rbrace=RightCurlyBrace(
+                                        whitespace_before=ParenthesizedWhitespace(
+                                            first_line=TrailingWhitespace(
+                                                whitespace=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                comment=None,
+                                                newline=Newline(
+                                                    value=None,
+                                                ),
+                                            ),
+                                            empty_lines=[],
+                                            indent=True,
+                                            last_line=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                        ),
+                                    ),
+                                    lpar=[],
+                                    rpar=[],
+                                ),
+                                semicolon=MaybeSentinel.DEFAULT,
+                            ),
+                        ],
+                        leading_lines=[],
+                        trailing_whitespace=TrailingWhitespace(
+                            whitespace=SimpleWhitespace(
+                                value='',
+                            ),
+                            comment=None,
+                            newline=Newline(
+                                value=None,
+                            ),
+                        ),
+                    ),
+                ],
+                header=TrailingWhitespace(
+                    whitespace=SimpleWhitespace(
+                        value='',
+                    ),
+                    comment=None,
+                    newline=Newline(
+                        value=None,
+                    ),
+                ),
+                indent=None,
+                footer=[],
+            ),
+            orelse=Else(
+                body=IndentedBlock(
+                    body=[
+                        SimpleStatementLine(
+                            body=[
+                                Assign(
+                                    targets=[
+                                        AssignTarget(
+                                            target=Subscript(
+                                                value=Subscript(
+                                                    value=Name(
+                                                        value=f'{self.child}',
+                                                        lpar=[],
+                                                        rpar=[],
+                                                    ),
+                                                    slice=[
+                                                        SubscriptElement(
+                                                            slice=Index(
+                                                                value=SimpleString(
+                                                                    value="'_links'",
+                                                                    lpar=[],
+                                                                    rpar=[],
+                                                                ),
+                                                            ),
+                                                            comma=MaybeSentinel.DEFAULT,
+                                                        ),
+                                                    ],
+                                                    lbracket=LeftSquareBracket(
+                                                        whitespace_after=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                    rbracket=RightSquareBracket(
+                                                        whitespace_before=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                    lpar=[],
+                                                    rpar=[],
+                                                    whitespace_after_value=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                slice=[
+                                                    SubscriptElement(
+                                                        slice=Index(
+                                                            value=SimpleString(
+                                                                value="'parent'",
+                                                                lpar=[],
+                                                                rpar=[],
+                                                            ),
+                                                        ),
+                                                        comma=MaybeSentinel.DEFAULT,
+                                                    ),
+                                                ],
+                                                lbracket=LeftSquareBracket(
+                                                    whitespace_after=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                rbracket=RightSquareBracket(
+                                                    whitespace_before=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                lpar=[],
+                                                rpar=[],
+                                                whitespace_after_value=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            whitespace_before_equal=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                            whitespace_after_equal=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                        ),
+                                    ],
+                                    value=Dict(
+                                        elements=[
+                                            DictElement(
+                                                key=SimpleString(
+                                                    value="'href'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                value=SimpleString(
+                                                    value="'/'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                comma=Comma(
+                                                    whitespace_before=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                    whitespace_after=ParenthesizedWhitespace(
+                                                        first_line=TrailingWhitespace(
+                                                            whitespace=SimpleWhitespace(
+                                                                value='',
+                                                            ),
+                                                            comment=None,
+                                                            newline=Newline(
+                                                                value=None,
+                                                            ),
+                                                        ),
+                                                        empty_lines=[],
+                                                        indent=True,
+                                                        last_line=SimpleWhitespace(
+                                                            value='    ',
+                                                        ),
+                                                    ),
+                                                ),
+                                                whitespace_before_colon=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_after_colon=SimpleWhitespace(
+                                                    value=' ',
+                                                ),
+                                            ),
+                                            DictElement(
+                                                key=SimpleString(
+                                                    value="'title'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                value=SimpleString(
+                                                    value="'home'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                comma=MaybeSentinel.DEFAULT,
+                                                whitespace_before_colon=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_after_colon=SimpleWhitespace(
+                                                    value=' ',
+                                                ),
+                                            ),
+                                        ],
+                                        lbrace=LeftCurlyBrace(
+                                            whitespace_after=ParenthesizedWhitespace(
+                                                first_line=TrailingWhitespace(
+                                                    whitespace=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                    comment=None,
+                                                    newline=Newline(
+                                                        value=None,
+                                                    ),
+                                                ),
+                                                empty_lines=[],
+                                                indent=True,
+                                                last_line=SimpleWhitespace(
+                                                    value='    ',
+                                                ),
+                                            ),
+                                        ),
+                                        rbrace=RightCurlyBrace(
+                                            whitespace_before=ParenthesizedWhitespace(
+                                                first_line=TrailingWhitespace(
+                                                    whitespace=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                    comment=None,
+                                                    newline=Newline(
+                                                        value=None,
+                                                    ),
+                                                ),
+                                                empty_lines=[],
+                                                indent=True,
+                                                last_line=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                        ),
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    semicolon=MaybeSentinel.DEFAULT,
+                                ),
+                            ],
+                            leading_lines=[],
+                            trailing_whitespace=TrailingWhitespace(
+                                whitespace=SimpleWhitespace(
+                                    value='',
+                                ),
+                                comment=None,
+                                newline=Newline(
+                                    value=None,
+                                ),
+                            ),
+                        ),
+                        SimpleStatementLine(
+                            body=[
+                                Assign(
+                                    targets=[
+                                        AssignTarget(
+                                            target=Subscript(
+                                                value=Subscript(
+                                                    value=Name(
+                                                        value=f'{self.child}',
+                                                        lpar=[],
+                                                        rpar=[],
+                                                    ),
+                                                    slice=[
+                                                        SubscriptElement(
+                                                            slice=Index(
+                                                                value=SimpleString(
+                                                                    value="'_links'",
+                                                                    lpar=[],
+                                                                    rpar=[],
+                                                                ),
+                                                            ),
+                                                            comma=MaybeSentinel.DEFAULT,
+                                                        ),
+                                                    ],
+                                                    lbracket=LeftSquareBracket(
+                                                        whitespace_after=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                    rbracket=RightSquareBracket(
+                                                        whitespace_before=SimpleWhitespace(
+                                                            value='',
+                                                        ),
+                                                    ),
+                                                    lpar=[],
+                                                    rpar=[],
+                                                    whitespace_after_value=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                slice=[
+                                                    SubscriptElement(
+                                                        slice=Index(
+                                                            value=SimpleString(
+                                                                value="'collection'",
+                                                                lpar=[],
+                                                                rpar=[],
+                                                            ),
+                                                        ),
+                                                        comma=MaybeSentinel.DEFAULT,
+                                                    ),
+                                                ],
+                                                lbracket=LeftSquareBracket(
+                                                    whitespace_after=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                rbracket=RightSquareBracket(
+                                                    whitespace_before=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                lpar=[],
+                                                rpar=[],
+                                                whitespace_after_value=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            whitespace_before_equal=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                            whitespace_after_equal=SimpleWhitespace(
+                                                value=' ',
+                                            ),
+                                        ),
+                                    ],
+                                    value=Dict(
+                                        elements=[
+                                            DictElement(
+                                                key=SimpleString(
+                                                    value="'href'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                value=SimpleString(
+                                                    value=f"'/{self.children}'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                comma=Comma(
+                                                    whitespace_before=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                    whitespace_after=ParenthesizedWhitespace(
+                                                        first_line=TrailingWhitespace(
+                                                            whitespace=SimpleWhitespace(
+                                                                value='',
+                                                            ),
+                                                            comment=None,
+                                                            newline=Newline(
+                                                                value=None,
+                                                            ),
+                                                        ),
+                                                        empty_lines=[],
+                                                        indent=True,
+                                                        last_line=SimpleWhitespace(
+                                                            value='    ',
+                                                        ),
+                                                    ),
+                                                ),
+                                                whitespace_before_colon=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_after_colon=SimpleWhitespace(
+                                                    value=' ',
+                                                ),
+                                            ),
+                                            DictElement(
+                                                key=SimpleString(
+                                                    value="'title'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                value=SimpleString(
+                                                    value=f"'{self.children}'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                comma=MaybeSentinel.DEFAULT,
+                                                whitespace_before_colon=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                whitespace_after_colon=SimpleWhitespace(
+                                                    value=' ',
+                                                ),
+                                            ),
+                                        ],
+                                        lbrace=LeftCurlyBrace(
+                                            whitespace_after=ParenthesizedWhitespace(
+                                                first_line=TrailingWhitespace(
+                                                    whitespace=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                    comment=None,
+                                                    newline=Newline(
+                                                        value=None,
+                                                    ),
+                                                ),
+                                                empty_lines=[],
+                                                indent=True,
+                                                last_line=SimpleWhitespace(
+                                                    value='    ',
+                                                ),
+                                            ),
+                                        ),
+                                        rbrace=RightCurlyBrace(
+                                            whitespace_before=ParenthesizedWhitespace(
+                                                first_line=TrailingWhitespace(
+                                                    whitespace=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                    comment=None,
+                                                    newline=Newline(
+                                                        value=None,
+                                                    ),
+                                                ),
+                                                empty_lines=[],
+                                                indent=True,
+                                                last_line=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                        ),
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    semicolon=MaybeSentinel.DEFAULT,
+                                ),
+                            ],
+                            leading_lines=[],
+                            trailing_whitespace=TrailingWhitespace(
+                                whitespace=SimpleWhitespace(
+                                    value='',
+                                ),
+                                comment=None,
+                                newline=Newline(
+                                    value=None,
+                                ),
+                            ),
+                        ),
+                    ],
+                    header=TrailingWhitespace(
+                        whitespace=SimpleWhitespace(
+                            value='',
+                        ),
+                        comment=None,
+                        newline=Newline(
+                            value=None,
+                        ),
+                    ),
+                    indent=None,
+                    footer=[],
+                ),
+                leading_lines=[],
+                whitespace_before_colon=SimpleWhitespace(
+                    value='',
+                ),
+            ),
+            leading_lines=[],
+            whitespace_before_test=SimpleWhitespace(
+                value=' ',
+            ),
+            whitespace_after_test=SimpleWhitespace(
+                value='',
+            ),
+        )
+
+    
+
+
+
+
+
+class ParentLinksInserter(CSTTransformer):
+    def __init__(self, parent, child, parents, children):
+        self.parent = parent
+        self.child = child
+        self.parents = parents
+        self.children = children
+
+    def leave_FunctionDef(self, original_node, updated_node):
+        if not original_node.name.value == f'_add_links_to_{self.parent}':
+            return original_node
+            
+        new_body = []
+        for item in original_node.body.body:
+            new_body.append(item)
+        new_body.append(self.make_children_link())    
+
+        return updated_node.with_changes(
+            body=updated_node.body.with_changes(
+                body=new_body
+            )
+        )
+
+    def make_children_link(self):
+        return SimpleStatementLine(
+            body=[
+                Assign(
+                    targets=[
+                        AssignTarget(
+                            target=Subscript(
+                                value=Subscript(
+                                    value=Name(
+                                        value=f'{self.parent}',
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    slice=[
+                                        SubscriptElement(
+                                            slice=Index(
+                                                value=SimpleString(
+                                                    value="'_links'",
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                            ),
+                                            comma=MaybeSentinel.DEFAULT,
+                                        ),
+                                    ],
+                                    lbracket=LeftSquareBracket(
+                                        whitespace_after=SimpleWhitespace(
+                                            value='',
+                                        ),
+                                    ),
+                                    rbracket=RightSquareBracket(
+                                        whitespace_before=SimpleWhitespace(
+                                            value='',
+                                        ),
+                                    ),
+                                    lpar=[],
+                                    rpar=[],
+                                    whitespace_after_value=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                ),
+                                slice=[
+                                    SubscriptElement(
+                                        slice=Index(
+                                            value=SimpleString(
+                                                value=f"'{self.children}'",
+                                                lpar=[],
+                                                rpar=[],
+                                            ),
+                                        ),
+                                        comma=MaybeSentinel.DEFAULT,
+                                    ),
+                                ],
+                                lbracket=LeftSquareBracket(
+                                    whitespace_after=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                ),
+                                rbracket=RightSquareBracket(
+                                    whitespace_before=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                ),
+                                lpar=[],
+                                rpar=[],
+                                whitespace_after_value=SimpleWhitespace(
+                                    value='',
+                                ),
+                            ),
+                            whitespace_before_equal=SimpleWhitespace(
+                                value=' ',
+                            ),
+                            whitespace_after_equal=SimpleWhitespace(
+                                value=' ',
+                            ),
+                        ),
+                    ],
+                    value=Dict(
+                        elements=[
+                            DictElement(
+                                key=SimpleString(
+                                    value="'href'",
+                                    lpar=[],
+                                    rpar=[],
+                                ),
+                                value=Call(
+                                    func=Attribute(
+                                        value=SimpleString(
+                                            value=f"'/{self.parents}/{{0}}/{self.children}'",
+                                            lpar=[],
+                                            rpar=[],
+                                        ),
+                                        attr=Name(
+                                            value='format',
+                                            lpar=[],
+                                            rpar=[],
+                                        ),
+                                        dot=Dot(
+                                            whitespace_before=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                            whitespace_after=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                        ),
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    args=[
+                                        Arg(
+                                            value=Subscript(
+                                                value=Name(
+                                                    value=f'{self.parent}',
+                                                    lpar=[],
+                                                    rpar=[],
+                                                ),
+                                                slice=[
+                                                    SubscriptElement(
+                                                        slice=Index(
+                                                            value=SimpleString(
+                                                                value="'_id'",
+                                                                lpar=[],
+                                                                rpar=[],
+                                                            ),
+                                                        ),
+                                                        comma=MaybeSentinel.DEFAULT,
+                                                    ),
+                                                ],
+                                                lbracket=LeftSquareBracket(
+                                                    whitespace_after=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                rbracket=RightSquareBracket(
+                                                    whitespace_before=SimpleWhitespace(
+                                                        value='',
+                                                    ),
+                                                ),
+                                                lpar=[],
+                                                rpar=[],
+                                                whitespace_after_value=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                            ),
+                                            keyword=None,
+                                            equal=MaybeSentinel.DEFAULT,
+                                            comma=MaybeSentinel.DEFAULT,
+                                            star='',
+                                            whitespace_after_star=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                            whitespace_after_arg=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                        ),
+                                    ],
+                                    lpar=[],
+                                    rpar=[],
+                                    whitespace_after_func=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                    whitespace_before_args=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                ),
+                                comma=Comma(
+                                    whitespace_before=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                    whitespace_after=ParenthesizedWhitespace(
+                                        first_line=TrailingWhitespace(
+                                            whitespace=SimpleWhitespace(
+                                                value='',
+                                            ),
+                                            comment=None,
+                                            newline=Newline(
+                                                value=None,
+                                            ),
+                                        ),
+                                        empty_lines=[],
+                                        indent=True,
+                                        last_line=SimpleWhitespace(
+                                            value='    ',
+                                        ),
+                                    ),
+                                ),
+                                whitespace_before_colon=SimpleWhitespace(
+                                    value='',
+                                ),
+                                whitespace_after_colon=SimpleWhitespace(
+                                    value=' ',
+                                ),
+                            ),
+                            DictElement(
+                                key=SimpleString(
+                                    value="'title'",
+                                    lpar=[],
+                                    rpar=[],
+                                ),
+                                value=SimpleString(
+                                    value=f"'{self.children}'",
+                                    lpar=[],
+                                    rpar=[],
+                                ),
+                                comma=MaybeSentinel.DEFAULT,
+                                whitespace_before_colon=SimpleWhitespace(
+                                    value='',
+                                ),
+                                whitespace_after_colon=SimpleWhitespace(
+                                    value=' ',
+                                ),
+                            ),
+                        ],
+                        lbrace=LeftCurlyBrace(
+                            whitespace_after=ParenthesizedWhitespace(
+                                first_line=TrailingWhitespace(
+                                    whitespace=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                    comment=None,
+                                    newline=Newline(
+                                        value=None,
+                                    ),
+                                ),
+                                empty_lines=[],
+                                indent=True,
+                                last_line=SimpleWhitespace(
+                                    value='    ',
+                                ),
+                            ),
+                        ),
+                        rbrace=RightCurlyBrace(
+                            whitespace_before=ParenthesizedWhitespace(
+                                first_line=TrailingWhitespace(
+                                    whitespace=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                    comment=None,
+                                    newline=Newline(
+                                        value=None,
+                                    ),
+                                ),
+                                empty_lines=[],
+                                indent=True,
+                                last_line=SimpleWhitespace(
+                                    value='',
+                                ),
+                            ),
+                        ),
+                        lpar=[],
+                        rpar=[],
+                    ),
+                    semicolon=MaybeSentinel.DEFAULT,
+                ),
+            ],
+            leading_lines=[],
+            trailing_whitespace=TrailingWhitespace(
+                whitespace=SimpleWhitespace(
+                    value='    ',
+                ),
+                comment=None,
+                newline=Newline(
+                    value=None,
+                ),
+            ),
+        ) 
+
+
+
+
+class DomainChildrenDefinitionInserter(CSTTransformer):
+    def __init__(self, parent, child, parents, children):
+        self.parent = parent
+        self.child = child
+        self.parents = parents
+        self.children = children
+
+    def visit_SimpleStatementLine(self, node):
+        if not isinstance(node.body[0], Assign):
+            return False
+            
+        if not node.body[0].targets[0].target.value == 'SCHEMA':
+            return False
+            
+        return True
+        
+
+    def leave_Assign(self, original_node, updated_node):
+        new_elements = []
+        for item in original_node.value.elements[:-1]:
+            new_elements.append(item)
+        new_elements.append(original_node.value.elements[-1].with_changes (comma=get_comma()))        
+        new_elements.append(self.make_parent_ref())
+        
+        members = Dict(elements=new_elements,
+                lbrace=LeftCurlyBrace(
+                    whitespace_after=ParenthesizedWhitespace(
+                        first_line=TrailingWhitespace(
+                            whitespace=SimpleWhitespace(
+                                value='',
+                            ),
+                            comment=None,
+                            newline=Newline(
+                                value=None,
+                            ),
+                        ),
+                        empty_lines=[],
+                        indent=True,
+                        last_line=SimpleWhitespace(
+                            value='    ',
+                        ),
+                    ),
+                ),
+                rbrace=RightCurlyBrace(
+                    whitespace_before=ParenthesizedWhitespace(
+                        first_line=TrailingWhitespace(
+                            whitespace=SimpleWhitespace(
+                                value='',
+                            ),
+                            comment=None,
+                            newline=Newline(
+                                value=None,
+                            ),
+                        ),
+                        empty_lines=[],
+                        indent=True,
+                        last_line=SimpleWhitespace(
+                            value='',
+                        ),
+                    ),
+                ),
+                lpar=[],
+                rpar=[],
+            )
+            
+        return updated_node.with_changes (value=members)
+            
+
+    def make_parent_ref(self):
+        return DictElement(
+            key=SimpleString(
+                value="'_{self.parent}_ref'",
+                lpar=[],
+                rpar=[],
+            ),
+            value=Dict(
+                elements=[
+                    DictElement(
+                        key=SimpleString(
+                            value="'type'",
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        value=SimpleString(
+                            value="'objectid'",
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        comma=Comma(
+                            whitespace_before=SimpleWhitespace(
+                                value='',
+                            ),
+                            whitespace_after=ParenthesizedWhitespace(
+                                first_line=TrailingWhitespace(
+                                    whitespace=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                    comment=None,
+                                    newline=Newline(
+                                        value=None,
+                                    ),
+                                ),
+                                empty_lines=[],
+                                indent=True,
+                                last_line=SimpleWhitespace(
+                                    value='        ',
+                                ),
+                            ),
+                        ),
+                        whitespace_before_colon=SimpleWhitespace(
+                            value='',
+                        ),
+                        whitespace_after_colon=SimpleWhitespace(
+                            value=' ',
+                        ),
+                    ),
+                    DictElement(
+                        key=SimpleString(
+                            value="'data_relation'",
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        value=Dict(
+                            elements=[
+                                DictElement(
+                                    key=SimpleString(
+                                        value="'resource'",
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    value=SimpleString(
+                                        value=f"'{self.parents}'",
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    comma=Comma(
+                                        whitespace_before=SimpleWhitespace(
+                                            value='',
+                                        ),
+                                        whitespace_after=ParenthesizedWhitespace(
+                                            first_line=TrailingWhitespace(
+                                                whitespace=SimpleWhitespace(
+                                                    value='',
+                                                ),
+                                                comment=None,
+                                                newline=Newline(
+                                                    value=None,
+                                                ),
+                                            ),
+                                            empty_lines=[],
+                                            indent=True,
+                                            last_line=SimpleWhitespace(
+                                                value='            ',
+                                            ),
+                                        ),
+                                    ),
+                                    whitespace_before_colon=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                    whitespace_after_colon=SimpleWhitespace(
+                                        value=' ',
+                                    ),
+                                ),
+                                DictElement(
+                                    key=SimpleString(
+                                        value="'embeddable'",
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    value=Name(
+                                        value='True',
+                                        lpar=[],
+                                        rpar=[],
+                                    ),
+                                    comma=MaybeSentinel.DEFAULT,
+                                    whitespace_before_colon=SimpleWhitespace(
+                                        value='',
+                                    ),
+                                    whitespace_after_colon=SimpleWhitespace(
+                                        value=' ',
+                                    ),
+                                ),
+                            ],
+                            lbrace=LeftCurlyBrace(
+                                whitespace_after=ParenthesizedWhitespace(
+                                    first_line=TrailingWhitespace(
+                                        whitespace=SimpleWhitespace(
+                                            value='',
+                                        ),
+                                        comment=None,
+                                        newline=Newline(
+                                            value=None,
+                                        ),
+                                    ),
+                                    empty_lines=[],
+                                    indent=True,
+                                    last_line=SimpleWhitespace(
+                                        value='            ',
+                                    ),
+                                ),
+                            ),
+                            rbrace=RightCurlyBrace(
+                                whitespace_before=ParenthesizedWhitespace(
+                                    first_line=TrailingWhitespace(
+                                        whitespace=SimpleWhitespace(
+                                            value='',
+                                        ),
+                                        comment=None,
+                                        newline=Newline(
+                                            value=None,
+                                        ),
+                                    ),
+                                    empty_lines=[],
+                                    indent=True,
+                                    last_line=SimpleWhitespace(
+                                        value='        ',
+                                    ),
+                                ),
+                            ),
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        comma=MaybeSentinel.DEFAULT,
+                        whitespace_before_colon=SimpleWhitespace(
+                            value='',
+                        ),
+                        whitespace_after_colon=SimpleWhitespace(
+                            value=' ',
+                        ),
+                    ),
+                ],
+                lbrace=LeftCurlyBrace(
+                    whitespace_after=ParenthesizedWhitespace(
+                        first_line=TrailingWhitespace(
+                            whitespace=SimpleWhitespace(
+                                value='',
+                            ),
+                            comment=None,
+                            newline=Newline(
+                                value=None,
+                            ),
+                        ),
+                        empty_lines=[],
+                        indent=True,
+                        last_line=SimpleWhitespace(
+                            value='        ',
+                        ),
+                    ),
+                ),
+                rbrace=RightCurlyBrace(
+                    whitespace_before=ParenthesizedWhitespace(
+                        first_line=TrailingWhitespace(
+                            whitespace=SimpleWhitespace(
+                                value='',
+                            ),
+                            comment=None,
+                            newline=Newline(
+                                value=None,
+                            ),
+                        ),
+                        empty_lines=[],
+                        indent=True,
+                        last_line=SimpleWhitespace(
+                            value='    ',
+                        ),
+                    ),
+                ),
+                lpar=[],
+                rpar=[],
+            ),
+            comma=MaybeSentinel.DEFAULT,
+            whitespace_before_colon=SimpleWhitespace(
+                value='',
+            ),
+            whitespace_after_colon=SimpleWhitespace(
+                value=' ',
+            ),
+        )
+
+
 
 
 
@@ -27,8 +1661,10 @@ class DomainDefinitionInserter(CSTTransformer):
 
     def leave_Assign(self, original_node, updated_node):
         new_elements = []
-        for item in original_node.value.elements:
-            new_elements.append(item)
+        if original_node.value.elements:
+            for item in original_node.value.elements[:-1]:
+                new_elements.append(item)
+            new_elements.append(original_node.value.elements[-1].with_changes (comma=get_comma()))        
         new_elements.append(self.make_domain_relation())    
         
         relations = Dict(elements=new_elements,
@@ -147,7 +1783,7 @@ class DomainDefinitionInserter(CSTTransformer):
                             rpar=[],
                         ),
                         value=SimpleString(
-                            value=f'\'venues/<regex("[a-f0-9]{{24}}"):_{self.parent}_ref>/{self.children}\'',
+                            value=f'\'{self.parents}/<regex("[a-f0-9]{{24}}"):_{self.parent}_ref>/{self.children}\'',
                             lpar=[],
                             rpar=[],
                         ),
@@ -307,14 +1943,7 @@ class DomainDefinitionInserter(CSTTransformer):
                 lpar=[],
                 rpar=[],
             ),
-            comma=Comma(
-                whitespace_before=SimpleWhitespace(
-                    value='',
-                ),
-                whitespace_after=SimpleWhitespace(
-                    value='',
-                ),
-            ),
+            comma=MaybeSentinel.DEFAULT,
             whitespace_before_colon=SimpleWhitespace(
                 value='',
             ),
@@ -324,6 +1953,28 @@ class DomainDefinitionInserter(CSTTransformer):
         )
 
         
+def add_links_to_child_hooks(parent, child, parents, children):
+    with open(f'hooks/{children}.py', 'r') as source:
+        tree = parse_module(source.read())
+    
+    inserter = ChildLinksInserter(parent, child, parents, children)
+    new_tree = tree.visit(inserter)
+    
+    with open(f'hooks/{children}.py', 'w') as source:
+        source.write(new_tree.code)
+
+
+def add_links_to_parent_hooks(parent, child, parents, children):
+    with open(f'hooks/{parents}.py', 'r') as source:
+        tree = parse_module(source.read())
+    
+    inserter = ParentLinksInserter(parent, child, parents, children)
+    new_tree = tree.visit(inserter)
+    
+    with open(f'hooks/{parents}.py', 'w') as source:
+        source.write(new_tree.code)
+
+
 def add_to_domain_init(parent, child, parents, children):
     with open('domain/__init__.py', 'r') as source:
         tree = parse_module(source.read())
@@ -335,6 +1986,15 @@ def add_to_domain_init(parent, child, parents, children):
         source.write(new_tree.code)
 
 
+def add_to_domain_child(parent, child, parents, children):
+    with open(f'domain/{children}.py', 'r') as source:
+        tree = parse_module(source.read())
+    
+    inserter = DomainChildrenDefinitionInserter(parent, child, parents, children)
+    new_tree = tree.visit(inserter)
+    
+    with open(f'domain/{children}.py', 'w') as source:
+        source.write(new_tree.code)
 
 
 def main():
@@ -347,53 +2007,12 @@ def main():
     child, children = singular, plural = get_pair(args.child)  # TODO: validate, safe name, etc.
 
     if os.path.exists('eve_service.py') and os.path.exists('domain'):
-        print(f'Creating link rel from {child} (child) to {parent} (parent)')
-        print('Until this is automated, please do the following manually:')
-        print()
+        print(f'Creating link rel from {parent} (parent) to {child} (child)')
+
         add_to_domain_init(parent, child, parents, children)
-        print(f'''- Add to domain.__init__
-    '{parents}_{children}': {{
-        'schema': {children}.SCHEMA,
-        'url': '{parents}/<regex("[a-f0-9]{{24}}"):_{parent}_ref>/{children}',
-        'resource_title': '{children}',
-        'datasource': {{'source': '{children}'}}
-    }},
-
-- Add to domain.{child}
-    '_{parent}_ref': {{
-        'type': 'objectid',
-        'data_relation': {{
-            'resource': '{parents}',
-            'embeddable': True
-        }}
-    }}
-    
-- Add to hooks.{parent}._add_links_to_{parent}({parent})
-    rink['_links']['{children}'] = {{
-        'href': '/{parents}/{{0}}/{children}'.format({parent}['_id']),
-        'title': '{children}'
-    }}
-
-- Add to hooks.{child}._add_links_to_{child}({child})
-    if {child}.get('_{parent}_ref'):
-        {child}['_links']['parent'] = {{
-            'href': '/{parents}/{{0}}'.format({child}['_{parent}_ref']),
-            'title': '{parents}'
-        }}
-        {child}['_links']['collection'] = {{
-            'href': '/{parents}/{{0}}/{children}'.format({child}['_{parent}_ref']),
-            'title': '{parent}_{children}'
-        }}
-    else:
-        {child}['_links']['parent'] = {{
-            'href': '/',
-            'title': 'home'
-        }}
-        {child}['_links']['collection'] = {{
-            'href': '/{children}',
-            'title': '{children}'
-        }}
-''')
+        add_to_domain_child(parent, child, parents, children)
+        add_links_to_parent_hooks(parent, child, parents, children)
+        add_links_to_child_hooks(parent, child, parents, children)
 
 
 if __name__ == '__main__':
