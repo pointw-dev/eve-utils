@@ -1430,7 +1430,7 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
     def make_parent_ref(self):
         return DictElement(
             key=SimpleString(
-                value="'_{self.parent}_ref'",
+                value=f"'_{self.parent}_ref'",
                 lpar=[],
                 rpar=[],
             ),
