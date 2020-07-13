@@ -4,12 +4,13 @@ from setuptools import setup
 # TODO: pull PyInstaller out of packages, make it a command (mkwin32?)
 # TODO: remove python 2.7 compatibilities (six, .format(), etc.)
 # TODO: doco CORS
+# TODO: SMTP_HOST/recipients
 
 bin = glob('bin/*')
 
 setup(
     name='eve-utils',
-    version='0.6.5',
+    version='0.6.6',
     description='Templates and scripts to rapidly spin up an Eve-based API.',
     long_description=open('README.rst').read(),
     license='MIT',

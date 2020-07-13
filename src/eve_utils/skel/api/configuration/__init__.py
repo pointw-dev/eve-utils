@@ -36,14 +36,13 @@ SETTINGS = {
     'ES_MONGO_PORT': os.environ.get('ES_MONGO_PORT', 27017),
     'ES_MONGO_DBNAME': os.environ.get('ES_MONGO_DBNAME', '{$project_name}'),
     'ES_API_PORT': os.environ.get('ES_API_PORT', 2112),
-    'ES_CMS_ADAPTER': os.environ.get('ES_CMS_ADAPTER', 'ConsoleOnly'),
     'ES_INSTANCE_NAME': os.environ.get('ES_INSTANCE_NAME', socket.gethostname()),
     'ES_TRACE_LOGGING': os.environ.get('ES_TRACE_LOGGING', 'Enabled'),
     'ES_PAGINATION_LIMIT': os.environ.get('ES_PAGINATION_LIMIT', 1000),
     'ES_PAGINATION_DEFAULT': os.environ.get('ES_PAGINATION_DEFAULT', 500),
     'SMTP_HOST': os.environ.get('SMTP_HOST', 'internalmail.cri.com'),
     'SMTP_PORT': os.environ.get('SMTP_PORT', 25),
-    'EMAIL_RECIPIENTS': os.environ.get('EMAIL_RECIPIENTS', 'errors@cri.com, michael.ottoson@cri.com')
+    'EMAIL_RECIPIENTS': os.environ.get('EMAIL_RECIPIENTS', 'michael@pointw.com')
 }
 
 # optional settings...
