@@ -338,7 +338,6 @@ def add_hooks(app):
     app.on_fetched_item_{plural} += _add_links_to_{singular}
     app.on_fetched_resource_{plural} += _add_links_to_{plural}_collection
     app.on_post_POST_{plural} += _post_{plural}
-    app.on_post_POST_rinks_{plural} += _post_{plural}
 
 
 @trace

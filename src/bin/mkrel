@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# xcopy ..\back . /sY && upd.bat && mkrel venue devices
 
 import os
 import argparse
@@ -39,19 +38,23 @@ class ChildLinksInserter(CSTTransformer):
         self.children = children
 
     def leave_FunctionDef(self, original_node, updated_node):
-        if not original_node.name.value == f'_add_links_to_{self.child}':
+        if (not original_node.name.value == f'_add_links_to_{self.child}') and (not original_node.name.value == 'add_hooks'):
             return original_node
-            
+
         new_body = []
         for item in original_node.body.body:
             new_body.append(item)
-        new_body.append(self.make_parent_link())    
+
+        if original_node.name.value == f'_add_links_to_{self.child}':
+            new_body.append(self.make_parent_link())
+        if original_node.name.value == 'add_hooks':
+            new_body.extend(self.add_rel_hooks())
 
         return updated_node.with_changes(
             body=updated_node.body.with_changes(
                 body=new_body
             )
-        )        
+        )
 
     def make_parent_link(self):
         return If(
@@ -1061,7 +1064,177 @@ class ChildLinksInserter(CSTTransformer):
             ),
         )
 
-    
+    def add_rel_hooks(self):
+        return [
+            SimpleStatementLine(
+                body=[
+                    AugAssign(
+                        target=Attribute(
+                            value=Name(
+                                value='app',
+                                lpar=[],
+                                rpar=[],
+                            ),
+                            attr=Name(
+                                value=f'on_fetched_item_{self.parents}_{self.children}',
+                                lpar=[],
+                                rpar=[],
+                            ),
+                            dot=Dot(
+                                whitespace_before=SimpleWhitespace(
+                                    value='',
+                                ),
+                                whitespace_after=SimpleWhitespace(
+                                    value='',
+                                ),
+                            ),
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        operator=AddAssign(
+                            whitespace_before=SimpleWhitespace(
+                                value=' ',
+                            ),
+                            whitespace_after=SimpleWhitespace(
+                                value=' ',
+                            ),
+                        ),
+                        value=Name(
+                            value=f'_add_links_to_{self.child}',
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        semicolon=MaybeSentinel.DEFAULT,
+                    ),
+                ],
+                leading_lines=[
+                    EmptyLine(
+                        indent=False,
+                        whitespace=SimpleWhitespace(
+                            value='',
+                        ),
+                        comment=None,
+                        newline=Newline(
+                            value=None,
+                        ),
+                    ),
+                ],
+                trailing_whitespace=TrailingWhitespace(
+                    whitespace=SimpleWhitespace(
+                        value='',
+                    ),
+                    comment=None,
+                    newline=Newline(
+                        value=None,
+                    ),
+                ),
+            ),
+            SimpleStatementLine(
+                body=[
+                    AugAssign(
+                        target=Attribute(
+                            value=Name(
+                                value='app',
+                                lpar=[],
+                                rpar=[],
+                            ),
+                            attr=Name(
+                                value=f'on_fetched_resource_{self.parents}_{self.children}',
+                                lpar=[],
+                                rpar=[],
+                            ),
+                            dot=Dot(
+                                whitespace_before=SimpleWhitespace(
+                                    value='',
+                                ),
+                                whitespace_after=SimpleWhitespace(
+                                    value='',
+                                ),
+                            ),
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        operator=AddAssign(
+                            whitespace_before=SimpleWhitespace(
+                                value=' ',
+                            ),
+                            whitespace_after=SimpleWhitespace(
+                                value=' ',
+                            ),
+                        ),
+                        value=Name(
+                            value=f'_add_links_to_{self.children}_collection',
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        semicolon=MaybeSentinel.DEFAULT,
+                    ),
+                ],
+                leading_lines=[],
+                trailing_whitespace=TrailingWhitespace(
+                    whitespace=SimpleWhitespace(
+                        value='',
+                    ),
+                    comment=None,
+                    newline=Newline(
+                        value=None,
+                    ),
+                ),
+            ),
+            SimpleStatementLine(
+                body=[
+                    AugAssign(
+                        target=Attribute(
+                            value=Name(
+                                value='app',
+                                lpar=[],
+                                rpar=[],
+                            ),
+                            attr=Name(
+                                value=f'on_post_POST_{self.parents}_{self.children}',
+                                lpar=[],
+                                rpar=[],
+                            ),
+                            dot=Dot(
+                                whitespace_before=SimpleWhitespace(
+                                    value='',
+                                ),
+                                whitespace_after=SimpleWhitespace(
+                                    value='',
+                                ),
+                            ),
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        operator=AddAssign(
+                            whitespace_before=SimpleWhitespace(
+                                value=' ',
+                            ),
+                            whitespace_after=SimpleWhitespace(
+                                value=' ',
+                            ),
+                        ),
+                        value=Name(
+                            value=f'_post_{self.children}',
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        semicolon=MaybeSentinel.DEFAULT,
+                    ),
+                ],
+                leading_lines=[],
+                trailing_whitespace=TrailingWhitespace(
+                    whitespace=SimpleWhitespace(
+                        value='',
+                    ),
+                    comment=None,
+                    newline=Newline(
+                        value=None,
+                    ),
+                ),
+            )
+        ]
+
 
 
 
@@ -1077,11 +1250,11 @@ class ParentLinksInserter(CSTTransformer):
     def leave_FunctionDef(self, original_node, updated_node):
         if not original_node.name.value == f'_add_links_to_{self.parent}':
             return original_node
-            
+
         new_body = []
         for item in original_node.body.body:
             new_body.append(item)
-        new_body.append(self.make_children_link())    
+        new_body.append(self.make_children_link())
 
         return updated_node.with_changes(
             body=updated_node.body.with_changes(
@@ -1354,7 +1527,7 @@ class ParentLinksInserter(CSTTransformer):
                     value=None,
                 ),
             ),
-        ) 
+        )
 
 
 
@@ -1369,20 +1542,20 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
     def visit_SimpleStatementLine(self, node):
         if not isinstance(node.body[0], Assign):
             return False
-            
+
         if not node.body[0].targets[0].target.value == 'SCHEMA':
             return False
-            
+
         return True
-        
+
 
     def leave_Assign(self, original_node, updated_node):
         new_elements = []
         for item in original_node.value.elements[:-1]:
             new_elements.append(item)
-        new_elements.append(original_node.value.elements[-1].with_changes (comma=get_comma()))        
+        new_elements.append(original_node.value.elements[-1].with_changes (comma=get_comma()))
         new_elements.append(self.make_parent_ref())
-        
+
         members = Dict(elements=new_elements,
                 lbrace=LeftCurlyBrace(
                     whitespace_after=ParenthesizedWhitespace(
@@ -1423,9 +1596,9 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
                 lpar=[],
                 rpar=[],
             )
-            
+
         return updated_node.with_changes (value=members)
-            
+
 
     def make_parent_ref(self):
         return DictElement(
@@ -1652,21 +1825,21 @@ class DomainDefinitionInserter(CSTTransformer):
     def visit_SimpleStatementLine(self, node):
         if not isinstance(node.body[0], Assign):
             return False
-            
+
         if not node.body[0].targets[0].target.value == 'DOMAIN_RELATIONS':
             return False
-            
+
         return True
-        
+
 
     def leave_Assign(self, original_node, updated_node):
         new_elements = []
         if original_node.value.elements:
             for item in original_node.value.elements[:-1]:
                 new_elements.append(item)
-            new_elements.append(original_node.value.elements[-1].with_changes (comma=get_comma()))        
-        new_elements.append(self.make_domain_relation())    
-        
+            new_elements.append(original_node.value.elements[-1].with_changes (comma=get_comma()))
+        new_elements.append(self.make_domain_relation())
+
         relations = Dict(elements=new_elements,
                 lbrace=LeftCurlyBrace(
                     whitespace_after=ParenthesizedWhitespace(
@@ -1707,7 +1880,7 @@ class DomainDefinitionInserter(CSTTransformer):
                 lpar=[],
                 rpar=[],
             )
-            
+
         return updated_node.with_changes (value=relations)
 
 
@@ -1949,17 +2122,17 @@ class DomainDefinitionInserter(CSTTransformer):
             ),
             whitespace_after_colon=SimpleWhitespace(
                 value=' ',
-            ),
+            )
         )
 
-        
+
 def add_links_to_child_hooks(parent, child, parents, children):
     with open(f'hooks/{children}.py', 'r') as source:
         tree = parse_module(source.read())
-    
+
     inserter = ChildLinksInserter(parent, child, parents, children)
     new_tree = tree.visit(inserter)
-    
+
     with open(f'hooks/{children}.py', 'w') as source:
         source.write(new_tree.code)
 
@@ -1967,10 +2140,10 @@ def add_links_to_child_hooks(parent, child, parents, children):
 def add_links_to_parent_hooks(parent, child, parents, children):
     with open(f'hooks/{parents}.py', 'r') as source:
         tree = parse_module(source.read())
-    
+
     inserter = ParentLinksInserter(parent, child, parents, children)
     new_tree = tree.visit(inserter)
-    
+
     with open(f'hooks/{parents}.py', 'w') as source:
         source.write(new_tree.code)
 
@@ -1978,10 +2151,10 @@ def add_links_to_parent_hooks(parent, child, parents, children):
 def add_to_domain_init(parent, child, parents, children):
     with open('domain/__init__.py', 'r') as source:
         tree = parse_module(source.read())
-    
+
     inserter = DomainDefinitionInserter(parent, child, parents, children)
     new_tree = tree.visit(inserter)
-    
+
     with open('domain/__init__.py', 'w') as source:
         source.write(new_tree.code)
 
@@ -1989,10 +2162,10 @@ def add_to_domain_init(parent, child, parents, children):
 def add_to_domain_child(parent, child, parents, children):
     with open(f'domain/{children}.py', 'r') as source:
         tree = parse_module(source.read())
-    
+
     inserter = DomainChildrenDefinitionInserter(parent, child, parents, children)
     new_tree = tree.visit(inserter)
-    
+
     with open(f'domain/{children}.py', 'w') as source:
         source.write(new_tree.code)
 
