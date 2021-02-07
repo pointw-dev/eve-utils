@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!c:\envs\reeltimeads-api\scripts\python.exe
 
 import os
 import argparse
@@ -31,11 +31,12 @@ def get_comma():
 
 
 class ChildLinksInserter(CSTTransformer):
-    def __init__(self, parent, child, parents, children):
+    def __init__(self, parent, child, parents, children, parent_ref):
         self.parent = parent
         self.child = child
         self.parents = parents
         self.children = children
+        self.parent_ref = parent_ref
 
     def leave_FunctionDef(self, original_node, updated_node):
         if (not original_node.name.value == f'_add_links_to_{self.child}') and (not original_node.name.value == 'add_hooks'):
@@ -84,7 +85,7 @@ class ChildLinksInserter(CSTTransformer):
                 args=[
                     Arg(
                         value=SimpleString(
-                            value=f"'_{self.parent}_ref'",
+                            value=f"'{self.parent_ref}'",
                             lpar=[],
                             rpar=[],
                         ),
@@ -230,7 +231,7 @@ class ChildLinksInserter(CSTTransformer):
                                                                 SubscriptElement(
                                                                     slice=Index(
                                                                         value=SimpleString(
-                                                                            value=f"'_{self.parent}_ref'",
+                                                                            value=f"'{self.parent_ref}'",
                                                                             lpar=[],
                                                                             rpar=[],
                                                                         ),
@@ -495,7 +496,7 @@ class ChildLinksInserter(CSTTransformer):
                                                                 SubscriptElement(
                                                                     slice=Index(
                                                                         value=SimpleString(
-                                                                            value=f"'_{self.parent}_ref'",
+                                                                            value=f"'{self.parent_ref}'",
                                                                             lpar=[],
                                                                             rpar=[],
                                                                         ),
@@ -1241,11 +1242,12 @@ class ChildLinksInserter(CSTTransformer):
 
 
 class ParentLinksInserter(CSTTransformer):
-    def __init__(self, parent, child, parents, children):
+    def __init__(self, parent, child, parents, children, parent_ref):
         self.parent = parent
         self.child = child
         self.parents = parents
         self.children = children
+        self.parent_ref = parent_ref
 
     def leave_FunctionDef(self, original_node, updated_node):
         if not original_node.name.value == f'_add_links_to_{self.parent}':
@@ -1533,11 +1535,12 @@ class ParentLinksInserter(CSTTransformer):
 
 
 class DomainChildrenDefinitionInserter(CSTTransformer):
-    def __init__(self, parent, child, parents, children):
+    def __init__(self, parent, child, parents, children, parent_ref):
         self.parent = parent
         self.child = child
         self.parents = parents
         self.children = children
+        self.parent_ref = parent_ref
 
     def visit_SimpleStatementLine(self, node):
         if not isinstance(node.body[0], Assign):
@@ -1603,7 +1606,7 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
     def make_parent_ref(self):
         return DictElement(
             key=SimpleString(
-                value=f"'_{self.parent}_ref'",
+                value=f"'{self.parent_ref}'",
                 lpar=[],
                 rpar=[],
             ),
@@ -1816,11 +1819,12 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
 
 
 class DomainDefinitionInserter(CSTTransformer):
-    def __init__(self, parent, child, parents, children):
+    def __init__(self, parent, child, parents, children, parent_ref):
         self.parent = parent
         self.child = child
         self.parents = parents
         self.children = children
+        self.parent_ref = parent_ref
 
     def visit_SimpleStatementLine(self, node):
         if not isinstance(node.body[0], Assign):
@@ -1956,7 +1960,7 @@ class DomainDefinitionInserter(CSTTransformer):
                             rpar=[],
                         ),
                         value=SimpleString(
-                            value=f'\'{self.parents}/<regex("[a-f0-9]{{24}}"):_{self.parent}_ref>/{self.children}\'',
+                            value=f'\'{self.parents}/<regex("[a-f0-9]{{24}}"):{self.parent_ref}>/{self.children}\'',
                             lpar=[],
                             rpar=[],
                         ),
@@ -2126,44 +2130,44 @@ class DomainDefinitionInserter(CSTTransformer):
         )
 
 
-def add_links_to_child_hooks(parent, child, parents, children):
+def add_links_to_child_hooks(parent, child, parents, children, parent_ref):
     with open(f'hooks/{children}.py', 'r') as source:
         tree = parse_module(source.read())
 
-    inserter = ChildLinksInserter(parent, child, parents, children)
+    inserter = ChildLinksInserter(parent, child, parents, children, parent_ref)
     new_tree = tree.visit(inserter)
 
     with open(f'hooks/{children}.py', 'w') as source:
         source.write(new_tree.code)
 
 
-def add_links_to_parent_hooks(parent, child, parents, children):
+def add_links_to_parent_hooks(parent, child, parents, children, parent_ref):
     with open(f'hooks/{parents}.py', 'r') as source:
         tree = parse_module(source.read())
 
-    inserter = ParentLinksInserter(parent, child, parents, children)
+    inserter = ParentLinksInserter(parent, child, parents, children, parent_ref)
     new_tree = tree.visit(inserter)
 
     with open(f'hooks/{parents}.py', 'w') as source:
         source.write(new_tree.code)
 
 
-def add_to_domain_init(parent, child, parents, children):
+def add_to_domain_init(parent, child, parents, children, parent_ref):
     with open('domain/__init__.py', 'r') as source:
         tree = parse_module(source.read())
 
-    inserter = DomainDefinitionInserter(parent, child, parents, children)
+    inserter = DomainDefinitionInserter(parent, child, parents, children, parent_ref)
     new_tree = tree.visit(inserter)
 
     with open('domain/__init__.py', 'w') as source:
         source.write(new_tree.code)
 
 
-def add_to_domain_child(parent, child, parents, children):
+def add_to_domain_child(parent, child, parents, children, parent_ref):
     with open(f'domain/{children}.py', 'r') as source:
         tree = parse_module(source.read())
 
-    inserter = DomainChildrenDefinitionInserter(parent, child, parents, children)
+    inserter = DomainChildrenDefinitionInserter(parent, child, parents, children, parent_ref)
     new_tree = tree.visit(inserter)
 
     with open(f'domain/{children}.py', 'w') as source:
@@ -2174,18 +2178,20 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('parent', help='The name of the parent resource to create the link from.')
     parser.add_argument('child', help='The name of the child resource to create the link to.')
+    parser.add_argument('-p', '--as_parent_ref', help='change name of related rel to parent, literally (instead of the name of the parent)', action='store_true')
 
     args = parser.parse_args()
     parent, parents = singular, plural = get_pair(args.parent)  # TODO: validate, safe name, etc.
     child, children = singular, plural = get_pair(args.child)  # TODO: validate, safe name, etc.
+    parent_ref = '_parent_ref' if args.as_parent_ref else f'_{parent}_ref'
 
     if os.path.exists('eve_service.py') and os.path.exists('domain'):
         print(f'Creating link rel from {parent} (parent) to {child} (child)')
 
-        add_to_domain_init(parent, child, parents, children)
-        add_to_domain_child(parent, child, parents, children)
-        add_links_to_parent_hooks(parent, child, parents, children)
-        add_links_to_child_hooks(parent, child, parents, children)
+        add_to_domain_init(parent, child, parents, children, parent_ref)
+        add_to_domain_child(parent, child, parents, children, parent_ref)
+        add_links_to_parent_hooks(parent, child, parents, children, parent_ref)
+        add_links_to_child_hooks(parent, child, parents, children, parent_ref)
 
 
 if __name__ == '__main__':
