@@ -1,7 +1,7 @@
 import sys
 from libcst import *
 
-if len(sys.argv) < 1:
+if len(sys.argv) < 2:
     print('USAGE: src_to_cst.py <python file>')
     quit(1)
 

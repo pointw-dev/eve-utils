@@ -14,14 +14,16 @@ if 'ES_MONGO_USERNAME' in SETTINGS.keys():
 if 'ES_MONGO_PASSWORD' in SETTINGS.keys():
     MONGO_PASSWORD = SETTINGS.get('ES_MONGO_PASSWORD')
 
-# the default BLACKLIST is ['$where', '$regex'] - this line turns on regex
+# the default BLACKLIST is ['$where', '$regex'] - the following line turns on regex
 MONGO_QUERY_BLACKLIST = ['$where']
 
 RENDERERS = ['eve.render.JSONRenderer']  # removed eve.render.XMLRenderer
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
-PAGINATION_LIMIT = 1000
-PAGINATION_DEFAULT = 500
+PAGINATION_LIMIT = 3000
+PAGINATION_DEFAULT = 1000
+OPTIMIZE_PAGINATION_FOR_SPEED = True
+
 
 # http://python-eve.org/features.html#operations-log
 # OPLOG = True
@@ -55,5 +57,3 @@ EXTENDED_MEDIA_INFO = ['content_type', 'name', 'length']
 DOMAIN = domain.DOMAIN
 
 UPLOAD_FOLDER = 'uploads/'
-
-OPTIMIZE_PAGINATION_FOR_SPEED = True

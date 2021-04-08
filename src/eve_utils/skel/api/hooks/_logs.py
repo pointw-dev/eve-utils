@@ -14,7 +14,6 @@ LOG = logging.getLogger('hooks.logs')
 @trace
 def add_hooks(app):
     """Wire up the events for logging"""
-    # TODO: delete cleanup
     app.on_post_GET += _log_request
     app.on_post_POST += _log_request
     app.on_post_PATCH += _log_request
@@ -24,16 +23,16 @@ def add_hooks(app):
     @app.route('/_logging', methods=['GET'])
     def get_logging_config():
         """Returns the current verbosity levels for logging handlers."""
-#        if not app.auth.authorized(None, '_logging', 'GET'):
-#            return make_error_response('Please provide proper credentials', 401)
+        if not app.auth.authorized(None, '_logging', 'GET'):
+            return make_error_response('Please provide proper credentials', 401)
 
         return _get_logging_config()
 
     @app.route('/_logging', methods=['PUT'])
     def put_logging_config():
         """PUT logging level to handlers."""
-#        if not app.auth.authorized(None, '_logging', 'PUT'):
-#            return make_error_response('Please provide proper credentials', 401)
+        if not app.auth.authorized(None, '_logging', 'PUT'):
+            return make_error_response('Please provide proper credentials', 401)
 
         return _put_logging_config(request)
 
@@ -71,11 +70,11 @@ def _put_logging_config(request):
         for key in payload:
             handler = [x for x in logger.handlers if x.name == key]
             if not handler:
-                raise ValueError('{0} is not a valid log handler'.format(key))
+                raise ValueError(f'{key} is not a valid log handler')
             try:
                 getattr(logging, payload[key])
             except AttributeError:
-                raise ValueError('{0} is not a valid log verbosity level'.format(payload[key]))
+                raise ValueError(f'{payload[key]} is not a valid log verbosity level')
 
         # now it's safe to iterate and change levels
         for key in payload:

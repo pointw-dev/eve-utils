@@ -12,6 +12,17 @@ VERSION = '0.1.0'
 # TODO: organize into functions!
 
 
+def is_enabled(setting_key):
+    setting_value = SETTINGS.get(setting_key)
+    if not setting_value:
+        return False
+    return setting_value[0].lower() in 'yte'
+    # i.e. the following means setting is enabled:
+    # - 'Yes' or 'yes' or 'Y' or 'y'
+    # - 'True' or 'true' or 'T' or 't'
+    # - 'Enabled' or 'enabled' or 'E' or 'e'
+
+
 def set_optional_setting(var):
     if os.environ.get(var):
         SETTINGS[var] = os.environ.get(var)
@@ -80,17 +91,15 @@ werkzeug_log = logging.getLogger('werkzeug')
 werkzeug_log.setLevel(logging.ERROR)
 
 LOG = logging.getLogger('configuration')
-
-
 LOG.info('%s version:  %s', API_NAME, VERSION)
 LOG.info('Eve version:      %s', eve_version)
 LOG.info('Cerberus version: %s', cerberus_version)
 LOG.info('Python version:   %s', platform.sys.version)
 
-EMAIL_FORMAT = '''%(levelname)s sent from {0} instance "{1}" (hostname: {2})
+EMAIL_FORMAT = f'''%(levelname)s sent from {API_NAME} instance "{SETTINGS.get('ES_INSTANCE_NAME')}" (hostname: {socket.gethostname()})
 
 %(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s
-'''.format(API_NAME, SETTINGS.get('ES_INSTANCE_NAME'), socket.gethostname())
+'''
 
 EMAIL_FORMAT += f'''
 {API_NAME} version:  {VERSION}
@@ -103,8 +112,8 @@ Python version:   {platform.sys.version}
 for setting in sorted(SETTINGS):
     key = setting.upper()
     if ('PASSWORD' not in key) and ('SECRET' not in key):
-        LOG.info('%s: %s', setting, SETTINGS[setting])
-        EMAIL_FORMAT += '{0}: {1}\n'.format(setting, SETTINGS[setting])
+        LOG.info(f'{setting}: {SETTINGS[setting]}')
+        EMAIL_FORMAT += f'{setting}: {SETTINGS[setting]}\n'
 EMAIL_FORMAT += '\n\n'
 
 LOGGER = logging.getLogger()

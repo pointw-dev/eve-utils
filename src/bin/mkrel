@@ -196,32 +196,13 @@ class ChildLinksInserter(CSTTransformer):
                                                 lpar=[],
                                                 rpar=[],
                                             ),
-                                            value=Call(
-                                                func=Attribute(
-                                                    value=SimpleString(
-                                                        value=f"'/{self.parents}/{{0}}'",
-                                                        lpar=[],
-                                                        rpar=[],
+                                            value=FormattedString(  # ding (make_parent_link, 1)
+                                                parts=[
+                                                    FormattedStringText(
+                                                        value=f'/{self.parents}/',
                                                     ),
-                                                    attr=Name(
-                                                        value='format',
-                                                        lpar=[],
-                                                        rpar=[],
-                                                    ),
-                                                    dot=Dot(
-                                                        whitespace_before=SimpleWhitespace(
-                                                            value='',
-                                                        ),
-                                                        whitespace_after=SimpleWhitespace(
-                                                            value='',
-                                                        ),
-                                                    ),
-                                                    lpar=[],
-                                                    rpar=[],
-                                                ),
-                                                args=[
-                                                    Arg(
-                                                        value=Subscript(
+                                                    FormattedStringExpression(
+                                                        expression=Subscript(
                                                             value=Name(
                                                                 value=f'{self.child}',
                                                                 lpar=[],
@@ -231,7 +212,7 @@ class ChildLinksInserter(CSTTransformer):
                                                                 SubscriptElement(
                                                                     slice=Index(
                                                                         value=SimpleString(
-                                                                            value=f"'{self.parent_ref}'",
+                                                                            value=f'"{self.parent_ref}"',
                                                                             lpar=[],
                                                                             rpar=[],
                                                                         ),
@@ -255,26 +236,21 @@ class ChildLinksInserter(CSTTransformer):
                                                                 value='',
                                                             ),
                                                         ),
-                                                        keyword=None,
-                                                        equal=MaybeSentinel.DEFAULT,
-                                                        comma=MaybeSentinel.DEFAULT,
-                                                        star='',
-                                                        whitespace_after_star=SimpleWhitespace(
+                                                        conversion=None,
+                                                        format_spec=None,
+                                                        whitespace_before_expression=SimpleWhitespace(
                                                             value='',
                                                         ),
-                                                        whitespace_after_arg=SimpleWhitespace(
+                                                        whitespace_after_expression=SimpleWhitespace(
                                                             value='',
                                                         ),
+                                                        equal=None,
                                                     ),
                                                 ],
+                                                start="f'",
+                                                end="'",
                                                 lpar=[],
                                                 rpar=[],
-                                                whitespace_after_func=SimpleWhitespace(
-                                                    value='',
-                                                ),
-                                                whitespace_before_args=SimpleWhitespace(
-                                                    value='',
-                                                ),
                                             ),
                                             comma=Comma(
                                                 whitespace_before=SimpleWhitespace(
@@ -461,32 +437,13 @@ class ChildLinksInserter(CSTTransformer):
                                                 lpar=[],
                                                 rpar=[],
                                             ),
-                                            value=Call(
-                                                func=Attribute(
-                                                    value=SimpleString(
-                                                        value=f"'/{self.parents}/{{0}}/{self.children}'",
-                                                        lpar=[],
-                                                        rpar=[],
+                                            value=FormattedString(  # ding (make_parent_link, 2)
+                                                parts=[
+                                                    FormattedStringText(
+                                                        value=f'/{self.parents}/',
                                                     ),
-                                                    attr=Name(
-                                                        value='format',
-                                                        lpar=[],
-                                                        rpar=[],
-                                                    ),
-                                                    dot=Dot(
-                                                        whitespace_before=SimpleWhitespace(
-                                                            value='',
-                                                        ),
-                                                        whitespace_after=SimpleWhitespace(
-                                                            value='',
-                                                        ),
-                                                    ),
-                                                    lpar=[],
-                                                    rpar=[],
-                                                ),
-                                                args=[
-                                                    Arg(
-                                                        value=Subscript(
+                                                    FormattedStringExpression(
+                                                        expression=Subscript(
                                                             value=Name(
                                                                 value=f'{self.child}',
                                                                 lpar=[],
@@ -496,7 +453,7 @@ class ChildLinksInserter(CSTTransformer):
                                                                 SubscriptElement(
                                                                     slice=Index(
                                                                         value=SimpleString(
-                                                                            value=f"'{self.parent_ref}'",
+                                                                            value=f'"{self.parent_ref}"',
                                                                             lpar=[],
                                                                             rpar=[],
                                                                         ),
@@ -520,26 +477,24 @@ class ChildLinksInserter(CSTTransformer):
                                                                 value='',
                                                             ),
                                                         ),
-                                                        keyword=None,
-                                                        equal=MaybeSentinel.DEFAULT,
-                                                        comma=MaybeSentinel.DEFAULT,
-                                                        star='',
-                                                        whitespace_after_star=SimpleWhitespace(
+                                                        conversion=None,
+                                                        format_spec=None,
+                                                        whitespace_before_expression=SimpleWhitespace(
                                                             value='',
                                                         ),
-                                                        whitespace_after_arg=SimpleWhitespace(
+                                                        whitespace_after_expression=SimpleWhitespace(
                                                             value='',
                                                         ),
+                                                        equal=None,
+                                                    ),
+                                                    FormattedStringText(
+                                                        value=f'/{self.children}',
                                                     ),
                                                 ],
+                                                start="f'",
+                                                end="'",
                                                 lpar=[],
                                                 rpar=[],
-                                                whitespace_after_func=SimpleWhitespace(
-                                                    value='',
-                                                ),
-                                                whitespace_before_args=SimpleWhitespace(
-                                                    value='',
-                                                ),
                                             ),
                                             comma=Comma(
                                                 whitespace_before=SimpleWhitespace(
@@ -1349,32 +1304,13 @@ class ParentLinksInserter(CSTTransformer):
                                     lpar=[],
                                     rpar=[],
                                 ),
-                                value=Call(
-                                    func=Attribute(
-                                        value=SimpleString(
-                                            value=f"'/{self.parents}/{{0}}/{self.children}'",
-                                            lpar=[],
-                                            rpar=[],
+                                value=FormattedString(  # ding (make_children_link)
+                                    parts=[
+                                        FormattedStringText(
+                                            value=f'/{self.parents}/',
                                         ),
-                                        attr=Name(
-                                            value='format',
-                                            lpar=[],
-                                            rpar=[],
-                                        ),
-                                        dot=Dot(
-                                            whitespace_before=SimpleWhitespace(
-                                                value='',
-                                            ),
-                                            whitespace_after=SimpleWhitespace(
-                                                value='',
-                                            ),
-                                        ),
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    args=[
-                                        Arg(
-                                            value=Subscript(
+                                        FormattedStringExpression(
+                                            expression=Subscript(
                                                 value=Name(
                                                     value=f'{self.parent}',
                                                     lpar=[],
@@ -1384,7 +1320,7 @@ class ParentLinksInserter(CSTTransformer):
                                                     SubscriptElement(
                                                         slice=Index(
                                                             value=SimpleString(
-                                                                value="'_id'",
+                                                                value='"_id"',  ####### ding
                                                                 lpar=[],
                                                                 rpar=[],
                                                             ),
@@ -1408,26 +1344,24 @@ class ParentLinksInserter(CSTTransformer):
                                                     value='',
                                                 ),
                                             ),
-                                            keyword=None,
-                                            equal=MaybeSentinel.DEFAULT,
-                                            comma=MaybeSentinel.DEFAULT,
-                                            star='',
-                                            whitespace_after_star=SimpleWhitespace(
+                                            conversion=None,
+                                            format_spec=None,
+                                            whitespace_before_expression=SimpleWhitespace(
                                                 value='',
                                             ),
-                                            whitespace_after_arg=SimpleWhitespace(
+                                            whitespace_after_expression=SimpleWhitespace(
                                                 value='',
                                             ),
+                                            equal=None,
+                                        ),
+                                        FormattedStringText(
+                                            value=f'/{self.children}',
                                         ),
                                     ],
+                                    start="f'",
+                                    end="'",
                                     lpar=[],
                                     rpar=[],
-                                    whitespace_after_func=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    whitespace_before_args=SimpleWhitespace(
-                                        value='',
-                                    ),
                                 ),
                                 comma=Comma(
                                     whitespace_before=SimpleWhitespace(

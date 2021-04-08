@@ -6,6 +6,11 @@ import sys  # TODO: replace with argparser
 
 import eve_utils
 
+if len(sys.argv) < 2:
+    print('usage: mkdocker api-name')
+    print('mkdocker: error: the following arguments are required: api-name')
+    quit(1)
+
 project_name = sys.argv[1]  # TODO: ensure valid dir name, no spaces, other safety considerations
 print(f'Creating docker files for {project_name}')
 

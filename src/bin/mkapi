@@ -1,33 +1,49 @@
 #!/usr/bin/env python
 
 import os
+import argparse
 from distutils.dir_util import copy_tree, remove_tree
-import sys  # TODO: replace with argparser
+from subprocess import Popen
 
 import eve_utils
 
-project_name = sys.argv[1]  # TODO: ensure valid dir name, no spaces, other safety considerations
-print(f'Creating {project_name} api')
+dev make_api(project_name):
+    print(f'Creating {project_name} api')
 
-skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/api')
+    skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/api')
 
-os.mkdir(project_name)  # TODO: ensure doesn't already exist, etc
-copy_tree(skel, project_name)
+    os.mkdir(project_name)  # TODO: ensure doesn't already exist, etc
+    copy_tree(skel, project_name)
 
-# TODO: can the following remove_tree calls be obviated if skel is packaged differently?
-remove_tree(os.path.join(project_name, '__pycache__'))
-remove_tree(os.path.join(project_name, 'configuration', '__pycache__'))
-remove_tree(os.path.join(project_name, 'domain', '__pycache__'))
-remove_tree(os.path.join(project_name, 'hooks', '__pycache__'))
-remove_tree(os.path.join(project_name, 'log_trace', '__pycache__'))
-remove_tree(os.path.join(project_name, 'utils', '__pycache__'))
+    # TODO: can the following remove_tree calls be obviated if skel is packaged differently?
+    remove_tree(os.path.join(project_name, '__pycache__'))
+    remove_tree(os.path.join(project_name, 'configuration', '__pycache__'))
+    remove_tree(os.path.join(project_name, 'domain', '__pycache__'))
+    remove_tree(os.path.join(project_name, 'hooks', '__pycache__'))
+    remove_tree(os.path.join(project_name, 'log_trace', '__pycache__'))
+    remove_tree(os.path.join(project_name, 'utils', '__pycache__'))
 
-for dname, dirs, files in os.walk(project_name):
-    for fname in files:
-        fpath = os.path.join(dname, fname)
-        with open(fpath) as f:
-            s = f.read()
-        s = s.replace("{$project_name}", project_name)
-        with open(fpath, "w") as f:
-            f.write(s)
+    for dname, dirs, files in os.walk(project_name):
+        for fname in files:
+            fpath = os.path.join(dname, fname)
+            with open(fpath) as f:
+                s = f.read()
+            s = s.replace("{$project_name}", project_name)
+            with open(fpath, "w") as f:
+                f.write(s)
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('api_name', help='The name of the API to create.')
+    parser.add_argument('-d', '--with_docker', help='add Dockerfile and supporting files to deploy the API as a container', action='store_true')
+
+    args = parser.parse_args()
+    project_name = args.api_name)  # TODO: validate, safe name, etc.
+    make_api(project_name)
+    
+    if (args.with_docker):
+        Popen(f'python mkdocker {project_name}')
+
+
+if __name__ == '__main__':
+    main()

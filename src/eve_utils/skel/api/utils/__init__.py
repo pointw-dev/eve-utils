@@ -9,13 +9,14 @@ def make_error_response(message, code, issues=[], **kwargs):
         ex = kwargs.get('exception')
         LOG.exception(message, ex)
 
-        issues.append({
-            'exception': {
-                'name': type(ex).__name__,
-                'type': ".".join([type(ex).__module__, type(ex).__name__]),
-                'args': ex.args
-            }
-        })
+        if ex:
+            issues.append({
+                'exception': {
+                    'name': type(ex).__name__,
+                    'type': ".".join([type(ex).__module__, type(ex).__name__]),
+                    'args': ex.args
+                }
+            })
 
     resp = {
         '_status': 'ERR',
