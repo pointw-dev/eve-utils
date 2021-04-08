@@ -1,2 +1,2 @@
 @echo off
-python %~dp0mkapi %1
+python %~dp0mkapi %*
