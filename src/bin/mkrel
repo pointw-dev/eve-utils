@@ -1,4 +1,4 @@
-#!c:\envs\reeltimeads-api\scripts\python.exe
+#!/usr/bin/env python
 
 import os
 import argparse

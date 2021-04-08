@@ -38,11 +38,11 @@ def main():
     parser.add_argument('-d', '--with_docker', help='add Dockerfile and supporting files to deploy the API as a container', action='store_true')
 
     args = parser.parse_args()
-    project_name = args.api_name)  # TODO: validate, safe name, etc.
+    project_name = args.api_name  # TODO: validate, safe name, etc.
     make_api(project_name)
     
     if (args.with_docker):
-        Popen(f'python mkdocker {project_name}')
+        Popen(f'python add_docker {project_name}')
 
 
 if __name__ == '__main__':
