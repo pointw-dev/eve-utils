@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+
+import os
+import subprocess
+import sys
+import argparse
+from distutils.dir_util import copy_tree, remove_tree
+
+import importlib
+import eve_utils
+
+import subprocess
+import sys
+
+def install(package):
+    trigger = 'Successfully installed '
+
+    out = subprocess.check_output([sys.executable, "-m", "pip", "install", package]).decode('utf-8')
+    for line in out.split('\n'):
+        if line.startswith(trigger):
+            packages = line[len(trigger):].split(' ')
+            with open('requirements.txt', 'a') as f:
+                f.write('\n# start: added by add_auth\n')
+                
+                for installed_package in packages:
+                    hyphen = installed_package.rfind('-')
+                    f.write(f'{installed_package[:hyphen]}=={installed_package[hyphen+1:]}\n')
+
+                f.write('# end: added by add_auth\n')
+
+
+def import_path(path):
+    module_name = os.path.basename(path).replace('-', '_')
+    spec = importlib.util.spec_from_loader(
+        module_name,
+        importlib.machinery.SourceFileLoader(module_name, path)
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    sys.modules[module_name] = module
+    return module
+
+
+def remove_if_exists(folder):
+    if os.path.exists(folder):
+        remove_tree(folder)
+
+
+def add_auth(project_name):
+    print(f'Adding auth to {project_name} api')
+
+    skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/auth')
+
+    os.mkdir('auth')  # TODO: ensure doesn't already exist, etc
+    copy_tree(skel, 'auth')
+
+    # TODO: can the following remove_tree calls be obviated if skel is packaged differently?
+    # remove_if_exists(os.path.join(project_name, '__pycache__'))
+    # remove_if_exists(os.path.join(project_name, 'configuration', '__pycache__'))
+    # remove_if_exists(os.path.join(project_name, 'domain', '__pycache__'))
+    # remove_if_exists(os.path.join(project_name, 'hooks', '__pycache__'))
+    # remove_if_exists(os.path.join(project_name, 'log_trace', '__pycache__'))
+    # remove_if_exists(os.path.join(project_name, 'utils', '__pycache__'))
+
+    for dname, dirs, files in os.walk('auth'):
+        for fname in files:
+            fpath = os.path.join(dname, fname)
+            with open(fpath) as f:
+                s = f.read()
+            s = s.replace("{$project_name}", project_name)
+            with open(fpath, "w") as f:
+                f.write(s)
+
+
+def main():
+    if not os.path.exists('./requirements.txt'):
+        print('requirements.txt missing - must be run in the API folder')
+        quit(1)
+        
+    if not os.path.exists('./domain'):
+        print('domain folder missing - must be run in the API folder')
+        quit(2)
+        
+    if os.path.exists('./auth'):
+        print('auth folder already exists')
+        quit(3)
+        
+    project_name = os.path.basename(os.getcwd())
+    add_auth(project_name)
+    # install('authparser')
+    install('eve_negotiable_auth')
+    
+    print('auth modules added')
+    print('Please manually add to eve_service.py (until this is automated):')
+    print(' - from auth.es_auth import EveServiceAuth')
+    print(' - self._app = Eve(import_name=self._name, auth=EveServiceAuth)')
+
+
+if __name__ == '__main__':
+    main()
