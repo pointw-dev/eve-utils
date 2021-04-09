@@ -7,7 +7,7 @@ setup(
     name='eve-utils',
     version='0.7.2',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     license='MIT',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
