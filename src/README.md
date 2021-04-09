@@ -1,5 +1,4 @@
-eve-utils
-=========
+# eve-utils
 Templates and scripts to rapidly spin up a production-ready Eve-based API.
 
 > **Please note**:  although I currently use these tools to create production-ready APIs, the tools themselves are still under development.  Use at your own risk.
@@ -176,6 +175,11 @@ If you followed the above, be sure to clean up after playing around with your ne
 
     `image-build.bat`
 
+*  `add_auth`  - run this in the API folder. It will add a folder named ``auth`` with modules to add authorization to your API (docs to come)
+
+   * NOTE: the only supported IdP is [Auth0](https://auth0.com/) at the moment, but it will be fairly easy to manually tweak to use any OAuth2 JWT issuer. (I have used a forked [Glewlwyd](https://github.com/babelouest/glewlwyd) with very minimal changes)
+   
+     
 
 
 MORE TO COME!
