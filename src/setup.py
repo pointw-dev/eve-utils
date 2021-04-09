@@ -5,9 +5,9 @@ bin = glob('bin/*')
 
 setup(
     name='eve-utils',
-    version='0.8.0',
+    version='0.8.1',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
-    long_description=open('README.md').read(),
+    long_description=open('../README.md').read(),
     long_description_content_type='text/markdown',
     license='MIT',
     classifiers=[
@@ -21,7 +21,7 @@ setup(
         'Topic :: Software Development :: Code Generators',
         'Topic :: Utilities'
     ],
-    url='http://pointw.com',
+    url='https://pointw.com/rapid-api-creation-with-eve-utils/',
     author='Michael Ottoson',
     author_email='michael@pointw.com',
     packages=['eve_utils'],
