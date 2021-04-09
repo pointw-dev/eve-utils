@@ -4,7 +4,6 @@ chardet==3.0.4
 colorama==0.4.4
 docutils==0.15.2
 entrypoints==0.3
-eve-utils==0.7.1
 idna==2.8
 importlib-metadata==3.10.0
 inflect==4.1.0

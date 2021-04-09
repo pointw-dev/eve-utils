@@ -1,1 +1,1 @@
-from .utils import foobar
+from .utils import insert_import

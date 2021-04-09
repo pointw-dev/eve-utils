@@ -5,13 +5,13 @@ bin = glob('bin/*')
 
 setup(
     name='eve-utils',
-    version='0.7.4',
+    version='0.8.0',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     license='MIT',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
@@ -29,7 +29,7 @@ setup(
     install_requires=[
         'libcst',
         'inflect'
-    ],
+    ],    
     scripts=bin,
     zip_safe=False
 )

@@ -3,6 +3,7 @@
 import os
 import argparse
 import itertools
+from eve_utils import insert_import
 from libcst import *
 from singplu import get_pair
 
@@ -62,11 +63,9 @@ class DomainDefinitionInserter(CSTTransformer):
                 ),
             ),
         )
-        
-        new_body = []
-        for item in itertools.chain([updated_node.body[0], addition], updated_node.body[1:]):
-            new_body.append(item)
-        
+
+        new_body = insert_import(updated_node.body, addition)
+
         return updated_node.with_changes(
             body = new_body
         )
@@ -173,9 +172,7 @@ class HooksInserter(CSTTransformer):
             ),
         )
         
-        new_body = []
-        for item in itertools.chain([addition, updated_node.body[0]], updated_node.body[1:]):
-            new_body.append(item)
+        new_body = insert_import(updated_node.body, addition)
         
         return updated_node.with_changes(
             body = new_body
@@ -272,7 +269,7 @@ class HooksInserter(CSTTransformer):
         )
 
         new_body = []
-        for item in itertools.chain([addition, updated_node.body.body[0]], updated_node.body.body[1:]):
+        for item in itertools.chain(updated_node.body.body, [addition]):  # TODO: if addition is first, prepend with newline
             new_body.append(item)
             
         return updated_node.with_changes(

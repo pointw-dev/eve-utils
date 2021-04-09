@@ -66,6 +66,9 @@ def main():
         ad = import_path(add_docker_path)
         ad.add_docker(project_name)
 
+    print('Please run these two commands')
+    print(f'  cd {project_name}')
+    print('  pip install -r requirements.txt')
 
 if __name__ == '__main__':
     main()

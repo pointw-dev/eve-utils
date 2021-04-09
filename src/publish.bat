@@ -1,10 +1,27 @@
 @echo off
-rd dist /s/q >nul 2>nul
+if not exist dist\nul call build.bat
 
-grep -o version setup.py
+if "x%1"=="x" goto real
 
-python setup.py sdist bdist_wheel
+:test
+echo publishing to TEST PyPi
+twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+echo install with:
+echo pip install libcst
+echo pip install inflect
+echo pip install --index-url https://test.pypi.org/simple/ eve-utils
 
-echo About to upload to pypi (Ctrl+C to cancel)
-pause
+
+goto :end
+
+
+:real
+echo publishing to PROD PyPi
 twine upload dist/*
+echo install with:
+echo pip install eve-utils
+echo upgrade with:
+echo pip install --upgrade eve-utils
+
+:end
+

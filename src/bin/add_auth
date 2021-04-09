@@ -5,12 +5,160 @@ import subprocess
 import sys
 import argparse
 from distutils.dir_util import copy_tree, remove_tree
-
+import itertools
+from libcst import *
 import importlib
 import eve_utils
 
 import subprocess
 import sys
+
+# TODO: script getting default values (e.g. client keys)
+# TODO: provide non Auth0
+
+class EveServiceInserter(CSTTransformer):
+    def __init__(self):
+        pass
+
+    def leave_Module(self, original_node, updated_node):
+        addition = SimpleStatementLine(
+            body=[
+                ImportFrom(
+                    module=Attribute(
+                        value=Name(
+                            value='auth',
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        attr=Name(
+                            value='es_auth',
+                            lpar=[],
+                            rpar=[],
+                        ),
+                        dot=Dot(
+                            whitespace_before=SimpleWhitespace(
+                                value='',
+                            ),
+                            whitespace_after=SimpleWhitespace(
+                                value='',
+                            ),
+                        ),
+                        lpar=[],
+                        rpar=[],
+                    ),
+                    names=[
+                        ImportAlias(
+                            name=Name(
+                                value='EveServiceAuth',
+                                lpar=[],
+                                rpar=[],
+                            ),
+                            asname=None,
+                            comma=MaybeSentinel.DEFAULT,
+                        ),
+                    ],
+                    relative=[],
+                    lpar=None,
+                    rpar=None,
+                    semicolon=MaybeSentinel.DEFAULT,
+                    whitespace_after_from=SimpleWhitespace(
+                        value=' ',
+                    ),
+                    whitespace_before_import=SimpleWhitespace(
+                        value=' ',
+                    ),
+                    whitespace_after_import=SimpleWhitespace(
+                        value=' ',
+                    ),
+                ),
+            ])
+
+        new_body = eve_utils.insert_import(updated_node.body, addition)
+
+        return updated_node.with_changes(
+            body = new_body
+        )
+
+    def visit_SimpleStatementLine(self, node):
+        if not isinstance(node.body[0], Assign):
+            return False
+            
+        target = node.body[0].targets[0].target
+        
+        if not isinstance(target, Attribute):
+            return False
+            
+        if not (target.value.value == 'self' and target.attr.value == '_app'):
+            return False
+            
+        return True
+        
+    def leave_Assign(self, original_node, updated_node):
+        addition = Arg(
+            value=Name(
+                value='EveServiceAuth',
+                lpar=[],
+                rpar=[],
+            ),
+            keyword=Name(
+                value='auth',
+                lpar=[],
+                rpar=[],
+            ),
+            equal=AssignEqual(
+                whitespace_before=SimpleWhitespace(
+                    value='',
+                ),
+                whitespace_after=SimpleWhitespace(
+                    value='',
+                ),
+            ),
+            comma=MaybeSentinel.DEFAULT,
+            star='',
+            whitespace_after_star=SimpleWhitespace(
+                value='',
+            ),
+            whitespace_after_arg=SimpleWhitespace(
+                value='',
+            ),
+        )
+        
+        comma = Comma(
+            whitespace_before=SimpleWhitespace(
+                value='',
+            ),
+            whitespace_after=SimpleWhitespace(
+                value=' ',
+            ),
+        )       
+
+        new_args = []
+        last_arg = updated_node.value.args[-1].with_changes(comma=comma)
+
+        for item in itertools.chain(updated_node.value.args[0:-1], [last_arg, addition]):
+            new_args.append(item)
+
+        new_value = updated_node.value.with_changes(args=new_args)
+
+        return updated_node.with_changes(
+            value = new_value
+        )
+
+
+def wire_up_service():
+    with open('eve_service.py', 'r') as source:
+        tree = parse_module(source.read())
+    
+    inserter = EveServiceInserter()
+    new_tree = tree.visit(inserter)
+    
+    with open('eve_service.py', 'w') as source:
+        source.write(new_tree.code)
+
+
+
+
+
 
 def install(package):
     trigger = 'Successfully installed '
@@ -55,12 +203,7 @@ def add_auth(project_name):
     copy_tree(skel, 'auth')
 
     # TODO: can the following remove_tree calls be obviated if skel is packaged differently?
-    # remove_if_exists(os.path.join(project_name, '__pycache__'))
-    # remove_if_exists(os.path.join(project_name, 'configuration', '__pycache__'))
-    # remove_if_exists(os.path.join(project_name, 'domain', '__pycache__'))
-    # remove_if_exists(os.path.join(project_name, 'hooks', '__pycache__'))
-    # remove_if_exists(os.path.join(project_name, 'log_trace', '__pycache__'))
-    # remove_if_exists(os.path.join(project_name, 'utils', '__pycache__'))
+    remove_if_exists(os.path.join('auth', '__pycache__'))
 
     for dname, dirs, files in os.walk('auth'):
         for fname in files:
@@ -87,13 +230,10 @@ def main():
         
     project_name = os.path.basename(os.getcwd())
     add_auth(project_name)
-    # install('authparser')
-    install('eve_negotiable_auth')
+    install('eve_negotiable_auth')  # also installs authparser and pyparsing
+    wire_up_service()
     
     print('auth modules added')
-    print('Please manually add to eve_service.py (until this is automated):')
-    print(' - from auth.es_auth import EveServiceAuth')
-    print(' - self._app = Eve(import_name=self._name, auth=EveServiceAuth)')
 
 
 if __name__ == '__main__':
