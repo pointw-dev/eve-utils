@@ -23,8 +23,8 @@ def add_hooks(api_app):
 
 @trace
 def _fetch_settings(response):
-    # if not app.auth.authorized(None, '_settings', 'GET'):
-    #     abort(make_error_response('Please provide proper credentials', 401))
+    if app.auth and not app.auth.authorized(None, '_settings', 'GET'):
+        abort(make_error_response('Please provide proper credentials', 401))
 
     del response['_items']
     del response['_meta']

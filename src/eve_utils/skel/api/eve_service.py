@@ -10,7 +10,7 @@ LOG = logging.getLogger('{$project_name}')
 class EveService:
     def __init__(self):
         self._name = SETTINGS.get('ES_API_NAME', '{$project_name}')
-        self._app = Eve(import_name=self._name)  # , auth=Auth, validator=Validator
+        self._app = Eve(import_name=self._name)
         CORS(self._app)
         hooks.add_hooks(self._app)
 

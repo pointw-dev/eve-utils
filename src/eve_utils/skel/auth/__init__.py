@@ -20,7 +20,7 @@ SETTINGS = {
     'AUTH0_TOKEN_ENDPOINT': os.environ.get('AUTH0_TOKEN_ENDPOINT', 'https://{$project_name}.us.auth0.com/oauth/token'),
     'AUTH0_CLIENT_ID': os.environ.get('AUTH0_CLIENT_ID', '--your-client-id--'),
     'AUTH0_CLIENT_SECRET': os.environ.get('AUTH0_CLIENT_SECRET',
-                                          '--your-client-secret--')
+                                          '--your-client-secret--'),
                                           
     'AUTH0_PUBLIC_KEY': b'''
 -----BEGIN PUBLIC KEY-----

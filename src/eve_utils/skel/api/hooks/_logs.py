@@ -23,7 +23,7 @@ def add_hooks(app):
     @app.route('/_logging', methods=['GET'])
     def get_logging_config():
         """Returns the current verbosity levels for logging handlers."""
-        if not app.auth.authorized(None, '_logging', 'GET'):
+        if app.auth and not app.auth.authorized(None, '_logging', 'GET'):
             return make_error_response('Please provide proper credentials', 401)
 
         return _get_logging_config()
@@ -31,7 +31,7 @@ def add_hooks(app):
     @app.route('/_logging', methods=['PUT'])
     def put_logging_config():
         """PUT logging level to handlers."""
-        if not app.auth.authorized(None, '_logging', 'PUT'):
+        if app.auth and not app.auth.authorized(None, '_logging', 'PUT'):
             return make_error_response('Please provide proper credentials', 401)
 
         return _put_logging_config(request)
