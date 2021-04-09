@@ -126,16 +126,16 @@ If you followed the above, be sure to clean up after playing around with your ne
 
     ```json
     {
-      _id: '606f5453b43a8f480a1b8fc6',
-      name: 'Michael',
-      _updated: '2021-04-08T19:06:59',
-      _created: '2021-04-08T19:06:59',
-      _etag: '6e91d500cbb0a2f6645d9b4dced422d429a69820',
-      _links: {
-        self: { href: '/people/606f5453b43a8f480a1b8fc6', title: 'person' },
-        parent: { title: 'home', href: '/' },
-        collection: { title: 'people', href: 'people' },
-        cars: { href: '/people/606f5453b43a8f480a1b8fc6/cars', title: 'cars' }
+      "_id": "606f5453b43a8f480a1b8fc6",
+      "name": "Michael",
+      "_updated": "2021-04-08T19:06:59",
+      "_created": "2021-04-08T19:06:59",
+      "_etag": "6e91d500cbb0a2f6645d9b4dced422d429a69820",
+      "_links": {
+        "self": { "href": "/people/606f5453b43a8f480a1b8fc6", "title": "person" },
+        "parent": { "title": "home", "href": "/" },
+        "collection": { "title": "people", "href": "people" },
+        "cars": { "href": "/people/606f5453b43a8f480a1b8fc6/cars", "title": "cars" }
       }
     }
     ```
