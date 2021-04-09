@@ -5,9 +5,10 @@ bin = glob('bin/*')
 
 setup(
     name='eve-utils',
-    version='0.7.2',
+    version='0.7.4',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     license='MIT',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
