@@ -1,0 +1,104 @@
+Ignore this file
+- it is a rough memory jog list that will eventually become documentation
+
+
+List of features to documentation
+---------------------------------
+settings system
+- envars (useful for docker)
+- defaults
+- dumped to log
+- viewable via endpoint
+- extensible (add settings, add additional modules (e.g. auth) with its own settings)
+- cancelable/optional (doco!)
+- comes with...
+  - built-in
+    'ES_API_NAME': 'my-api',
+    'ES_MONGO_HOST': os.environ.get('ES_MONGO_HOST', 'localhost'),
+    'ES_MONGO_PORT': os.environ.get('ES_MONGO_PORT', 27017),
+    'ES_MONGO_DBNAME': os.environ.get('ES_MONGO_DBNAME', 'my-api'),
+    'ES_API_PORT': os.environ.get('ES_API_PORT', 2112),
+    'ES_INSTANCE_NAME': os.environ.get('ES_INSTANCE_NAME', socket.gethostname()),
+    'ES_TRACE_LOGGING': os.environ.get('ES_TRACE_LOGGING', 'Enabled'),
+    'ES_PAGINATION_LIMIT': os.environ.get('ES_PAGINATION_LIMIT', 3000),
+    'ES_PAGINATION_DEFAULT': os.environ.get('ES_PAGINATION_DEFAULT', 1000),
+    'SMTP_HOST': os.environ.get('SMTP_HOST', 'internalmail.cri.com'),
+    'SMTP_PORT': os.environ.get('SMTP_PORT', 25),
+    'EMAIL_RECIPIENTS': os.environ.get('EMAIL_RECIPIENTS', 'michael@pointw.com'),
+ - auth
+    'ES_AUTH_ADD_BASIC': os.environ.get('ES_AUTH_ADD_BASIC', 'No'),  # [0] in 'yYtT', i.e. yes, Yes, true, True
+    'ES_AUTH_ROOT_PASSWORD': os.environ.get('ES_AUTH_ROOT_PASSWORD', 'password'),
+    'ES_AUTH_REALM': os.environ.get('ES_AUTH_REALM', 'my-api.cri.com'),
+
+    'ES_AUTH_JWT_DOMAIN': os.environ.get('ES_AUTH_JWT_DOMAIN', 'my-api.us.auth0.com'),
+    'ES_AUTH_JWT_CLIENT_ID': os.environ.get('ES_AUTH_JWT_CLIENT_ID', '--your-client_id--'),
+    'ES_AUTH_JWT_ISSUER': os.environ.get('ES_AUTH_JWT_ISSUER', 'https://my-api.us.auth0.com/'),
+    'ES_AUTH_JWT_AUDIENCE': os.environ.get('ES_AUTH_JWT_AUDIENCE', 'https://cri.com/my-api'),
+
+    'AUTH0_API_AUDIENCE': os.environ.get('AUTH0_API_AUDIENCE', 'https://my-api.us.auth0.com/api/v2/'),
+    'AUTH0_API_BASE_URL': os.environ.get('AUTH0_API_BASE_URL', 'https://my-api.us.auth0.com/api/v2'),
+    'AUTH0_CLAIMS_NAMESPACE': os.environ.get('AUTH0_CLAIMS_NAMESPACE', 'https://cri.com/my-api'),
+    'AUTH0_TOKEN_ENDPOINT': os.environ.get('AUTH0_TOKEN_ENDPOINT', 'https://my-api.us.auth0.com/oauth/token'),
+    'AUTH0_CLIENT_ID': os.environ.get('AUTH0_CLIENT_ID', '--your-client-id--'),
+    'AUTH0_CLIENT_SECRET': os.environ.get('AUTH0_CLIENT_SECRET',
+                                          '--your-client-secret--'),
+                                          
+    'AUTH0_PUBLIC_KEY': b'''
+- expandable for app needs
+    - cancellable
+    - is_enabled == 'YyTtEe'
+_settings endpoint
+    - GET from API call
+
+
+logging
+    - /var/log/*app-name*
+    - dumps settings, incl. key version numbers
+    - email on error
+        - includes app name, version, and hostname
+    - _logging endpoint 
+        - GET and PUT verbosity via API call
+
+exception handling 
+    - emit JSON/500 on unhandled exception instead of HTML
+    - make_error_response
+    - standards (_issues, status: 'ERR', etc.)
+
+@trace decorator
+
+commands
+- mkapi
+- mkresource
+- mkrel
+- add_docker
+- add_auth
+- add_val
+
+tidied _links (parent, collection, etc.)
+
+configuration
+    
+organized folder structure
+- domain decomposition
+- hooks
+- common.py
+
+_x
+name
+description
+
+make_error_response
+
+_env_conf
+
+field naming conventions
+- xxx_ref is an expandable field
+- starting with _ is a non-domain field (e.g. _id, _meta)
+- enforced pluralization (resource names are collection names, therefore plural)
+
+
+Default Eve settings
+- CORS stuff (in eve_service.py and in settings.py)
+
+
+
