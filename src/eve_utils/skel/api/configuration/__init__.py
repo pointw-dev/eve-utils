@@ -49,8 +49,8 @@ SETTINGS = {
     'ES_API_PORT': os.environ.get('ES_API_PORT', 2112),
     'ES_INSTANCE_NAME': os.environ.get('ES_INSTANCE_NAME', socket.gethostname()),
     'ES_TRACE_LOGGING': os.environ.get('ES_TRACE_LOGGING', 'Enabled'),
-    'ES_PAGINATION_LIMIT': os.environ.get('ES_PAGINATION_LIMIT', 1000),
-    'ES_PAGINATION_DEFAULT': os.environ.get('ES_PAGINATION_DEFAULT', 500),
+    'ES_PAGINATION_LIMIT': os.environ.get('ES_PAGINATION_LIMIT', 3000),
+    'ES_PAGINATION_DEFAULT': os.environ.get('ES_PAGINATION_DEFAULT', 1000),
     'SMTP_HOST': os.environ.get('SMTP_HOST', 'internalmail.cri.com'),
     'SMTP_PORT': os.environ.get('SMTP_PORT', 25),
     'EMAIL_RECIPIENTS': os.environ.get('EMAIL_RECIPIENTS', 'michael@pointw.com')

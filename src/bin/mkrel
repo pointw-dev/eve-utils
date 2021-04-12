@@ -1,4 +1,40 @@
 #!/usr/bin/env python
+"""Creates a parent/child relationship between two already existing resources.
+The Eve docs call this "sub resources"
+(https://docs.python-eve.org/en/stable/features.html#sub-resources)
+
+Usage:
+    mkrel [-h|--help] [-p|--as_parent_ref] parent child
+      NOTE: Must be run in the project folder
+            The name of parent or child can entered as either singular or plural
+
+Examples:
+    mkrel employer employee
+    mkrel groups members --as_parent_ref
+
+License:
+    MIT License
+
+    Copyright (c) 2021 Michael Ottoson
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+"""
 
 import os
 import argparse
@@ -2109,10 +2145,10 @@ def add_to_domain_child(parent, child, parents, children, parent_ref):
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser('mkrel', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('parent', help='The name of the parent resource to create the link from.')
     parser.add_argument('child', help='The name of the child resource to create the link to.')
-    parser.add_argument('-p', '--as_parent_ref', help='change name of related rel to parent, literally (instead of the name of the parent)', action='store_true')
+    parser.add_argument('-p', '--as_parent_ref', help='change name of related rel to "parent" (instead of the name of the parent)', action='store_true')
 
     args = parser.parse_args()
     parent, parents = singular, plural = get_pair(args.parent)  # TODO: validate, safe name, etc.

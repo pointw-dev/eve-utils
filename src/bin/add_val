@@ -1,12 +1,21 @@
 #!/usr/bin/env python
-"""Adds authorization module to the API project.
+"""Adds custom validation module to the API project.
+
+This also adds two new validation rules
+- unique_to_parent
+    - the field must be unique amongst other resources with the same parent_ref, but can
+      be repeated within other parents
+- unique_ignorecase
+    - prevents the same value being considered unique when the only difference is case
+      e.g. 'station #1' will be considered the same as 'Station #1', the rule will
+      prevent whichever is second from being inserted.
 
 Usage:
-    add_auth [-h|--help]
+    add_val [-h|--help]
       NOTE: Must be run in the project folder
 
 Examples:
-    add_auth
+    add_val
 
 License:
     MIT License
@@ -44,8 +53,6 @@ import eve_utils
 import subprocess
 import sys
 
-# TODO: script getting default values (e.g. client keys)
-# TODO: provide non Auth0
 
 class EveServiceInserter(CSTTransformer):
     def __init__(self):
@@ -57,12 +64,12 @@ class EveServiceInserter(CSTTransformer):
                 ImportFrom(
                     module=Attribute(
                         value=Name(
-                            value='auth',
+                            value='validation',
                             lpar=[],
                             rpar=[],
                         ),
                         attr=Name(
-                            value='es_auth',
+                            value='validator',
                             lpar=[],
                             rpar=[],
                         ),
@@ -80,7 +87,7 @@ class EveServiceInserter(CSTTransformer):
                     names=[
                         ImportAlias(
                             name=Name(
-                                value='EveServiceAuth',
+                                value='EveValidator',
                                 lpar=[],
                                 rpar=[],
                             ),
@@ -127,12 +134,12 @@ class EveServiceInserter(CSTTransformer):
     def leave_Assign(self, original_node, updated_node):
         addition = Arg(
             value=Name(
-                value='EveServiceAuth',
+                value='EveValidator',
                 lpar=[],
                 rpar=[],
             ),
             keyword=Name(
-                value='auth',
+                value='validator',
                 lpar=[],
                 rpar=[],
             ),
@@ -187,27 +194,8 @@ def wire_up_service():
         source.write(new_tree.code)
 
 
-def install_packages(packages):
-    trigger = 'Successfully installed '
-    subprocess.check_output([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-
-    with open('requirements.txt', 'a') as f:
-        f.write('\n# start: added by add_auth\n')
-        for package in packages:
-            out = subprocess.check_output([sys.executable, "-m", "pip", "install", package]).decode('utf-8')
-            for line in out.split('\n'):
-                if line.startswith(trigger):
-                    installed_packages = line[len(trigger):].split(' ')
-                        
-                    for installed_package in installed_packages:
-                        hyphen = installed_package.rfind('-')
-                        f.write(f'{installed_package[:hyphen]}=={installed_package[hyphen+1:]}\n')
-
-        f.write('# end: added by add_auth\n')
-
-
 def main():
-    parser = argparse.ArgumentParser('add_auth', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser('add_val', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     args = parser.parse_args()
 
     if not os.path.exists('./requirements.txt'):
@@ -218,19 +206,15 @@ def main():
         print('domain folder missing - must be run in the API folder')
         quit(2)
         
-    if os.path.exists('./auth'):
-        print('auth folder already exists')
+    if os.path.exists('./validation'):
+        print('validation folder already exists')
         quit(3)
         
     project_name = os.path.basename(os.getcwd())
-    eve_utils.copy_skel(project_name, 'auth')
-    install_packages(['eve_negotiable_auth', 'jwt'])  
-    # eve_negotiable_auth also installs authparser and pyparsing    
-    # jwt also installs cffi, cryptography, pycparser
-    
+    eve_utils.copy_skel(project_name, 'validation')
     wire_up_service()
     
-    print('auth modules added')
+    print('validation module added')
 
 
 if __name__ == '__main__':

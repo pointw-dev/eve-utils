@@ -1,4 +1,36 @@
 #!/usr/bin/env python
+"""Creates an Eve-based API project.
+
+Usage:
+    mkapi [-h|--help] [-d|--with_docker] api_name
+
+Examples:
+    mkapi my-api
+    mkapi my-api --with-docker
+
+License:
+    MIT License
+
+    Copyright (c) 2021 Michael Ottoson
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+"""
 
 import os
 import sys
@@ -26,7 +58,7 @@ def remove_if_exists(folder):
         remove_tree(folder)
 
 
-def make_api(project_name):
+def make_api(project_name):  # TODO: refactor with eve_utils.copy_skel()?
     print(f'Creating {project_name} api')
 
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/api')
@@ -53,7 +85,7 @@ def make_api(project_name):
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser('mkapi', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('api_name', help='The name of the API to create.')
     parser.add_argument('-d', '--with_docker', help='add Dockerfile and supporting files to deploy the API as a container', action='store_true')
 

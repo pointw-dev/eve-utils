@@ -6,10 +6,10 @@ import servicemanager
 from eve_service import EveService
 
 
-class ReportApiSvc(win32serviceutil.ServiceFramework):
+class EveWindowsService(win32serviceutil.ServiceFramework):
     _svc_name_ = "{$project_name}"
     _svc_display_name_ = "{$project_name} API"
-    # _svc_description_ = "Provides endpoints to get data on BSNEE (playback, uptime, etc)."  # TODO: replace with config or some such
+    # _svc_description_ = "Service description goes here."  # TODO: replace with config or some such
 
     def __init__(self, args):
         self._eve = EveService()
@@ -33,4 +33,4 @@ class ReportApiSvc(win32serviceutil.ServiceFramework):
 
 
 if __name__ == '__main__':
-    win32serviceutil.HandleCommandLine(ReportApiSvc)
+    win32serviceutil.HandleCommandLine(EveWindowsService)

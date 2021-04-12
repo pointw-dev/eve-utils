@@ -4,7 +4,7 @@ This module defines functions used by the other hooks modules, and some hooks of
 """
 import logging
 import platform
-from flask import current_app as app
+from flask import current_app as app, abort
 from utils import make_error_response
 from configuration import SETTINGS, VERSION
 from eve import __version__ as eve_version

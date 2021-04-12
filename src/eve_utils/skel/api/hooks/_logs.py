@@ -48,17 +48,21 @@ def _log_request(resource, request, payload):
 @trace
 def _get_logging_config():
     """Returns the verbosity for all handlers."""
-    response = {}
+    payload = {}
     logger = logging.getLogger()
     for handler in logger.handlers:
-        response[handler.name] = logging.getLevelName(handler.level)
+        payload[handler.name] = logging.getLevelName(handler.level)
 
-    return make_response(jsonify(response), 200)
+    response = make_response(jsonify(payload), 200)
+    _log_request('_logging', request, response)
+    return response
 
 
 @trace
 def _put_logging_config(request):
     """PUTs the verbosity for handlers."""
+    response = make_error_response('Could not change log settings', 400)
+    
     try:
         if not request.content_type == 'application/json':
             raise TypeError('The request body must be application/json')
@@ -81,16 +85,17 @@ def _put_logging_config(request):
             handler = [x for x in logger.handlers if x.name == key][0]
             handler.setLevel(getattr(logging, payload[key]))
 
-        response = {}
+        payload = {}
         for handler in logger.handlers:
-            response[handler.name] = logging.getLevelName(handler.level)
+            payload[handler.name] = logging.getLevelName(handler.level)
 
-        return make_response(jsonify(response), 200)
+        response = make_response(jsonify(payload), 200)
 
     except (TypeError, ValueError) as ex:
-        resp = make_error_response('Invalid log setting specification', 422, ex)
-        abort(resp)
+        response = make_error_response('Invalid log setting specification', 422, exception=ex)
 
     except Exception as ex:
-        resp = make_error_response('Could not change log settings', 500, ex)
-        abort(resp)
+        response = make_error_response('Could not change log settings', 400, exception=ex)
+        
+    _log_request('_logging', request, response)
+    return response
