@@ -5,7 +5,7 @@ bin = glob('bin/*')
 
 setup(
     name='eve-utils',
-    version='0.8.6',
+    version='0.8.7',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
     long_description=open('../README.md').read(),
     long_description_content_type='text/markdown',

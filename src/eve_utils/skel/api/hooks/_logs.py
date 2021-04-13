@@ -48,7 +48,6 @@ def _log_request(resource, request, payload):
 @trace
 def _get_logging_config():
     """Returns the verbosity for all handlers."""
-    """Returns the verbosity for all handlers."""
     logger = logging.getLogger()
     payload = {
         handler.name: logging.getLevelName(handler.level)
@@ -64,7 +63,7 @@ def _get_logging_config():
 def _put_logging_config(request):
     """PUTs the verbosity for handlers."""
     response = make_error_response('Could not change log settings', 400)
-    
+
     try:
         if request.content_type != 'application/json':
             raise TypeError('The request body must be application/json')
@@ -98,6 +97,6 @@ def _put_logging_config(request):
 
     except Exception as ex:
         response = make_error_response('Could not change log settings', 400, exception=ex)
-        
+
     _log_request('_logging', request, response)
     return response

@@ -88,10 +88,8 @@ class EveValidator(Validator):
         query = {
             field: re.compile('^' + re.escape(value) + '$', re.IGNORECASE)
         }
-        if parent_ref:
-            query[parent_ref_field] = ObjectId(parent_ref)
-        else:
-            query[parent_ref_field] = None
+
+        query[parent_ref_field] = ObjectId(parent_ref) if parent_ref else None
 
         prior = collection.find_one(query)
         if prior and unique_to_parent:

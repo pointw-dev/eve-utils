@@ -60,8 +60,8 @@ def bearer(token, **kwargs):
             if 'admin' in rtn['roles']:
                 rtn['role'] = 'admin'
 
-    except (jwt.ExpiredSignatureError, 
-            jwt.InvalidSignatureError, 
+    except (jwt.ExpiredSignatureError,
+            jwt.InvalidSignatureError,
             jwt.InvalidAudienceError,
             jwt.InvalidAlgorithmError) as ex:  # TODO: other jwt ex's?
         # TODO: how to return detail to user - abort 401 here with message?
@@ -72,13 +72,15 @@ def bearer(token, **kwargs):
         rtn = None
 
     return rtn
-
-
+    
+    
 def bearer_challenge(**kwargs):
     request = kwargs.get('request')
     rtn = {}
-    if request:
-        if 'Bearer' in request.headers.get('Authorization', '') or request.args.get('access_token'):
-            rtn['error'] = "invalid_token"
+    if request and (
+        'Bearer' in request.headers.get('Authorization', '')
+        or request.args.get('access_token')
+    ):
+        rtn['error'] = "invalid_token"
 
-    return rtn
+    return rtn    
