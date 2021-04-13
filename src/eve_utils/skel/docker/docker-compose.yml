@@ -8,12 +8,20 @@ services:
     environment:
       - ES_INSTANCE_NAME={$project_name} development container
       - ES_MONGO_HOST={$project_name}-mongo
-      
+    volumes:
+    - ./logs:/var/log/{$project_name}
     depends_on:
       - {$project_name}-mongo
 
   {$project_name}-mongo:
     image: mongo
+    container_name: {$project_name}-mongo
+    volumes:
+      - mongodb:/data/db
+      - mongodb_config:/data/configdb      
     ports:
       - "27017:27017"
-    container_name: {$project_name}-mongo
+
+volumes:
+    mongodb:
+    mongodb_config:

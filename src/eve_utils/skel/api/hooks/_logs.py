@@ -4,7 +4,7 @@ This module defines functions to log requests, and to manage log verbosity.
 """
 import logging
 import json
-from flask import abort, make_response, jsonify, request
+from flask import abort, make_response, jsonify, request as flask_request
 from log_trace.decorators import trace
 from utils import make_error_response
 
@@ -34,7 +34,7 @@ def add_hooks(app):
         if app.auth and not app.auth.authorized(None, '_logging', 'PUT'):
             return make_error_response('Please provide proper credentials', 401)
 
-        return _put_logging_config(request)
+        return _put_logging_config(flask_request)
 
 
 @trace

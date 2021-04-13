@@ -6,22 +6,20 @@ import logging
 
 from eve.utils import config
 from eve.io.mongo import Validator
-from flask import current_app as app
 from bson.objectid import ObjectId
 
+from utils import get_db
 from log_trace.decorators import trace
 
+
 LOG = logging.getLogger('validator')
-
-
-# TODO: alias app.data.driver.db
 
 
 class EveValidator(Validator):
     """Validator for custom types and validations."""
     @trace
-    def _validate_unique_ignorecase(self, unique, field, value):
-        """ Validates that a field value is unique.
+    def _validate_unique_ignorecase(self, unique_ignorecase, field, value):
+        """ Validates that a field value is unique, ignoring case.
             NOTE: this method was copy/pasted from Eve io/mongo/validation, then made
                   case insensitive
 
@@ -29,7 +27,7 @@ class EveValidator(Validator):
         {'type': 'boolean'}
         """
         query = {}
-        if unique:
+        if unique_ignorecase:
             query = {
                 field: re.compile('^' + re.escape(value) + '$', re.IGNORECASE)
             }
@@ -61,8 +59,7 @@ class EveValidator(Validator):
             # (for eve) query injection to interfere with this validation. We
             # are still operating within eve's mongo namespace anyway.
 
-            datasource, _, _, _ = app.data.datasource(self.resource)
-            if app.data.driver.db[datasource].find_one(query):
+            if get_db()[self.resource].find_one(query):
                 self._error(field, "value '%s' is not unique (case-insensitive)" % value)
 
     @trace
@@ -87,7 +84,7 @@ class EveValidator(Validator):
         # TODO: assert(parent_resource)
         parent_ref = self.document.get(parent_ref_field)
 
-        collection = app.data.driver.db[resource]
+        collection = get_db()[resource]
         query = {
             field: re.compile('^' + re.escape(value) + '$', re.IGNORECASE)
         }

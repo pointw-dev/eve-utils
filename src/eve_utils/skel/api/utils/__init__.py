@@ -1,7 +1,13 @@
 import logging
 from flask import jsonify, make_response
+from flask import current_app
+
 
 LOG = logging.getLogger('utils')
+
+
+def get_db():
+    return current_app.data.driver.db
 
 
 def make_error_response(message, code, issues=[], **kwargs):

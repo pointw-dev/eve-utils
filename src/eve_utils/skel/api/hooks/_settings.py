@@ -4,7 +4,7 @@ This module defines functions used by the other hooks modules, and some hooks of
 """
 import logging
 import platform
-from flask import current_app as app, abort
+from flask import current_app, abort
 from utils import make_error_response
 from configuration import SETTINGS, VERSION
 from eve import __version__ as eve_version
@@ -16,14 +16,14 @@ LOG = logging.getLogger('hooks.utils')
 
 
 @trace
-def add_hooks(api_app):
+def add_hooks(app):
     """Wire up the events for _settings endpoint."""
-    api_app.on_fetched_resource__settings += _fetch_settings
+    app.on_fetched_resource__settings += _fetch_settings
 
 
 @trace
 def _fetch_settings(response):
-    if app.auth and not app.auth.authorized(None, '_settings', 'GET'):
+    if current_app.auth and not current_app.auth.authorized(None, '_settings', 'GET'):
         abort(make_error_response('Please provide proper credentials', 401))
 
     del response['_items']

@@ -18,7 +18,7 @@ def _trace(target):
 
     @wraps(target)
     def _wrapper(*args, **kwargs):
-        global return_value
+        return_value = None
         LOG.trace(f'Entering function: {target.__module__}.{target.__name__}')
 
         try:

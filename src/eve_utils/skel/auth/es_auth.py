@@ -1,10 +1,10 @@
 """
 The auth module used for ES.
 """
-from flask import current_app as app
 from bson.objectid import ObjectId
 from eve_negotiable_auth import NegotiableAuth, AUTH_PARSER
 
+from utils import get_db
 from . import SETTINGS
 from .auth_handlers import basic, bearer, bearer_challenge
 
@@ -26,7 +26,7 @@ class EveServiceAuth(NegotiableAuth):
 
         if not is_admin:
             auth_value = 'all-denied'
-            accounts = app.data.driver.db['accounts']
+            accounts = get_db()['accounts']
             account = accounts.find_one({'user_id': claims['user']})
             if account:
                 auth_value = ObjectId(account['_customer_ref'])

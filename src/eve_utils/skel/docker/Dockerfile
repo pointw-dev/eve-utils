@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.9-alpine
 
 ENV ES_API_PORT=80
 EXPOSE 80
