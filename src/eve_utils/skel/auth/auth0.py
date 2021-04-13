@@ -19,7 +19,7 @@ def get_token():
     audience = SETTINGS['AUTH0_API_AUDIENCE']
 
     body = json.dumps({
-        'client_id' : client_id,
+        'client_id': client_id,
         'client_secret': client_secret,
         'audience': audience,
         'grant_type': 'client_credentials'
@@ -40,8 +40,7 @@ def get_users(token):
         'Authorization': 'Bearer ' + token
     }
     response = requests.get(get_users_url, headers=headers)
-    users = response.json()
-    return users
+    return response.json()
 
 
 @trace
@@ -67,10 +66,7 @@ def add_user_roles(token, user_id, roles_to_add, remove=False):
     }
     response = requests.get(get_roles_url, headers=headers)
     roles = response.json()
-    role_ids = []
-    for role in roles:
-        if role['name'] in roles_to_add:
-            role_ids.append(role['id'])
+    role_ids = [role['id'] for role in roles if role['name'] in roles_to_add]
 
     request_body = {
         'roles': role_ids
@@ -82,7 +78,7 @@ def add_user_roles(token, user_id, roles_to_add, remove=False):
         else:
             response = requests.post(user_roles_url, headers=headers, data=json.dumps(request_body))
         LOG.info(f'{"Removed" if remove else "Added"} roles on {user_id}: {response.status_code}')
-        if not response.status_code == 204:
+        if response.status_code != 204:
             return False
     else:
         LOG.warning('no valid roles specified')

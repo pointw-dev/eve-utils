@@ -22,12 +22,12 @@ SETTINGS = {
     'AUTH0_CLIENT_SECRET': os.environ.get('AUTH0_CLIENT_SECRET',
                                           '--your-client-secret--'),
                                           
+    # NOTE: AUTH0_PUBLIC_KEY cannot be set by envar
     'AUTH0_PUBLIC_KEY': b'''
 -----BEGIN PUBLIC KEY-----
     --your-public-key--
 -----END PUBLIC KEY-----
-'''  # NOTE: this cannot be set by envar
-# TODO: include as file?
+'''
 }
 
 # cancellable

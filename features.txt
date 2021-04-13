@@ -62,7 +62,7 @@ logging
 exception handling 
     - emit JSON/500 on unhandled exception instead of HTML
     - make_error_response
-    - standards (_issues, status: 'ERR', etc.)
+    - standards {_status: "ERR", _error: {code:422, message: ""}, _issues: [] }
 
 @trace decorator
 
@@ -71,7 +71,14 @@ commands
 - mkresource
 - mkrel
 - add_docker
+    docker-compose: 
+        volumes for logs and for mongo (db & config)
+        .env (project_name)
 - add_auth
+    - out-of-box BASIC (ES_AUTH_ADD_BASIC = Yes - added to _env.conf) 
+        grants all usernames no matter what password,
+        admin if root (unless accounts is used, then account.role=='admin')
+        used as backdoor - to harden modify es_auth.process_claims and auth_handlers.basic()
 - add_val
 
 tidied _links (parent, collection, etc.)
@@ -100,5 +107,7 @@ field naming conventions
 Default Eve settings
 - CORS stuff (in eve_service.py and in settings.py)
 
-
+utils
+- make_error_response()
+- get_db()
 

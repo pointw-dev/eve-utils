@@ -159,7 +159,7 @@ If you followed the above, be sure to clean up after playing around with your ne
 
   
 
-* `add_docker` <api-name> - run this in the folder above the root api folder to create a basic `Dockerfile`, `docker-compose.yml` file, and some useful build scripts (to be further documented later).
+* `add_docker` <api-name> - run this in the folder above the root api folder to create a basic docker files and some useful build scripts (to be further documented later).
 
   * NOTE: not necessary if you have created the API using `--with_docker`
 
@@ -181,7 +181,41 @@ If you followed the above, be sure to clean up after playing around with your ne
 
    * NOTE: the only supported IdP is [Auth0](https://auth0.com/) at the moment, but it will be fairly easy to manually tweak to use any OAuth2 JWT issuer. (I have used a forked [Glewlwyd](https://github.com/babelouest/glewlwyd) with very minimal changes)
    
-     
+* `add_val` - run this in the API folder.  It will add a folder named `validation` with a module that adds custom validator to `EveService`.  Use this to extend custom validations.  It comes with two:
+
+  * `unique_ignorecase` - works exactly like the built-in `unique` validator except case is ignored
+  
+  * `unique_to_parent` - set this to a string of a resource's parent (singular!).  Uniqueness will only be applied to sibling resources, i.e. the same name can be used if the resource has a different parent.
+  
+    * e.g.
+  
+      ```bash
+      mkresource region
+      mkresource store
+      mkrel region store
+      ```
+  
+      Now in domain.store, change the name field definition from this:
+  
+      ```python
+      'name": {
+        'type': 'string',
+              ...
+        'unique': True
+      }
+      ```
+  
+      to this:
+  
+      ```python
+      'name": {
+        'type': 'string',
+              ...
+        'unique_to_parent': 'region'
+      }
+      ```
+
+
 
 
 MORE TO COME!

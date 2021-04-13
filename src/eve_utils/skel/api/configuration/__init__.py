@@ -96,7 +96,8 @@ LOG.info('Eve version:      %s', eve_version)
 LOG.info('Cerberus version: %s', cerberus_version)
 LOG.info('Python version:   %s', platform.sys.version)
 
-EMAIL_FORMAT = f'''%(levelname)s sent from {API_NAME} instance "{SETTINGS.get('ES_INSTANCE_NAME')}" (hostname: {socket.gethostname()})
+instance_name = SETTINGS.get('ES_INSTANCE_NAME')
+EMAIL_FORMAT = f'''%(levelname)s sent from {API_NAME} instance "{instance_name}" (hostname: {socket.gethostname()})
 
 %(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s
 '''

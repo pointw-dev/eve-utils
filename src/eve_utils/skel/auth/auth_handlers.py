@@ -60,7 +60,10 @@ def bearer(token, **kwargs):
             if 'admin' in rtn['roles']:
                 rtn['role'] = 'admin'
 
-    except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError, jwt.InvalidAudienceError, jwt.InvalidAlgorithmError) as ex:  # TODO: other jwt ex's?
+    except (jwt.ExpiredSignatureError, 
+            jwt.InvalidSignatureError, 
+            jwt.InvalidAudienceError,
+            jwt.InvalidAlgorithmError) as ex:  # TODO: other jwt ex's?
         # TODO: how to return detail to user - abort 401 here with message?
         rtn = None
     except ValueError as ex:

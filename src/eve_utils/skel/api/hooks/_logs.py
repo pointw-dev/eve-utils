@@ -48,10 +48,12 @@ def _log_request(resource, request, payload):
 @trace
 def _get_logging_config():
     """Returns the verbosity for all handlers."""
-    payload = {}
+    """Returns the verbosity for all handlers."""
     logger = logging.getLogger()
-    for handler in logger.handlers:
-        payload[handler.name] = logging.getLevelName(handler.level)
+    payload = {
+        handler.name: logging.getLevelName(handler.level)
+        for handler in logger.handlers
+    }
 
     response = make_response(jsonify(payload), 200)
     _log_request('_logging', request, response)
@@ -64,7 +66,7 @@ def _put_logging_config(request):
     response = make_error_response('Could not change log settings', 400)
     
     try:
-        if not request.content_type == 'application/json':
+        if request.content_type != 'application/json':
             raise TypeError('The request body must be application/json')
 
         payload = json.loads(request.data)
