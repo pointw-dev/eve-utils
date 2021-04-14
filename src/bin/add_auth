@@ -200,8 +200,9 @@ def install_packages(packages):
                     installed_packages = line[len(trigger):].split(' ')
                         
                     for installed_package in installed_packages:
-                        hyphen = installed_package.rfind('-')
-                        f.write(f'{installed_package[:hyphen]}=={installed_package[hyphen+1:]}\n')
+                        if package in installed_package:
+                            hyphen = installed_package.rfind('-')
+                            f.write(f'{installed_package[:hyphen]}=={installed_package[hyphen+1:]}\n')
 
         f.write('# end: added by add_auth\n')
 
@@ -224,9 +225,10 @@ def main():
         
     project_name = os.path.basename(os.getcwd())
     eve_utils.copy_skel(project_name, 'auth')
-    install_packages(['eve_negotiable_auth', 'jwt'])  
+    install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'])  # py-crytopgraphy?
     # eve_negotiable_auth also installs authparser and pyparsing    
-    # jwt also installs cffi, cryptography, pycparser
+    # cryptography also installs cffi, pycparser
+    # requests also installs certifi, chardet, idna, urllib3
     
     wire_up_service()
     

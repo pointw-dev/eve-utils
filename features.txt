@@ -5,6 +5,10 @@ Ignore this file
 List of features to documentation
 ---------------------------------
 settings system
+- principles:
+    - API should run right after git clone, i.e. with optionals omitted or with default values (even if only in limited capacity)
+    - all settings can be set (or derived) from envars (container compatible)
+    - _env.conf takes precedence (developer convenience)
 - envars (useful for docker)
 - defaults
 - dumped to log
@@ -25,25 +29,37 @@ settings system
     'SMTP_HOST': os.environ.get('SMTP_HOST', 'internalmail.cri.com'),
     'SMTP_PORT': os.environ.get('SMTP_PORT', 25),
     'EMAIL_RECIPIENTS': os.environ.get('EMAIL_RECIPIENTS', 'michael@pointw.com'),
+ 
  - auth
     'ES_AUTH_ADD_BASIC': os.environ.get('ES_AUTH_ADD_BASIC', 'No'),  # [0] in 'yYtT', i.e. yes, Yes, true, True
     'ES_AUTH_ROOT_PASSWORD': os.environ.get('ES_AUTH_ROOT_PASSWORD', 'password'),
     'ES_AUTH_REALM': os.environ.get('ES_AUTH_REALM', 'my-api.cri.com'),
 
     'ES_AUTH_JWT_DOMAIN': os.environ.get('ES_AUTH_JWT_DOMAIN', 'my-api.us.auth0.com'),
-    'ES_AUTH_JWT_CLIENT_ID': os.environ.get('ES_AUTH_JWT_CLIENT_ID', '--your-client_id--'),
+        # Auth0: Applications->Applications->(Custom Application)->Basic Information->Domain
     'ES_AUTH_JWT_ISSUER': os.environ.get('ES_AUTH_JWT_ISSUER', 'https://my-api.us.auth0.com/'),
+        # https://{ES_AUTH_JWT_DOMAIN}/
     'ES_AUTH_JWT_AUDIENCE': os.environ.get('ES_AUTH_JWT_AUDIENCE', 'https://cri.com/my-api'),
+        # Auth0: Applications->APIs->API Audience (from the Custom API created for your api)
 
     'AUTH0_API_AUDIENCE': os.environ.get('AUTH0_API_AUDIENCE', 'https://my-api.us.auth0.com/api/v2/'),
+        # https://{ES_AUTH_JWT_DOMAIN}/api/v2/
     'AUTH0_API_BASE_URL': os.environ.get('AUTH0_API_BASE_URL', 'https://my-api.us.auth0.com/api/v2'),
+        # https://{ES_AUTH_JWT_DOMAIN}/api/v2   (note: is absence of trailing slash important between this and above?)
     'AUTH0_CLAIMS_NAMESPACE': os.environ.get('AUTH0_CLAIMS_NAMESPACE', 'https://cri.com/my-api'),
+        # it's a good practice to use the same value as ES_AUTH_JWT_AUDIENCE
     'AUTH0_TOKEN_ENDPOINT': os.environ.get('AUTH0_TOKEN_ENDPOINT', 'https://my-api.us.auth0.com/oauth/token'),
+        # https://{ES_AUTH_JWT_DOMAIN}/oauth/token  (
+        # Auth0: Applications->Applications->Machine-to-machine->Advanced Settings->Endpoints->OAuth Token URL
     'AUTH0_CLIENT_ID': os.environ.get('AUTH0_CLIENT_ID', '--your-client-id--'),
+        # Auth0: Applications->APIs->Auth0 Management API->Machine To Machine Applications (enable Authorized)
+        # also found at Applications->Applications->(Machine to Machine)->Basic Information->Client ID
     'AUTH0_CLIENT_SECRET': os.environ.get('AUTH0_CLIENT_SECRET',
                                           '--your-client-secret--'),
+        # Auth0: Applications->Applications->(Machine to Machine)->Basic Information->Client Secret
                                           
-    'AUTH0_PUBLIC_KEY': b'''
+ 
+    
 - expandable for app needs
     - cancellable
     - is_enabled == 'YyTtEe'

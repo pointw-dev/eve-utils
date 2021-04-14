@@ -8,9 +8,9 @@ from utils import get_db
 from . import SETTINGS
 from .auth_handlers import basic, bearer, bearer_challenge
 
-AUTH_PARSER.add_handler('Bearer', bearer, bearer_challenge, realm='{SETTINGS["ES_AUTH_REALM"]}')
+AUTH_PARSER.add_handler('Bearer', bearer, bearer_challenge, realm=f'{SETTINGS["ES_AUTH_REALM"]}')
 if SETTINGS['ES_AUTH_ADD_BASIC'][0] in 'tyTY':
-    AUTH_PARSER.add_handler('Basic', basic, realm='{SETTINGS["ES_AUTH_REALM"]}')
+    AUTH_PARSER.add_handler('Basic', basic, realm=f'{SETTINGS["ES_AUTH_REALM"]}')
 
 
 class EveServiceAuth(NegotiableAuth):

@@ -1,7 +1,6 @@
-import os
 import jwt
 from base64 import b64decode
-from auth import SETTINGS
+from auth import SETTINGS, SIGNING_KEYS
 
 
 def basic(token, **kwargs):
@@ -27,8 +26,6 @@ def basic(token, **kwargs):
 
 # TODO: detect opaque token, then handle accordingly (how?)
 def bearer(token, **kwargs):
-    client_id = SETTINGS.get('ES_AUTH_JWT_CLIENT_ID')
-    domain = SETTINGS.get('ES_AUTH_JWT_DOMAIN')
     audience = SETTINGS.get('ES_AUTH_JWT_AUDIENCE')
     issuer = SETTINGS.get('ES_AUTH_JWT_ISSUER')
 
@@ -39,12 +36,12 @@ def bearer(token, **kwargs):
     if issuer:
         options['issuer'] = issuer
 
-    options['algorithm'] = 'RS256'  # TODO: how to detect the actual algo?
-
     try:
         headers = jwt.get_unverified_header(token)
+        options['algorithms'] = [headers['alg']]
+        signing_key = SIGNING_KEYS[headers['kid']]
 
-        parsed = jwt.decode(token, SETTINGS['AUTH0_PUBLIC_KEY'], **options)
+        parsed = jwt.decode(token, signing_key, **options)
         rtn = {
             'user': parsed.get('sub')
         }
@@ -64,16 +61,18 @@ def bearer(token, **kwargs):
             jwt.InvalidSignatureError,
             jwt.InvalidAudienceError,
             jwt.InvalidAlgorithmError) as ex:  # TODO: other jwt ex's?
-        # TODO: how to return detail to user - abort 401 here with message?
-        rtn = None
+        rtn = {'_issues': {'token': f'{ex}'}}
     except ValueError as ex:
-        rtn = None
-    except Exception as ex:  # TODO: handle differently?  end result is the same though...
-        rtn = None
+        rtn = {'_issues': {'config': f'{ex} - Please contact support for assistance, quoting this message'}}
+    except jwt.DecodeError as ex:
+        # NOTE: this should never occur - only did during development of this handler
+        rtn = {'_issues': {'auth_handler': f'{ex} - Please contact support for assistance, quoting this message'}}
+    except Exception as ex:
+        rtn = {'_issues': {'unknown': f'{ex} - Please contact support for assistance, quoting this message'}}
 
     return rtn
-    
-    
+
+
 def bearer_challenge(**kwargs):
     request = kwargs.get('request')
     rtn = {}
@@ -83,4 +82,4 @@ def bearer_challenge(**kwargs):
     ):
         rtn['error'] = "invalid_token"
 
-    return rtn    
+    return rtn

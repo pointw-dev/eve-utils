@@ -1,11 +1,9 @@
 from glob import glob
 from setuptools import setup
 
-bin = glob('bin/*')
-
 setup(
     name='eve-utils',
-    version='0.8.7',
+    version='0.9.0',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
     long_description=open('../README.md').read(),
     long_description_content_type='text/markdown',
@@ -21,7 +19,7 @@ setup(
         'Topic :: Software Development :: Code Generators',
         'Topic :: Utilities'
     ],
-    url='https://pointw.com/rapid-api-creation-with-eve-utils/',
+    url='https://github.com/pointw-dev/eve-utils',
     author='Michael Ottoson',
     author_email='michael@pointw.com',
     packages=['eve_utils'],
@@ -30,7 +28,7 @@ setup(
         'libcst',
         'inflect'
     ],    
-    scripts=bin,
+    scripts=glob('bin/*'),
     zip_safe=False
 )
 
