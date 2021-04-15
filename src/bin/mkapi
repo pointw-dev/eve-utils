@@ -2,7 +2,7 @@
 """Creates an Eve-based API project.
 
 Usage:
-    mkapi [-h|--help] [-d|--with_docker] api_name
+    mkapi [-h|--help] [-d|--with_docker] [-v|--with_val] [-a|--with_auth] api_name
 
 Examples:
     mkapi my-api
