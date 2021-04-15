@@ -3,6 +3,7 @@ Defines custom validations used in domain.
 """
 import re
 import logging
+import isodate
 
 from eve.utils import config
 from eve.io.mongo import Validator
@@ -98,3 +99,43 @@ class EveValidator(Validator):
             if not parent_ref:
                 message = f'/{resource} already has an item whose {field} is {prior_name}'
             self._error(field, message)
+
+    # ISO type definitions
+    @trace
+    def _validate_type_iso_date(self, date_value):
+        is_valid = True
+        try:
+            isodate.parse_date(date_value)
+            if not re.match(r'^([0-9]{4})-?((1[0-2]|0[1-9])-?(3[01]|0[1-9]|[12][0-9])|(W([0-4]\d|5[0-2])(-?[1-7]))|((00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6]))))$', date_value): # pylint: disable=line-too-long
+                is_valid = False
+        except isodate.ISO8601Error as ex:
+            is_valid = False
+
+        if is_valid:
+            return True
+
+    @trace
+    def _validate_type_iso_time(self, time_value):
+        is_valid = True
+        if time_value == '24:00':
+            return is_valid
+        try:
+            isodate.parse_time(time_value)
+            if not re.match(r'^([01]\d|2[0-3])\D?([0-5]\d)\D?([0-5]\d)?\D?(\d{3})?$', time_value):
+                is_valid = False
+        except isodate.ISO8601Error as ex:
+            is_valid = False
+
+        if is_valid:
+            return True
+
+    @trace
+    def _validate_type_iso_duration(self, duration_value):
+        is_valid = True
+        try:
+            isodate.parse_duration(duration_value)
+        except isodate.ISO8601Error as ex:
+            is_valid = False
+
+        if is_valid:
+            return True

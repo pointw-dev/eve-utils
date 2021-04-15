@@ -39,7 +39,7 @@ from distutils.dir_util import copy_tree
 import eve_utils
 
 def add_docker(project_name):
-    print(f'Creating docker files for {project_name}')
+    print(f'Adding docker files for {project_name} API')
 
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/docker')
 

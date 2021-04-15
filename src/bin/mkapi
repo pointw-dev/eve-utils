@@ -88,6 +88,8 @@ def main():
     parser = argparse.ArgumentParser('mkapi', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('api_name', help='The name of the API to create.')
     parser.add_argument('-d', '--with_docker', help='add Dockerfile and supporting files to deploy the API as a container', action='store_true')
+    parser.add_argument('-v', '--with_val', help='add custom validation class', action='store_true')
+    parser.add_argument('-a', '--with_auth', help='add authorization class and supporting files', action='store_true')
 
     args = parser.parse_args()
     project_name = args.api_name  # TODO: validate, safe name, etc.
@@ -97,6 +99,22 @@ def main():
         add_docker_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_docker')
         ad = import_path(add_docker_path)
         ad.add_docker(project_name)
+
+    if args.with_val:
+        add_val_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_val')
+        ad = import_path(add_val_path)
+        cur = os.getcwd()
+        os.chdir(project_name)
+        ad.add_validation()
+        os.chdir(cur)
+
+    if args.with_auth:
+        add_auth_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_auth')
+        ad = import_path(add_auth_path)
+        cur = os.getcwd()
+        os.chdir(project_name)
+        ad.add_authorization()
+        os.chdir(cur)
 
     print('Please run these two commands')
     print(f'  cd {project_name}')

@@ -86,6 +86,8 @@ If you followed the above, be sure to clean up after playing around with your ne
 
   * creates a skeleton Eve API in that folder
 
+  * for more details run `mkapi -h`
+
     
 
 * `mkresource` <resource-name>
@@ -179,10 +181,13 @@ If you followed the above, be sure to clean up after playing around with your ne
 
 *  `add_auth`  - run this in the API folder. It will add a folder named ``auth`` with modules to add authorization to your API (docs to come)
 
+   * NOTE: not necessary if you have created the API using `--with_auth`
    * NOTE: the only supported IdP is [Auth0](https://auth0.com/) at the moment, but it will be fairly easy to manually tweak to use any OAuth2 JWT issuer. (I have used a forked [Glewlwyd](https://github.com/babelouest/glewlwyd) with very minimal changes)
    
 * `add_val` - run this in the API folder.  It will add a folder named `validation` with a module that adds custom validator to `EveService`.  Use this to extend custom validations.  It comes with two:
 
+  * NOTE: not necessary if you have created the API using `--with_val`
+  
   * `unique_ignorecase` - works exactly like the built-in `unique` validator except case is ignored
   
   * `unique_to_parent` - set this to a string of a resource's parent (singular!).  Uniqueness will only be applied to sibling resources, i.e. the same name can be used if the resource has a different parent.

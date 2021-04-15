@@ -1,6 +1,8 @@
 import os
-import eve_utils
+import sys
+import subprocess
 from distutils.dir_util import copy_tree, remove_tree
+import eve_utils
 
 
 def insert_import(original_body, addition):
@@ -20,6 +22,26 @@ def insert_import(original_body, addition):
         rtn.append(item)
         
     return rtn
+    
+    
+def install_packages(packages, command):
+    trigger = 'Successfully installed '
+    subprocess.check_output([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+
+    with open('requirements.txt', 'a') as f:
+        f.write(f'\n# start: added by {command}\n')
+        for package in packages:
+            out = subprocess.check_output([sys.executable, "-m", "pip", "install", package]).decode('utf-8')
+            for line in out.split('\n'):
+                if line.startswith(trigger):
+                    installed_packages = line[len(trigger):].split(' ')
+                        
+                    for installed_package in installed_packages:
+                        if package in installed_package:
+                            hyphen = installed_package.rfind('-')
+                            f.write(f'{installed_package[:hyphen]}=={installed_package[hyphen+1:]}\n')
+
+        f.write(f'# end: added by {command}\n')
 
 
 def copy_skel(project_name, skel_folder, target_folder=None):

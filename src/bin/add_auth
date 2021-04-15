@@ -33,16 +33,11 @@ License:
 """
 
 import os
-import subprocess
-import sys
 import argparse
 import itertools
 from libcst import *
 import importlib
 import eve_utils
-
-import subprocess
-import sys
 
 # TODO: script getting default values (e.g. client keys)
 # TODO: provide non Auth0
@@ -187,24 +182,15 @@ def wire_up_service():
         source.write(new_tree.code)
 
 
-def install_packages(packages):
-    trigger = 'Successfully installed '
-    subprocess.check_output([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-
-    with open('requirements.txt', 'a') as f:
-        f.write('\n# start: added by add_auth\n')
-        for package in packages:
-            out = subprocess.check_output([sys.executable, "-m", "pip", "install", package]).decode('utf-8')
-            for line in out.split('\n'):
-                if line.startswith(trigger):
-                    installed_packages = line[len(trigger):].split(' ')
-                        
-                    for installed_package in installed_packages:
-                        if package in installed_package:
-                            hyphen = installed_package.rfind('-')
-                            f.write(f'{installed_package[:hyphen]}=={installed_package[hyphen+1:]}\n')
-
-        f.write('# end: added by add_auth\n')
+def add_authorization():
+    project_name = os.path.basename(os.getcwd())
+    eve_utils.copy_skel(project_name, 'auth')
+    eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add_auth')
+    # eve_negotiable_auth also installs authparser and pyparsing    
+    # cryptography also installs cffi, pycparser
+    # requests also installs certifi, chardet, idna, urllib3
+    
+    wire_up_service()
 
 
 def main():
@@ -223,14 +209,7 @@ def main():
         print('auth folder already exists')
         quit(3)
         
-    project_name = os.path.basename(os.getcwd())
-    eve_utils.copy_skel(project_name, 'auth')
-    install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'])  # py-crytopgraphy?
-    # eve_negotiable_auth also installs authparser and pyparsing    
-    # cryptography also installs cffi, pycparser
-    # requests also installs certifi, chardet, idna, urllib3
-    
-    wire_up_service()
+    add_authorization()
     
     print('auth modules added')
 

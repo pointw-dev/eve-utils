@@ -42,16 +42,11 @@ License:
 """
 
 import os
-import subprocess
-import sys
 import argparse
 import itertools
 from libcst import *
 import importlib
 import eve_utils
-
-import subprocess
-import sys
 
 
 class EveServiceInserter(CSTTransformer):
@@ -192,6 +187,13 @@ def wire_up_service():
     
     with open('eve_service.py', 'w') as source:
         source.write(new_tree.code)
+        
+        
+def add_validation():        
+    project_name = os.path.basename(os.getcwd())
+    eve_utils.copy_skel(project_name, 'validation')
+    eve_utils.install_packages(['isodate'], 'add_val')
+    wire_up_service()
 
 
 def main():
@@ -210,10 +212,8 @@ def main():
         print('validation folder already exists')
         quit(3)
         
-    project_name = os.path.basename(os.getcwd())
-    eve_utils.copy_skel(project_name, 'validation')
-    wire_up_service()
-    
+    add_validation()
+
     print('validation module added')
 
 
