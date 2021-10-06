@@ -76,12 +76,18 @@ def make_api(project_name):  # TODO: refactor with eve_utils.copy_skel()?
 
     for dname, dirs, files in os.walk(project_name):
         for fname in files:
+            # do not process if traversing venv folder
+            if os.path.abspath(dname).startswith(sys.prefix):
+              continue
             fpath = os.path.join(dname, fname)
-            with open(fpath) as f:
-                s = f.read()
-            s = s.replace("{$project_name}", project_name)
-            with open(fpath, "w") as f:
-                f.write(s)
+            try:
+                with open(fpath) as f:
+                    s = f.read()
+                s = s.replace("{$project_name}", project_name)
+                with open(fpath, "w") as f:
+                    f.write(s)
+            except UnicodeDecodeError as ex:
+              print(f'Skipping unprocessable file: {dname}/{fname}')
 
 
 def main():
@@ -94,7 +100,7 @@ def main():
     args = parser.parse_args()
     project_name = args.api_name  # TODO: validate, safe name, etc.
     make_api(project_name)
-    
+
     if args.with_docker:
         add_docker_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_docker')
         ad = import_path(add_docker_path)

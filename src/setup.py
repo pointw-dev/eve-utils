@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='eve-utils',
-    version='0.9.2',
+    version='0.9.3',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
     long_description=open('../README.md').read(),
     long_description_content_type='text/markdown',
@@ -27,8 +27,7 @@ setup(
     install_requires=[
         'libcst',
         'inflect'
-    ],    
+    ],
     scripts=glob('bin/*'),
     zip_safe=False
 )
-

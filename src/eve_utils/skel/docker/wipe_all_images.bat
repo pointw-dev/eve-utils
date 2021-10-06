@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-echo About to delete all images named {$project_name}
+echo About to delete all images containing the string "{$project_name}"
 SET /P AREYOUSURE=Are you sure (Y/[N])?
 IF /I "%AREYOUSURE%" NEQ "Y" GOTO END
 
