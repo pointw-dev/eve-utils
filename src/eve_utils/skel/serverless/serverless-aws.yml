@@ -1,0 +1,43 @@
+service: {$project_name}
+
+frameworkVersion: ">=1.1.0"
+
+provider:
+  name: aws
+  region: us-east-1
+  lambdaHashingVersion: 20201221
+
+  stage: dev
+  runtime: python3.9
+  environment:
+    ES_INSTANCE_NAME: "{$project_name} development serverless (aws)"
+    ## NEED MONGO CONNECTION DETAILS HERE
+    ES_MONGO_HOST: "xxx.mongodb.net"
+    ES_MONGO_PORT: 27107
+    ES_MONGO_USERNAME : "mongo-user"
+    ES_MONGO_PASSWORD : "mongo-atlas-password"
+    ES_MONGO_DBNAME: "mongo db name"
+
+
+plugins:
+  - serverless-wsgi
+  - serverless-python-requirements
+
+
+functions:
+  api:
+    handler: wsgi_handler.handler
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}
+
+
+custom:
+  wsgi:
+    app: serverless.app
+    packRequirements: false
+  pythonRequirements:
+    dockerizePip: non-linux
+
+
+configValidationMode: error

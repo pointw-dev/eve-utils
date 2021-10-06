@@ -1,12 +1,13 @@
 #!/home/sysop/git/b/bb/bin/python
-"""Adds files to facilitate building the API as a docker container
+"""Adds files to facilitate deploying the API as a serverless function
+   in either aws, azure, or google cloud
 
 Usage:
-    add_docker [-h|--help] api_name
+    add_serverless [-h|--help] api_name
       NOTE: Run this in the folder above the API project folder
 
 Examples:
-    add_docker my-api
+    add_serverless my-api
 
 License:
     MIT License
@@ -39,19 +40,19 @@ from distutils.dir_util import copy_tree
 
 import eve_utils
 
-def add_docker(project_name):
-    print(f'Adding docker files for {project_name} API')
+def add_serverless(project_name):
+    print(f'Adding serverless files for {project_name} API')
 
-    skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/docker')
+    skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/serverless')
 
     if not os.path.exists(f'{project_name}'):
         print(f'Please run this in the folder above {project_name}')
     else:
-        copy_tree(skel, '.')
+        copy_tree(skel, f'./{project_name}')
 
         # TODO: potentially dangerous to traverse folder from here?
-        # TODO: refactor this traversal/replacement with add_serverless, mkapi
-        for dname, dirs, files in os.walk('.'):
+        # TODO: refactor this traversal/replacement with add_docker, mkapi
+        for dname, dirs, files in os.walk('./{project_name}'):
             for fname in files:
                 # do not process if traversing venv folder
                 if os.path.abspath(dname).startswith(sys.prefix):
@@ -60,7 +61,7 @@ def add_docker(project_name):
                 try:
                   with open(fpath) as f:
                       s = f.read()
-                  s = s.replace("{$project_name}}", project_name)
+                  s = s.replace("{$project_name}", project_name)
                   with open(fpath, "w") as f:
                       f.write(s)
                 except UnicodeDecodeError as ex:
@@ -68,8 +69,8 @@ def add_docker(project_name):
 
 
 def main():
-    parser = argparse.ArgumentParser('add_docker', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('api_name', help='The name of the API to add docker to.')
+    parser = argparse.ArgumentParser('add_serverless', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('api_name', help='The name of the API to add serverless to.')
 
     args = parser.parse_args()
     project_name = args.api_name  # TODO: validate, safe name, etc.
@@ -77,4 +78,28 @@ def main():
 
 
 if __name__ == '__main__':
+    print('''NOTE: this feature is still under development - use at your own risk')
+This will only add four files to your api, no other changes (in other words,
+delete the four serverless* files and everything is reverted
+(one .py, three .yml).
+
+*** DO NOT USE THIS UNLESS YOU KNOW WHAT YOU ARE DOING ***
+
+To deploy your API as a serverless function you have a lot to do (that
+eventually this script will help you do).  Amongst these things:
+- install node (if you haven't already)
+- in the api folder
+    - node init your api folder
+    - npm install -g serverless
+    - npm install --save-dev serverless-wsgi serverless-python-requirements
+    --- possibly npm install other plugins
+    - configure serverless with credentials to your cloud provdiers
+      (e.g. sls config credentials --provider aws --key XXXX --secret YYYY -o)
+    - modify as required the serverless-*.yml files
+    - add  dnspython==2.1.0  to requirements.txt
+- when you are ready to deploy:
+    - sls deploy --config serverless-XXX.yml
+      (where XXX is aws, azure, or google)
+''')
+    print()
     main()

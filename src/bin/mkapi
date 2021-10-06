@@ -74,6 +74,8 @@ def make_api(project_name):  # TODO: refactor with eve_utils.copy_skel()?
     remove_if_exists(os.path.join(project_name, 'log_trace', '__pycache__'))
     remove_if_exists(os.path.join(project_name, 'utils', '__pycache__'))
 
+    # TODO: potentially dangerous to traverse folder from here?
+    # TODO: refactor this traversal/replacement with add_docker, add_serverless
     for dname, dirs, files in os.walk(project_name):
         for fname in files:
             # do not process if traversing venv folder
@@ -96,6 +98,7 @@ def main():
     parser.add_argument('-d', '--with_docker', help='add Dockerfile and supporting files to deploy the API as a container', action='store_true')
     parser.add_argument('-v', '--with_val', help='add custom validation class', action='store_true')
     parser.add_argument('-a', '--with_auth', help='add authorization class and supporting files', action='store_true')
+    parser.add_argument('-s', '--with_serverless', help='add serverless framework and supporting files', action='store_true')
 
     args = parser.parse_args()
     project_name = args.api_name  # TODO: validate, safe name, etc.
@@ -121,6 +124,11 @@ def main():
         os.chdir(project_name)
         ad.add_authorization()
         os.chdir(cur)
+
+    if args.with_serverless:
+        add_serverless_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_serverless')
+        ad = import_path(add_serverless_path)
+        ad.add_serverless(project_name)
 
     print('Please run these two commands')
     print(f'  cd {project_name}')
