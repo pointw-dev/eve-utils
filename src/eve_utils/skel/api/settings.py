@@ -2,17 +2,20 @@
 Settings to configure Eve's behaviours.
 """
 import domain
-from configuration import SETTINGS
+from configuration import SETTINGS, is_enabled
 
-MONGO_HOST = SETTINGS.get('ES_MONGO_HOST')
-MONGO_PORT = SETTINGS.get('ES_MONGO_PORT')
-MONGO_DBNAME = SETTINGS.get('ES_MONGO_DBNAME')
-if 'ES_MONGO_AUTH_SOURCE' in SETTINGS.keys():
-    MONGO_AUTH_SOURCE = SETTINGS.get('ES_MONGO_AUTH_SOURCE')
-if 'ES_MONGO_USERNAME' in SETTINGS.keys():
-    MONGO_USERNAME = SETTINGS.get('ES_MONGO_USERNAME')
-if 'ES_MONGO_PASSWORD' in SETTINGS.keys():
-    MONGO_PASSWORD = SETTINGS.get('ES_MONGO_PASSWORD')
+if is_enabled('ES_MONGO_ATLAS'):
+    MONGO_URI = f'mongodb+srv://{SETTINGS.get("ES_MONGO_USERNAME")}:{SETTINGS.get("ES_MONGO_PASSWORD")}@{SETTINGS["ES_MONGO_HOST"]}/{SETTINGS["ES_MONGO_DBNAME"]}?retryWrites=true&w=majority'
+else:
+    MONGO_HOST = SETTINGS.get('ES_MONGO_HOST')
+    MONGO_PORT = SETTINGS.get('ES_MONGO_PORT')
+    MONGO_DBNAME = SETTINGS.get('ES_MONGO_DBNAME')
+    if 'ES_MONGO_AUTH_SOURCE' in SETTINGS.keys():
+        MONGO_AUTH_SOURCE = SETTINGS.get('ES_MONGO_AUTH_SOURCE')
+    if 'ES_MONGO_USERNAME' in SETTINGS.keys():
+        MONGO_USERNAME = SETTINGS.get('ES_MONGO_USERNAME')
+    if 'ES_MONGO_PASSWORD' in SETTINGS.keys():
+        MONGO_PASSWORD = SETTINGS.get('ES_MONGO_PASSWORD')
 
 # the default BLACKLIST is ['$where', '$regex'] - the following line turns on regex
 MONGO_QUERY_BLACKLIST = ['$where']

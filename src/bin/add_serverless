@@ -40,8 +40,42 @@ from distutils.dir_util import copy_tree
 
 import eve_utils
 
+def warning():
+    print('''
+NOTE: this feature is still under development - use at your own risk!
+
+This will only add five files to your api, no other changes (in other words,
+delete the four serverless* files and the logging_console-only.yml file and
+everything is reverted.
+
+*** DO NOT USE THIS UNLESS YOU KNOW WHAT YOU ARE DOING ***
+
+To deploy your API as a serverless function you have a lot to do (that
+eventually this script will help you do).  Amongst these things (but not all):
+- install node (if you haven't already)
+- in the api folder
+    - node init your api folder
+    - npm install -g serverless
+    - npm install --save-dev serverless-wsgi serverless-python-requirements
+    --- possibly npm install other plugins
+    - configure serverless with credentials to your cloud provdiers
+      (e.g. sls config credentials --provider aws --key XXXX --secret YYYY -o)
+    - modify as required the serverless-*.yml files (esp. connection to mongo)
+    - add  dnspython==2.1.0  to requirements.txt
+- test with serverless
+    - sls wsgi serve
+- when you are ready to deploy:
+    - sls deploy --config serverless-XXX.yml
+      (where XXX is aws, azure, or google)
+
+''')
+
+
+
 def add_serverless(project_name):
     print(f'Adding serverless files for {project_name} API')
+
+    warning()
 
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/serverless')
 
@@ -52,10 +86,12 @@ def add_serverless(project_name):
 
         # TODO: potentially dangerous to traverse folder from here?
         # TODO: refactor this traversal/replacement with add_docker, mkapi
-        for dname, dirs, files in os.walk('./{project_name}'):
+        for dname, dirs, files in os.walk(f'./{project_name}'):
             for fname in files:
-                # do not process if traversing venv folder
+                # do not process if traversing nested venv folder
                 if os.path.abspath(dname).startswith(sys.prefix):
+                  continue
+                if '__pycache__' in dname:
                   continue
                 fpath = os.path.join(dname, fname)
                 try:
@@ -74,32 +110,8 @@ def main():
 
     args = parser.parse_args()
     project_name = args.api_name  # TODO: validate, safe name, etc.
-    add_docker(project_name)
+    add_serverless(project_name)
 
 
 if __name__ == '__main__':
-    print('''NOTE: this feature is still under development - use at your own risk')
-This will only add four files to your api, no other changes (in other words,
-delete the four serverless* files and everything is reverted
-(one .py, three .yml).
-
-*** DO NOT USE THIS UNLESS YOU KNOW WHAT YOU ARE DOING ***
-
-To deploy your API as a serverless function you have a lot to do (that
-eventually this script will help you do).  Amongst these things:
-- install node (if you haven't already)
-- in the api folder
-    - node init your api folder
-    - npm install -g serverless
-    - npm install --save-dev serverless-wsgi serverless-python-requirements
-    --- possibly npm install other plugins
-    - configure serverless with credentials to your cloud provdiers
-      (e.g. sls config credentials --provider aws --key XXXX --secret YYYY -o)
-    - modify as required the serverless-*.yml files
-    - add  dnspython==2.1.0  to requirements.txt
-- when you are ready to deploy:
-    - sls deploy --config serverless-XXX.yml
-      (where XXX is aws, azure, or google)
-''')
-    print()
     main()
