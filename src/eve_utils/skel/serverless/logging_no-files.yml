@@ -15,7 +15,7 @@ loggers:
         handlers: [console]
         propagate: true
     error:
-        handlers: [console]
+        handlers: [console, smtp]
         propagate: true
 
 handlers:
@@ -24,6 +24,15 @@ handlers:
         level: DEBUG
         formatter: simple
         stream: ext://sys.stdout
+    smtp: # TODO: integrate with QueueHandler so email doesn't block (look at http://flask-logconfig.readthedocs.io/en/latest/ ?)
+        # TODO: replace cri.com with some setting or something (or remove it from here and put it in config.py
+        class: logging.handlers.SMTPHandler
+        level: ERROR
+        formatter: email
+        mailhost: [internalmail.cri.com, 25]
+        fromaddr: {$project_name} <{$project_name}@cri.com>
+        toaddrs: [michael.ottoson@cri.com]
+        subject: 'Problem encountered with {$project_name}'
 
 root:
   level: DEBUG

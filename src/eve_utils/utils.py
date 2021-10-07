@@ -18,12 +18,12 @@ def insert_import(original_body, addition):
         if state == 'in-position':
             rtn.append(addition)  # TODO: if no other appends before, add newline after here
             state = 'on-bottom'
-            
+
         rtn.append(item)
-        
+
     return rtn
-    
-    
+
+
 def install_packages(packages, command):
     trigger = 'Successfully installed '
     subprocess.check_output([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
@@ -35,7 +35,7 @@ def install_packages(packages, command):
             for line in out.split('\n'):
                 if line.startswith(trigger):
                     installed_packages = line[len(trigger):].split(' ')
-                        
+
                     for installed_package in installed_packages:
                         if package in installed_package:
                             hyphen = installed_package.rfind('-')
@@ -76,7 +76,28 @@ def copy_skel(project_name, skel_folder, target_folder=None):
                     f.write(s)
 
 
+def replace_project_name(project_name, folder=None):
+    if not folder:
+        folder = f'./{project_name}'
+    for dname, dirs, files in os.walk(folder):
+        for fname in files:
+            # do not process if traversing nested venv folder
+            if os.path.abspath(dname).startswith(sys.prefix):
+              continue
+            if '__pycache__' in dname:
+              continue
+            fpath = os.path.join(dname, fname)
+            try:
+              with open(fpath) as f:
+                  s = f.read()
+              s = s.replace("{$project_name}", project_name)
+              with open(fpath, "w") as f:
+                  f.write(s)
+            except UnicodeDecodeError as ex:
+              print(f'Skipping unprocessable file: {dname}/{fname}')
+
+
+
 def remove_if_exists(folder):
     if os.path.exists(folder):
         remove_tree(folder)
-

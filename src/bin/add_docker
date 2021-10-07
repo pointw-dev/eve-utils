@@ -1,4 +1,4 @@
-#!/home/sysop/git/b/bb/bin/python
+#!/usr/bin/env python
 """Adds files to facilitate building the API as a docker container
 
 Usage:
@@ -46,27 +46,10 @@ def add_docker(project_name):
 
     if not os.path.exists(f'{project_name}'):
         print(f'Please run this in the folder above {project_name}')
-    else:
-        copy_tree(skel, '.')
+        return
 
-        # TODO: potentially dangerous to traverse folder from here?
-        # TODO: refactor this traversal/replacement with add_serverless, mkapi
-        for dname, dirs, files in os.walk(f'./{project_name}'):
-            for fname in files:
-                # do not process if traversing nested venv folder
-                if os.path.abspath(dname).startswith(sys.prefix):
-                  continue
-                if '__pycache__' in dname:
-                  continue
-                fpath = os.path.join(dname, fname)
-                try:
-                  with open(fpath) as f:
-                      s = f.read()
-                  s = s.replace("{$project_name}}", project_name)
-                  with open(fpath, "w") as f:
-                      f.write(s)
-                except UnicodeDecodeError as ex:
-                  print(f'Skipping unprocessable file: {dname}/{fname}')
+    copy_tree(skel, '.')
+    eve_utils.replace_project_name(project_name, '.')
 
 
 def main():

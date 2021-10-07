@@ -13,6 +13,7 @@ provider:
   runtime: python3.9
   environment:
     ES_INSTANCE_NAME: "{$project_name} development serverless (azure)"
+    ES_LOG_TO_FOLDER: Disabled
     ## NEED MONGO CONNECTION DETAILS HERE
     ES_MONGO_HOST: "xxx.mongodb.net"
     ES_MONGO_PORT: 27107

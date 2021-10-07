@@ -29,6 +29,17 @@ def set_optional_setting(var):
         SETTINGS[var] = os.environ.get(var)
 
 
+def envar_to_int(envar, default=0):
+    rtn = default
+    try:
+        rtn = int(os.environ.get(envar, default)
+    except ValueError:
+        rtn = default
+
+    return rtn
+
+
+
 # set environment variables from _env.conf (which is in .gitignore)
 if os.path.exists('_env.conf'):
     with open('_env.conf') as setting:
@@ -46,17 +57,17 @@ SETTINGS = {
 
     'ES_MONGO_ATLAS': os.environ.get('ES_MONGO_ATLAS', 'Disabled'),
     'ES_MONGO_HOST': os.environ.get('ES_MONGO_HOST', 'localhost'),
-    'ES_MONGO_PORT': os.environ.get('ES_MONGO_PORT', 27017),
+    'ES_MONGO_PORT': envar_to_int('ES_MONGO_PORT', 27017),
     'ES_MONGO_DBNAME': os.environ.get('ES_MONGO_DBNAME', '{$project_name}'),
-    'ES_API_PORT': os.environ.get('ES_API_PORT', 2112),
+    'ES_API_PORT': envar_to_int('ES_API_PORT', 2112),
     'ES_INSTANCE_NAME': os.environ.get('ES_INSTANCE_NAME', socket.gethostname()),
     'ES_TRACE_LOGGING': os.environ.get('ES_TRACE_LOGGING', 'Enabled'),
-    'ES_PAGINATION_LIMIT': os.environ.get('ES_PAGINATION_LIMIT', 3000),
-    'ES_PAGINATION_DEFAULT': os.environ.get('ES_PAGINATION_DEFAULT', 1000),
+    'ES_PAGINATION_LIMIT': envar_to_int('ES_PAGINATION_LIMIT', 3000),
+    'ES_PAGINATION_DEFAULT': envar_to_int('ES_PAGINATION_DEFAULT', 1000),
     'ES_LOG_TO_FOLDER': os.environ.get('ES_LOG_TO_FOLDER', 'Enabled'),
     'ES_SEND_ERROR_EMAILS': os.environ.get('ES_SEND_ERROR_EMAILS', 'Enabled'),
     'ES_SMTP_HOST': os.environ.get('ES_SMTP_HOST', 'internalmail.cri.com'),
-    'ES_SMTP_PORT': os.environ.get('ES_SMTP_PORT', 25),
+    'ES_SMTP_PORT': envar_to_int('ES_SMTP_PORT', 25),
     'ES_ERROR_EMAIL_RECIPIENTS': os.environ.get('ES_ERROR_EMAIL_RECIPIENTS', 'michael@pointw.com')
 }
 
@@ -74,17 +85,12 @@ set_optional_setting('ES_PUBLIC_RESOURCES')
 
 # Set up logging
 API_NAME = SETTINGS.get('ES_API_NAME')
-LOG_FOLDER = f'/var/log/{secure_filename(API_NAME)}'
-
-if not os.path.exists(LOG_FOLDER):
-    os.makedirs(LOG_FOLDER)
 
 with open('logging.yml', 'r') as f:
     logging_config = yaml.load(f, Loader=yaml.FullLoader)
 
 if is_enabled('ES_LOG_TO_FOLDER'):
     LOG_FOLDER = f'/var/log/{secure_filename(API_NAME)}'
-
     if not os.path.exists(LOG_FOLDER):
         os.makedirs(LOG_FOLDER)
 
@@ -96,7 +102,6 @@ if is_enabled('ES_SEND_ERROR_EMAILS'):
     logging_config['handlers']['smtp']['mailhost'] = [SETTINGS.get('ES_SMTP_HOST'), SETTINGS.get('ES_SMTP_PORT')]
     logging_config['handlers']['smtp']['toaddrs'] = [e.strip() for e in SETTINGS.get('ES_ERROR_EMAIL_RECIPIENTS').split(',')]
     logging_config['handlers']['smtp']['subject'] = f'Problem encountered with {API_NAME}'
-
 
 
 logging.config.dictConfig(logging_config)

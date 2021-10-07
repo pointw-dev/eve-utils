@@ -74,22 +74,7 @@ def make_api(project_name):  # TODO: refactor with eve_utils.copy_skel()?
     remove_if_exists(os.path.join(project_name, 'log_trace', '__pycache__'))
     remove_if_exists(os.path.join(project_name, 'utils', '__pycache__'))
 
-    # TODO: potentially dangerous to traverse folder from here?
-    # TODO: refactor this traversal/replacement with add_docker, add_serverless
-    for dname, dirs, files in os.walk(project_name):
-        for fname in files:
-            # do not process if traversing venv folder
-            if os.path.abspath(dname).startswith(sys.prefix):
-              continue
-            fpath = os.path.join(dname, fname)
-            try:
-                with open(fpath) as f:
-                    s = f.read()
-                s = s.replace("{$project_name}", project_name)
-                with open(fpath, "w") as f:
-                    f.write(s)
-            except UnicodeDecodeError as ex:
-              print(f'Skipping unprocessable file: {dname}/{fname}')
+    eve_utils.replace_project_name(project_name)
 
 
 def main():
