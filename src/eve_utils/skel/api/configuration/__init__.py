@@ -32,7 +32,7 @@ def set_optional_setting(var):
 def envar_to_int(envar, default=0):
     rtn = default
     try:
-        rtn = int(os.environ.get(envar, default)
+        rtn = int(os.environ.get(envar, default))
     except ValueError:
         rtn = default
 

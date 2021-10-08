@@ -12,12 +12,8 @@ provider:
   environment:
     ES_INSTANCE_NAME: "{$project_name} development serverless (aws)"
     ES_LOG_TO_FOLDER: Disabled
+    ES_SEND_ERROR_EMAILS: Disabled
     ## NEED MONGO CONNECTION DETAILS HERE
-    ES_MONGO_HOST: "xxx.mongodb.net"
-    ES_MONGO_PORT: 27107
-    ES_MONGO_USERNAME : "mongo-user"
-    ES_MONGO_PASSWORD : "mongo-atlas-password"
-    ES_MONGO_DBNAME: "mongo db name"
 
 
 plugins:

@@ -13,7 +13,7 @@ if [ "$opt" = "TEST" ]; then
       echo NOT PUBLISHING
       # TODO: build first
     fi
-elif [ -d $opt/bin ]; then
+elif [ ! -z $opt ] && [ -d $opt/bin ]; then
     echo "Publishing to $opt"
     cp ./bin/* $opt/bin
     find $opt/lib/ -type d -name eve_utils -exec cp -r ./eve_utils/* {} \;

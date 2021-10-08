@@ -1,6 +1,6 @@
 # ishowroom-control-api
 
-An Eve-based API, brought to you by **[eve-utils](https://pointw.com/rapid-api-creation-with-eve-utils/)**.
+An Eve-based API, created with **[eve-utils](https://pointw.com/rapid-api-creation-with-eve-utils/)**.
 
 ## Getting Started
 
@@ -65,7 +65,7 @@ The base variables are prefixed with ES_ for Eve Service.  The environment varia
 | Variable                  | Description                                                  | Default                                                     |
 | ------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
 | ES_API_NAME               | The name of your API.  Appears in logs and emails.           | The name you used with `mkapi` (i.e. {$project_name})                              |
-| ES_MONGO_ATLAS            | Set to Enabled (or True, or Yes) to use the following Mongo values to construct the MONGO_URI.  If disabled, will use a non-atlas connection. | Disabled                                                    |
+| ES_MONGO_ATLAS            | Set to Enabled (or True, or Yes) to use the following Mongo values to construct the MONGO_URI.  If disabled, will use a non-Atlas connection. | Disabled                                                    |
 | ES_MONGO_HOST             |                                                              | localhost                                                   |
 | ES_MONGO_PORT             | (ignored if ES_MONGO_ATLAS is enabled)                       | 27017                                                       |
 | ES_MONGO_DBNAME           |                                                              | The name you used with `mkapi` (i.e. {$project_name})                             |
@@ -90,19 +90,19 @@ Optional environment variables
 | ES_MEDIA_BASE_URL    | Eve pass-through                        |
 | ES_PUBLIC_RESOURCES  | not yet implemented                     |
 
-If using auth (e.g. `mkapi {$project_name} --with_auth` )
+If using auth (e.g. `mkapi {$project_name} --with_auth` or `add_auth` )
 | Variable               | Description                                                  | Default                                          |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
 | ES_AUTH_ADD_BASIC      | When enabled, allows a basic authentication scheme with root/password | No                                               |
 | ES_AUTH_ROOT_PASSWORD  | When ES_AUTH_ADD_BASIC is enabled, this is the password the root user uses to gain access to the API. | password                                         |
-| ES_AUTH_REALM          |                                                              | {$project_name}.cri.com                          |
+| ES_AUTH_REALM          | Appears in the `WWW-Authenticate` header in unauthorized requests. | {$project_name}.pointw.com                       |
 | ES_AUTH_JWT_DOMAIN     |                                                              | {$project_name}.us.auth0.com                     |
-| ES_AUTH_JWT_AUDIENCE   |                                                              | https://cri.com/{$project_name}                  |
-| AUTH0_API_AUDIENCE     |                                                              | https://{$project_name}.us.auth0.com/api/v2/     |
-| AUTH0_API_BASE_URL     |                                                              | https://{$project_name}.us.auth0.com/api/v2      |
-| AUTH0_CLAIMS_NAMESPACE |                                                              | https://cri.com/{$project_name}                  |
-| AUTH0_TOKEN_ENDPOINT   |                                                              | https://{$project_name}.us.auth0.com/oauth/token |
-| AUTH0_CLIENT_ID        |                                                              | --your-client-id--                               |
+| ES_AUTH_JWT_AUDIENCE   | This is the identifier a client uses when requesting a token from the auth provider.  It is a URI only (identifier only), not an actual URL (i.e. no requests are made to it) | https://pointw.com/{$project_name}               |
+| AUTH0_API_AUDIENCE     | When {$project_name} requests a token to use the Auth0 API, this is the audience for the token. | https://{$project_name}.us.auth0.com/api/v2/     |
+| AUTH0_API_BASE_URL     | The base of the Auth0 API                                    | https://{$project_name}.us.auth0.com/api/v2      |
+| AUTH0_CLAIMS_NAMESPACE | If you configure Auth0 to insert additional claims, use this value as a namespace (prefix). | https://pointw.com/{$project_name}               |
+| AUTH0_TOKEN_ENDPOINT   | When {$project_name} needs to call the Auth0 API, it uses this endpoint to request a token. | https://{$project_name}.us.auth0.com/oauth/token |
+| AUTH0_CLIENT_ID        | When {$project_name} needs to call the Auth0 API, it uses this client id/secret to authenticate.  These are not the client id/secret of your application. | --your-client-id--                               |
 | AUTH0_CLIENT_SECRET    |                                                              | --your-client-secret--                           |
 
 ## Project Structure
