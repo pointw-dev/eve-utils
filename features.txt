@@ -9,7 +9,7 @@ settings system
     - API should run right after git clone, i.e. with optionals omitted or with default values (even if only in limited capacity)
     - all settings can be set (or derived) from envars (container compatible)
     - _env.conf takes precedence (developer convenience)
-- envars (useful for docker)
+- envars (useful for docker, serverless)
 - defaults
 - dumped to log
 - viewable via endpoint
@@ -83,7 +83,7 @@ exception handling
 @trace decorator
 
 commands
-- mkapi (-d|--with_docker, -v|--with_val, -a|--with_auth)
+- mkapi (-d|--with_docker, -v|--with_val, -a|--with_auth, -s|--with_serverless)
 - mkresource
 - mkrel
 - add_docker
@@ -104,6 +104,9 @@ commands
         - iso_date
         - iso_time
         - iso_duration
+- add_serverless
+    - basic wiring for aws, azure, google
+    - also provides sls wsgi serve
 
 tidied _links (parent, collection, etc.)
 

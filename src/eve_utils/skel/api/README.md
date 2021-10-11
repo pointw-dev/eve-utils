@@ -1,4 +1,4 @@
-# ishowroom-control-api
+# {$project_name}
 
 An Eve-based API, created with **[eve-utils](https://pointw.com/rapid-api-creation-with-eve-utils/)**.
 
@@ -10,12 +10,12 @@ If you have created this api with docker support (`mkapi {$project_name} --with_
 
 If you have created this api with serverless support (`mkapi {$project_name} --with_serverless`) then to launch your API:
 
-`sls wsgi serve`
+`sls wsgi serve -p 2112`
 
 If you did not add docker or serverless support, do the following (I recommend you first create a [virtual environment](https://realpython.com/python-virtual-environments-a-primer/)):
 
 ```bash
-cd ishowroom-control-api
+cd {$project_name}
 pip install -r requirements.txt
 python run.py
 ```
@@ -23,8 +23,7 @@ python run.py
 Either way, the API is now running and its base endpoint is
 
 http://localhost:2112 (for docker or for `python run.py`)
-or
-http://localhost:5000 (for serverless)
+
 
 After making changes to the API, you must stop/start the API service.
 
@@ -91,6 +90,7 @@ Optional environment variables
 | ES_PUBLIC_RESOURCES  | not yet implemented                     |
 
 If using auth (e.g. `mkapi {$project_name} --with_auth` or `add_auth` )
+
 | Variable               | Description                                                  | Default                                          |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
 | ES_AUTH_ADD_BASIC      | When enabled, allows a basic authentication scheme with root/password | No                                               |

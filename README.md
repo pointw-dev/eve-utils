@@ -22,7 +22,7 @@ app.run()
 
 **eve-utils** helps make some of that work easier.
 
-Install eve-utils with pip. 
+Install eve-utils with pip.
 
 `pip install eve-utils`
 
@@ -36,7 +36,7 @@ Get started with three easy steps
 
    *(note: if you don't have docker installed, create the API without `--with-docker`, then later run the API with `python run.py` - assuming you have mongodb running on localhost:27127)*
 
-   
+
 
 2. Add domain resources
 
@@ -45,7 +45,7 @@ Get started with three easy steps
    mkresource people
    ```
 
-   
+
 
 3. Build and launch the API
 
@@ -88,7 +88,7 @@ If you followed the above, be sure to clean up after playing around with your ne
 
   * for more details run `mkapi -h`
 
-    
+
 
 * `mkresource` <resource-name>
 
@@ -98,13 +98,13 @@ If you followed the above, be sure to clean up after playing around with your ne
 
   * add fields by modifying domain/*resource-name*.py - as you would any Eve resource
 
-  * NOTE: resources in Eve are collections, so eve-utils names resources as plural by convention, 
+  * NOTE: resources in Eve are collections, so eve-utils names resources as plural by convention,
 
     * i.e. if you enter mkresource **dog** it will create an endpoint named **/dogs**
 
     * eve-utils rely on the [inflect](https://pypi.org/project/inflect/) library for pluralization, which is very accurate but can make mistakes
 
-      
+
 
 * `mkrel` <parent-resource> <child-resource>
 
@@ -147,7 +147,7 @@ If you followed the above, be sure to clean up after playing around with your ne
     ```javascript
     const axios = require('axios')
     axios.defaults.baseURL = 'http://localhost:2112'
-    
+
     axios.get('/people/Michael').then((response) => {
         const person = response.data
         const car = {
@@ -159,9 +159,9 @@ If you followed the above, be sure to clean up after playing around with your ne
 
   * `-p` `--as_parent_ref`:  field name defaults to `_` *parent-resource* `_ref`, e.g. if the parent name was dogs the field would be `_dog_ref`.  Using this parameter, the field name become literally `_parent_ref`.  Useful to implement generic parent traversals.
 
-  
 
-* `add_docker` <api-name> - run this in the folder above the root api folder to create a basic docker files and some useful build scripts (to be further documented later).
+
+* `add_docker` <api-name> - run this in the folder above the root api folder to create basic docker files and some useful build scripts (to be further documented later).
 
   * NOTE: not necessary if you have created the API using `--with_docker`
 
@@ -176,32 +176,53 @@ If you followed the above, be sure to clean up after playing around with your ne
     `image-build`
 
     `image-build.bat`
-    
-    
+
+
+
+* `add_serverless` <api-name> - run this in the folder above the root api folder to create basic serverless files
+
+  * NOTE: not necessary if you have created the API using `--with_serverless`
+
+  * Adds the following files:
+
+    `serverless.py` - instantiates, but doesn't run, the Eve app object.  This object is made available to the serverless framework and is referenced in the `.yml` files
+
+    `serverless-aws.yml`
+
+    `serverless-azure.yml`
+
+    `serverless-google.yml`
+
+    `logging_no-files.yml` - copy this over the original `logging.yml` to eliminate logging to the file system (which is not available with serverless)
+
+  * Also installs serverless globally with npm, does an npm init in the root api folder, and locally installs some serverless plugins (node modules).
+
+
 
 *  `add_auth`  - run this in the API folder. It will add a folder named ``auth`` with modules to add authorization to your API (docs to come)
 
    * NOTE: not necessary if you have created the API using `--with_auth`
    * NOTE: the only supported IdP is [Auth0](https://auth0.com/) at the moment, but it will be fairly easy to manually tweak to use any OAuth2 JWT issuer. (I have used a forked [Glewlwyd](https://github.com/babelouest/glewlwyd) with very minimal changes)
-   
+
+
 * `add_val` - run this in the API folder.  It will add a folder named `validation` with a module that adds custom validator to `EveService`.  Use this to extend custom validations.  It comes with two:
 
   * NOTE: not necessary if you have created the API using `--with_val`
-  
+
   * `unique_ignorecase` - works exactly like the built-in `unique` validator except case is ignored
-  
+
   * `unique_to_parent` - set this to a string of a resource's parent (singular!).  Uniqueness will only be applied to sibling resources, i.e. the same name can be used if the resource has a different parent.
-  
+
     * e.g.
-  
+
       ```bash
       mkresource region
       mkresource store
       mkrel region store
       ```
-  
+
       Now in domain.store, change the name field definition from this:
-  
+
       ```python
       'name": {
         'type': 'string',
@@ -209,9 +230,9 @@ If you followed the above, be sure to clean up after playing around with your ne
         'unique': True
       }
       ```
-  
+
       to this:
-  
+
       ```python
       'name": {
         'type': 'string',
@@ -224,4 +245,3 @@ If you followed the above, be sure to clean up after playing around with your ne
 
 
 MORE TO COME!
-

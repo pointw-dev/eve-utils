@@ -4,7 +4,7 @@ frameworkVersion: ">=1.1.0"
 
 provider:
   name: google
-  project: ishowroom-control           # google account project name
+  project: {$project_name}           # google account project name
   credentials: ~/.gcloud/keyfile.json  # must be absolute path
 
   stage: dev

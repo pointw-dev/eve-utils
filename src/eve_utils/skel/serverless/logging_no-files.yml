@@ -5,7 +5,7 @@ formatters:
     detail:
         format: '%(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s'
     email:
-        format: '%(levelname)s sent from ishowroom-control-api %(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s'
+        format: '%(levelname)s sent from {$project_name} %(asctime)s - %(levelname)s - File: %(filename)s - %(funcName)s() - Line: %(lineno)d -  %(message)s'
 
 loggers:
     all:
