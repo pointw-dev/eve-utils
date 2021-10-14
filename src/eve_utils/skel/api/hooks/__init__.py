@@ -13,8 +13,8 @@ def add_hooks(app):
     hooks._error_handlers.add_hooks(app)
     hooks._settings.add_hooks(app)
     hooks._logs.add_hooks(app)
-    
-    
+
+
 def _post_POST(resource, request, payload):
     if payload.status_code == 201:
         j = json.loads(payload.data)
@@ -34,7 +34,36 @@ def _post_GET(resource, request, payload):
                 _remove_unnecessary_links(item)
         else:
             _remove_unnecessary_links(j)
+
+        if resource is None:
+            _rewrite_schema_links(j)
+
         payload.data = json.dumps(j)
+
+
+def _rewrite_schema_links(j):
+    if '_links' in j and 'child' in j['_links'] and len(j['_links']) == 1:
+        old = j['_links']['child']
+        del j['_links']['child']
+        new = {
+            'self': {
+                'href': '/',
+                'title': 'endpoints'
+            },
+            'logging': {
+                'href': '/_logging',
+                'title': 'logging'
+            }
+        }
+
+        for link in old:
+            if '<' not in link['href'] and not link['title'] == '_schema':
+                rel = link['title']
+                if rel.startswith('_'):
+                    rel = rel[1:]
+                link['href'] = '/' + link['href']
+                new[rel] = link
+        j['_links'] = new
 
 
 def _remove_unnecessary_links(item):

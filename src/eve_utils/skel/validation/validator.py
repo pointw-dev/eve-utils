@@ -94,10 +94,10 @@ class EveValidator(Validator):
 
         prior = collection.find_one(query)
         if prior and unique_to_parent:
-            prior_name = prior.get('name')
-            message = f'/{parent_resource}/{parent_ref}/{resource} already has an item whose {field} is {prior_name}'
+            prior_field = prior.get(field)
+            message = f'/{parent_resource}/{parent_ref}/{resource} already has an item whose {field} is {prior_field}'
             if not parent_ref:
-                message = f'/{resource} already has an item whose {field} is {prior_name}'
+                message = f'/{resource} already has an item whose {field} is {prior_field}'
             self._error(field, message)
 
     # ISO type definitions

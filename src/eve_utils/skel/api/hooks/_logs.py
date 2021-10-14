@@ -34,7 +34,7 @@ def add_hooks(app):
         if app.auth and not app.auth.authorized(None, '_logging', 'PUT'):
             return make_error_response('Please provide proper credentials', 401)
 
-        return _put_logging_config(flask_request)
+        return _put_logging_config()
 
 
 @trace
@@ -55,20 +55,20 @@ def _get_logging_config():
     }
 
     response = make_response(jsonify(payload), 200)
-    _log_request('_logging', request, response)
+    _log_request('_logging', flask_request, response)
     return response
 
 
 @trace
-def _put_logging_config(request):
+def _put_logging_config():
     """PUTs the verbosity for handlers."""
     response = make_error_response('Could not change log settings', 400)
 
     try:
-        if request.content_type != 'application/json':
+        if flask_request.content_type != 'application/json':
             raise TypeError('The request body must be application/json')
 
-        payload = json.loads(request.data)
+        payload = json.loads(flask_request.data)
 
         logger = logging.getLogger()
         # first loop through to ensure everything is valid
@@ -98,5 +98,5 @@ def _put_logging_config(request):
     except Exception as ex:
         response = make_error_response('Could not change log settings', 400, exception=ex)
 
-    _log_request('_logging', request, response)
+    _log_request('_logging', flask_request, response)
     return response

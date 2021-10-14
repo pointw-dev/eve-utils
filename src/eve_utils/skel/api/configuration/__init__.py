@@ -135,7 +135,6 @@ if is_enabled('ES_SEND_ERROR_EMAILS'):
     for setting in sorted(SETTINGS):
         key = setting.upper()
         if ('PASSWORD' not in key) and ('SECRET' not in key):
-            LOG.info(f'{setting}: {SETTINGS[setting]}')
             EMAIL_FORMAT += f'{setting}: {SETTINGS[setting]}\n'
     EMAIL_FORMAT += '\n\n'
 
@@ -144,3 +143,10 @@ if is_enabled('ES_SEND_ERROR_EMAILS'):
 
     SMTP_HANDLER = [x for x in HANDLERS if x.name == 'smtp'][0]
     SMTP_HANDLER.setFormatter(logging.Formatter(EMAIL_FORMAT))
+
+
+for setting in sorted(SETTINGS):
+    key = setting.upper()
+    if ('PASSWORD' not in key) and ('SECRET' not in key):
+        LOG.info(f'{setting}: {SETTINGS[setting]}')
+        EMAIL_FORMAT += f'{setting}: {SETTINGS[setting]}\n'
