@@ -23,7 +23,11 @@ def _post_POST(resource, request, payload):
                 _edit_collection_link(request, item)
         else:
             _edit_collection_link(request, j)
-        payload.data = json.dumps(j)
+
+        if 'pretty' in request.args:
+            payload.data = json.dumps(j, indent=4)
+        else:
+            payload.data = json.dumps(j)
 
 
 def _post_GET(resource, request, payload):
@@ -38,7 +42,10 @@ def _post_GET(resource, request, payload):
         if resource is None:
             _rewrite_schema_links(j)
 
-        payload.data = json.dumps(j)
+        if 'pretty' in request.args:
+            payload.data = json.dumps(j, indent=4)
+        else:
+            payload.data = json.dumps(j)
 
 
 def _rewrite_schema_links(j):

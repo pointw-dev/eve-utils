@@ -5,9 +5,21 @@ from flask import current_app
 
 LOG = logging.getLogger('utils')
 
+unauthorized_message = {
+    "_status": "ERR",
+    "_error": {
+        "message": "Please provide proper credentials",
+        "code": 401
+    }
+}
+
 
 def get_db():
     return current_app.data.driver.db
+
+
+def get_api():
+    return current_app.test_client()
 
 
 def make_error_response(message, code, issues=[], **kwargs):
@@ -37,4 +49,11 @@ def make_error_response(message, code, issues=[], **kwargs):
 
     return make_response(jsonify(resp), code)
 
+
+def is_enabled(setting):
+    return setting[0].lower() in 'yte'
+    # i.e. the following means setting is enabled:
+    # - 'Yes' or 'yes' or 'Y' or 'y'
+    # - 'True' or 'true' or 'T' or 't'
+    # - 'Enabled' or 'enabled' or 'E' or 'e'
 

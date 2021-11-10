@@ -23,6 +23,14 @@ plugins:
   - serverless-python-requirements
 #  - serverless-azure-functions
 
+package:
+  patterns:
+    - '!_env.conf'
+    - '!node_modules/**'
+    - '!.serverless/**'
+    - '!.serverless_plugins/**'
+    - '!venv/**'
+    - '!**/*.pyc'
 
 functions:
   api:

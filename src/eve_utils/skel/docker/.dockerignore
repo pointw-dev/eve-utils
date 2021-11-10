@@ -1,10 +1,10 @@
 Dockerfile
 .dockerignore
 docker-compose.yml
+**/node_modules
 **/*.pyproj
 **/*.pyc
 README.md
-**/eve
 **/*.pdb
 **/*.log
 **/.pylintrc

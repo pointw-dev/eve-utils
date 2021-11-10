@@ -4,12 +4,12 @@ The auth module used for ES.
 from bson.objectid import ObjectId
 from eve_negotiable_auth import NegotiableAuth, AUTH_PARSER
 
-from utils import get_db
+from utils import get_db, is_enabled
 from . import SETTINGS
 from .auth_handlers import basic, bearer, bearer_challenge
 
 AUTH_PARSER.add_handler('Bearer', bearer, bearer_challenge, realm=f'{SETTINGS["ES_AUTH_REALM"]}')
-if SETTINGS['ES_AUTH_ADD_BASIC'][0] in 'tyTY':
+if is_enabled(SETTINGS['ES_AUTH_ADD_BASIC']):
     AUTH_PARSER.add_handler('Basic', basic, realm=f'{SETTINGS["ES_AUTH_REALM"]}')
 
 

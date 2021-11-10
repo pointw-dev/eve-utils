@@ -3,7 +3,7 @@
 cp ../README.md .
 rm -rf dist
 rm -rf build
-rm eve_utils.egg-info
+rm -rf eve_utils.egg-info
 
 grep version setup.py
 

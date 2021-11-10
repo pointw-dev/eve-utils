@@ -21,6 +21,15 @@ plugins:
   - serverless-python-requirements
 #  - serverless-google-cloudfunctions
 
+package:
+  patterns:
+    - '!_env.conf'
+    - '!node_modules/**'
+    - '!.serverless/**'
+    - '!.serverless_plugins/**'
+    - '!venv/**'
+    - '!**/*.pyc'
+
 functions:
   api:
     handler: wsgi_handler.handler
