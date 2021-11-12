@@ -4,7 +4,7 @@ if [ "$#" -lt 1 ]; then
     exit
 fi
 
-REPOS=ishowroom-catalog-api
+REPOS={$project_name}
 docker build -t $REPOS:latest .
 
 LATESTIMAGE=$(docker images $REPOS:latest --quiet)
