@@ -1,4 +1,5 @@
 import json
+from utils import is_enabled, echo_message
 import hooks._error_handlers
 import hooks._settings
 import hooks._logs
@@ -9,6 +10,11 @@ from log_trace.decorators import trace
 def add_hooks(app):
     app.on_post_GET += _post_GET
     app.on_post_POST += _post_POST
+
+    if is_enabled('ES_ADD_ECHO'):
+        @app.route('/_echo', methods=['PUT'])
+        def _echo_message():
+            return echo_message()
 
     hooks._error_handlers.add_hooks(app)
     hooks._settings.add_hooks(app)

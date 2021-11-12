@@ -1,6 +1,6 @@
 import logging
 from flask import jsonify, make_response
-from flask import current_app
+from flask import current_app, request
 
 
 LOG = logging.getLogger('utils')
@@ -57,3 +57,23 @@ def is_enabled(setting):
     # - 'True' or 'true' or 'T' or 't'
     # - 'Enabled' or 'enabled' or 'E' or 'e'
 
+
+def echo_message():
+    log = logging.getLogger('echo')
+    message = 'PUT {"message": {}/"", "status_code": int}, content-type: "application/json"'
+    status_code = 400
+    if request.is_json:
+        try:
+            status_code = int(request.json.get('status_code', status_code))
+            message = request.json.get('message', message)
+        except ValueError:
+            pass
+
+    if status_code < 400:
+        log.info(message)
+    elif status_code < 500:
+        log.warning(message)
+    else:
+        log.error(message)
+
+    return make_response(jsonify(message), status_code)

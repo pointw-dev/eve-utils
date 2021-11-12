@@ -2,7 +2,8 @@
 Settings to configure Eve's behaviours.
 """
 import domain
-from configuration import SETTINGS, is_enabled
+from utils import is_enabled
+from configuration import SETTINGS
 
 if is_enabled('ES_MONGO_ATLAS'):
     MONGO_URI = f'mongodb+srv://{SETTINGS.get("ES_MONGO_USERNAME")}:{SETTINGS.get("ES_MONGO_PASSWORD")}@{SETTINGS["ES_MONGO_HOST"]}/{SETTINGS["ES_MONGO_DBNAME"]}?retryWrites=true&w=majority'

@@ -1,6 +1,7 @@
 import os
 import socket
 
+from utils import is_enabled
 from configuration.log_setup import get_configured_logger
 
 VERSION = '0.1.0'
@@ -42,6 +43,7 @@ SETTINGS = {
     'ES_TRACE_LOGGING': os.environ.get('ES_TRACE_LOGGING', 'Enabled'),
     'ES_PAGINATION_LIMIT': environment_variable_to_int('ES_PAGINATION_LIMIT', 3000),
     'ES_PAGINATION_DEFAULT': environment_variable_to_int('ES_PAGINATION_DEFAULT', 1000),
+    'ES_ADD_ECHO': os.environ.get('ES_ADD_ECHO', 'Disabled'),
     'ES_LOG_TO_FOLDER': os.environ.get('ES_LOG_TO_FOLDER', 'Disabled'),
     'ES_SEND_ERROR_EMAILS': os.environ.get('ES_SEND_ERROR_EMAILS', 'Disabled'),
 }
@@ -53,10 +55,11 @@ set_optional_setting('ES_MONGO_AUTH_SOURCE')
 set_optional_setting('ES_MEDIA_BASE_URL')
 set_optional_setting('ES_PUBLIC_RESOURCES')
 
-set_optional_setting('ES_SMTP_HOST')
-set_optional_setting('ES_SMTP_PORT')
-set_optional_setting('ES_ERROR_EMAIL_RECIPIENTS')
-set_optional_setting('ES_ERROR_EMAIL_FROM')
+if is_enabled('ES_SEND_ERROR_EMAILS'):
+    SETTINGS['ES_SMTP_PORT'] = environment_variable_to_int('ES_SMTP_PORT', 25)
+    set_optional_setting('ES_SMTP_HOST')
+    set_optional_setting('ES_ERROR_EMAIL_RECIPIENTS')
+    set_optional_setting('ES_ERROR_EMAIL_FROM')
 
 # cancellable settings...
 # if SETTINGS.get('ES_CANCELLABLE') == '':

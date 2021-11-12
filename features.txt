@@ -57,7 +57,9 @@ settings system
     'AUTH0_CLIENT_SECRET': os.environ.get('AUTH0_CLIENT_SECRET',
                                           '--your-client-secret--'),
         # Auth0: Applications->Applications->(Machine to Machine)->Basic Information->Client Secret
-                                          
+
+
+- ES_ADD_ECHO - turns on endpoint that echos the message body with given status_code                                          
  
     
 - expandable for app needs
