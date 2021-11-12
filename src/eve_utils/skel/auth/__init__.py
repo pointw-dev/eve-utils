@@ -2,6 +2,7 @@
 import os
 import logging
 import jwt
+from utils import log_settings
 
 LOG = logging.getLogger('auth')
 
@@ -32,7 +33,4 @@ SIGNING_KEYS = {jwk.key_id: jwk.key for jwk in _jwks}
 if SETTINGS['ES_AUTH_JWT_AUDIENCE'] == '':
     del SETTINGS['ES_AUTH_JWT_AUDIENCE']
 
-for setting in SETTINGS:
-    key = setting.upper()
-    if ('PASSWORD' not in key) and ('SECRET' not in key):
-        LOG.info('%s: %s', setting, SETTINGS[setting])
+log_settings(LOG, SETTINGS)

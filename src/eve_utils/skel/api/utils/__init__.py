@@ -58,6 +58,13 @@ def is_enabled(setting):
     # - 'Enabled' or 'enabled' or 'E' or 'e'
 
 
+def log_settings(log, settings):
+    for setting in sorted(settings):
+        key = setting.upper()
+        if ('PASSWORD' not in key) and ('SECRET' not in key):
+            log.info(f'{setting}: {settings[setting]}')
+
+
 def echo_message():
     log = logging.getLogger('echo')
     message = 'PUT {"message": {}/"", "status_code": int}, content-type: "application/json"'

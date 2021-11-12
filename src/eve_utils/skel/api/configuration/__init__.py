@@ -1,7 +1,7 @@
 import os
 import socket
 
-from utils import is_enabled
+from utils import is_enabled, log_settings
 from configuration.log_setup import get_configured_logger
 
 VERSION = '0.1.0'
@@ -66,7 +66,4 @@ if is_enabled('ES_SEND_ERROR_EMAILS'):
 #     del SETTINGS['ES_CANCELLABLE']
 
 LOG = get_configured_logger(SETTINGS, VERSION)
-for setting in sorted(SETTINGS):
-    key = setting.upper()
-    if ('PASSWORD' not in key) and ('SECRET' not in key):
-        LOG.info(f'{setting}: {SETTINGS[setting]}')
+log_settings(LOG, SETTINGS)
