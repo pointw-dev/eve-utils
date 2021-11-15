@@ -149,7 +149,7 @@ def ensure_node_initialized():
 
 def ensure_serverless_plugins_installed():
     print('Installing serverless plugins')
-    exit_code, out, err = run_process('npm install --save-dev serverless-wsgi serverless-python-requirements')
+    exit_code, out, err = run_process('npm install --save-dev serverless-wsgi serverless-python-requirements serverless-domain-manager')
 
     if exit_code:
         print('Something went wrong installing serverless plugins.')
