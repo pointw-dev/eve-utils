@@ -12,6 +12,11 @@ def set_optional_setting(var):
         SETTINGS[var] = os.environ.get(var)
 
 
+def set_optional_int_setting(var):
+    if os.environ.get(var):
+        SETTINGS[var] = environment_variable_to_int(var)
+
+
 def environment_variable_to_int(variable, default=0):
     try:
         rtn = int(os.environ.get(variable, default))
@@ -49,6 +54,9 @@ SETTINGS = {
 }
 
 # optional settings...
+set_optional_setting("ES_URL_PREFIX")
+set_optional_setting("ES_CACHE_CONTROL")
+set_optional_int_setting("ES_CACHE_EXPIRES")
 set_optional_setting('ES_MONGO_USERNAME')
 set_optional_setting('ES_MONGO_PASSWORD')
 set_optional_setting('ES_MONGO_AUTH_SOURCE')

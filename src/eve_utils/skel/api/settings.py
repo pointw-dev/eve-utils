@@ -2,8 +2,8 @@
 Settings to configure Eve's behaviours.
 """
 import domain
+from configuration import SETTINGS, environment_variable_to_int
 from utils import is_enabled
-from configuration import SETTINGS
 
 if is_enabled(SETTINGS.get('ES_MONGO_ATLAS')):
     MONGO_URI = f'mongodb+srv://{SETTINGS.get("ES_MONGO_USERNAME")}:{SETTINGS.get("ES_MONGO_PASSWORD")}@{SETTINGS["ES_MONGO_HOST"]}/{SETTINGS["ES_MONGO_DBNAME"]}?retryWrites=true&w=majority'
@@ -17,6 +17,13 @@ else:
         MONGO_USERNAME = SETTINGS.get('ES_MONGO_USERNAME')
     if 'ES_MONGO_PASSWORD' in SETTINGS.keys():
         MONGO_PASSWORD = SETTINGS.get('ES_MONGO_PASSWORD')
+
+if "ES_URL_PREFIX" in SETTINGS.keys():
+    URL_PREFIX = SETTINGS.get("ES_URL_PREFIX")
+if "ES_CACHE_CONTROL" in SETTINGS.keys():
+    CACHE_CONTROL = SETTINGS.get("ES_CACHE_CONTROL")
+if "ES_CACHE_EXPIRES" in SETTINGS.keys():
+    CACHE_EXPIRES = SETTINGS.get("ES_CACHE_EXPIRES")
 
 # the default BLACKLIST is ['$where', '$regex'] - the following line turns on regex
 MONGO_QUERY_BLACKLIST = ['$where']

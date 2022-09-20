@@ -88,6 +88,11 @@ Optional environment variables
 | ES_MONGO_AUTH_SOURCE | Eve pass-through                        |
 | ES_MEDIA_BASE_URL    | Eve pass-through                        |
 | ES_PUBLIC_RESOURCES  | not yet implemented                     |
+| ES_URL_PREFIX        | If the API will be deployed behind a URL with a path, use this variable to set that path.  For example, if you deploy the API behind https://example.com/api/my_service, then set ES_URL_PREFIX to "api/my_service" |
+| ES_CACHE_CONTROL     | Sets the Cache-Control header (e.g. `no-cache, no-store, must-revalidate`) |
+| ES_CACHE_EXPIRES     | Sets the Cache-Expires header (value is in secods)           |
+| ES_ADD_ECHO          | If enabled, an undocumented endpoint will be created off of the root resource: `_echo`.  PUT {"message": {}, "status_code: int"} to this endpoint and it will be echoed back to you and logged (`.info` if < 400, `.warning` if < 500, else `.error`).  Useful to test the behaviour of error codes (e.g. with logging configurations) |
+
 
 If using auth (e.g. `mkapi {$project_name} --with_auth` or `add_auth` )
 
