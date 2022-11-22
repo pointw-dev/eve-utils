@@ -85,7 +85,7 @@ exception handling
 @trace decorator
 
 commands
-- mkapi (-d|--with_docker, -v|--with_val, -a|--with_auth, -s|--with_serverless)
+- mkapi (-d|--with_docker, -v|--with_val, -a|--with_auth, -s|--with_serverless -w|--with_web_socket)
 - mkresource
 - mkrel
 - add_docker
@@ -109,6 +109,9 @@ commands
 - add_serverless
     - basic wiring for aws, azure, google
     - also provides sls wsgi serve
+- add_web_socket
+    - wires up a web socket, listening at /_ws
+    - provides samples (which should be deleted before production)
 
 tidied _links (parent, collection, etc.)
 

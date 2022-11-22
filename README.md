@@ -200,7 +200,6 @@ If you followed the above, be sure to clean up after playing around with your ne
 
 
 *  `add_auth`  - run this in the API folder. It will add a folder named ``auth`` with modules to add authorization to your API (docs to come)
-
    * NOTE: not necessary if you have created the API using `--with_auth`
    * NOTE: the only supported IdP is [Auth0](https://auth0.com/) at the moment, but it will be fairly easy to manually tweak to use any OAuth2 JWT issuer. (I have used a forked [Glewlwyd](https://github.com/babelouest/glewlwyd) with very minimal changes)
 
@@ -240,6 +239,12 @@ If you followed the above, be sure to clean up after playing around with your ne
         'unique_to_parent': 'region'
       }
       ```
+
+*  `add_web_socket`  - run this in the API folder. It will add web socket at `{{BASE_API_URL}}/_ws`
+   * Define other events/listeners, emitters/senders in `web_socket/__init__.py` - feel free to remove the default stuff you see there
+   * There is a test client at `{{BASE_API_URL}}/_ws` (which you can remove in `web_socket/__init__.py` by removing the `/_ws/chat` route)
+     * This is useful to see how to configure the Javascript socket.io client to connect to the web socket now running in the API
+     * It is also useful to test messages - the chat app merely re-emits what it receives
 
 
 

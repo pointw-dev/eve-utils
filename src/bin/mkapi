@@ -2,7 +2,7 @@
 """Creates an Eve-based API project.
 
 Usage:
-    mkapi [-h|--help] [-d|--with_docker] [-v|--with_val] [-a|--with_auth] api_name
+    mkapi [-h|--help] [-d|--with_docker] [-v|--with_val] [-a|--with_auth] [-w|--with_web_socket] api_name
 
 Examples:
     mkapi my-api
@@ -84,6 +84,7 @@ def main():
     parser.add_argument('-v', '--with_val', help='add custom validation class', action='store_true')
     parser.add_argument('-a', '--with_auth', help='add authorization class and supporting files', action='store_true')
     parser.add_argument('-s', '--with_serverless', help='add serverless framework and supporting files', action='store_true')
+    parser.add_argument('-w', '--with_web_socket', help='add web socket and supporting files', action='store_true')
 
     args = parser.parse_args()
     project_name = args.api_name  # TODO: validate, safe name, etc.
@@ -114,6 +115,11 @@ def main():
         add_serverless_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_serverless')
         ad = import_path(add_serverless_path)
         ad.add_serverless(project_name)
+
+    if args.with_web_socket:
+        add_web_socket = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_web_socket')
+        ad = import_path(add_web_socket)
+        ad.add_web_socket(project_name)
 
     print('Please run these two commands')
     print(f'  cd {project_name}')
