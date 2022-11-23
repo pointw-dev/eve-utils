@@ -145,3 +145,8 @@ If using auth (e.g. `mkapi {$project_name} --with_auth` or `add_auth` )
 | &nbsp;&nbsp; auth_handlers.py | Where you add/modify authentication handlers, (e.g. if you wish to support Digest or custom auth scheme). |
 | &nbsp;&nbsp; es_auth.py       | Defines `EveAuthService` which provides authentication to `EveService` . |
 | &nbsp;&nbsp; \_\_init\_\_.py      | Defines the settings used by the `auth` module. |
+| **templates**           | This folder is added when you run `add_web_socket`. |
+| &nbsp;&nbsp; ws.html       | Contains Javascript clients use to connect to the web socket. |
+| &nbsp;&nbsp; chat.html       | An ultra simple client you can use to test the web socket.  You should delete after testing. |
+| **web_socket**           | This module is added when you run `add_web_socket`. |
+| &nbsp;&nbsp; \_\_init\_\_.py       | This is where you can add web socket event handlers and/or send/emit methods to broadcast onto the socket.  It currently has 'hello world' code, including the chat application (see /templates).  You should remove these as you see fit. |
