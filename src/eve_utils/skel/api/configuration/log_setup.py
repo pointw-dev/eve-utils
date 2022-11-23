@@ -103,15 +103,15 @@ def get_configured_logger(settings, version):
 
     logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
-    log = logging.getLogger('configuration')
-    log.info('%s version:  %s', api_name, version)
-    log.info('Eve version:      %s', eve_version)
-    log.info('Cerberus version: %s', cerberus_version)
-    log.info('Python version:   %s', platform.sys.version)
+    LOG = logging.getLogger('configuration')
+    LOG.info('%s version:  %s', api_name, version)
+    LOG.info('Eve version:      %s', eve_version)
+    LOG.info('Cerberus version: %s', cerberus_version)
+    LOG.info('Python version:   %s', platform.sys.version)
 
     if smtp_warnings:
         for warning in smtp_warnings:
-            log.warning(warning)
+            LOG.warning(warning)
     elif is_enabled(settings['ES_SEND_ERROR_EMAILS']):  # TODO: can this be moved up to logging_config setup?
         instance_name = settings.get('ES_INSTANCE_NAME')
         email_format = f'''%(levelname)s sent from {api_name} instance "{instance_name}" (hostname: {socket.gethostname()})
