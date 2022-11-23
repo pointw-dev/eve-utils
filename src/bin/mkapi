@@ -119,7 +119,10 @@ def main():
     if args.with_web_socket:
         add_web_socket = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'add_web_socket')
         ad = import_path(add_web_socket)
-        ad.add_web_socket(project_name)
+        cur = os.getcwd()
+        os.chdir(project_name)
+        ad.add_web_socket()
+        os.chdir(cur)
 
     print('Please run these two commands')
     print(f'  cd {project_name}')
