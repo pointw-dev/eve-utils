@@ -25,7 +25,7 @@ class EveService:
         LOG.info(f'****** STARTING {self._name} ******')
         LOG.info(border)
         try:
-            self._socket.run(self._app, host='0.0.0.0', port=SETTINGS.get('ES_API_PORT'))
+            self._socket.run(self._app, host='0.0.0.0', port=SETTINGS.get('ES_API_PORT'), allow_unsafe_werkzeug=True)
         except Exception as ex:  # pylint: disable=broad-except
             LOG.exception(ex)
         finally:
