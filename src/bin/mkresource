@@ -345,7 +345,7 @@ Defines the {resource} resource.
         file.write('''DEFINITION = {
     'schema': SCHEMA,
     'datasource': {
-        'projection': {'_role': 0, '_acl': 0}
+        'projection': {'_tenant': 0}
     },
     'additional_lookup': {
         'url': 'regex("[\w]+")',  # pylint: disable=anomalous-backslash-in-string

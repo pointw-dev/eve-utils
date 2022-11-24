@@ -54,9 +54,9 @@ SETTINGS = {
 }
 
 # optional settings...
-set_optional_setting("ES_URL_PREFIX")
-set_optional_setting("ES_CACHE_CONTROL")
-set_optional_int_setting("ES_CACHE_EXPIRES")
+set_optional_setting('ES_URL_PREFIX')
+set_optional_setting('ES_CACHE_CONTROL')
+set_optional_int_setting('ES_CACHE_EXPIRES')
 set_optional_setting('ES_MONGO_USERNAME')
 set_optional_setting('ES_MONGO_PASSWORD')
 set_optional_setting('ES_MONGO_AUTH_SOURCE')

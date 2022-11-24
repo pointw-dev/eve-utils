@@ -8,8 +8,9 @@ from log_trace.decorators import trace
 
 @trace
 def add_hooks(app):
-    app.on_post_GET += _post_GET
+    app.on_post_GET += _fix_links
     app.on_post_POST += _post_POST
+    app.on_post_PATCH += _fix_links
 
     if is_enabled('ES_ADD_ECHO'):
         @app.route('/_echo', methods=['PUT'])
@@ -36,17 +37,20 @@ def _post_POST(resource, request, payload):
             payload.data = json.dumps(j)
 
 
-def _post_GET(resource, request, payload):
+def _fix_links(resource, request, payload):
     if payload.status_code == 200:
         j = json.loads(payload.data)
-        if '_items' in j:
-            for item in j['_items']:
-                _remove_unnecessary_links(item)
-        else:
-            _remove_unnecessary_links(j)
 
         if resource is None:
             _rewrite_schema_links(j)
+
+        if '_items' in j:
+            for item in j['_items']:
+                _remove_unnecessary_links(item)
+                _add_missing_slashes(item)
+        else:
+            _remove_unnecessary_links(j)
+            _add_missing_slashes(item)
 
         if 'pretty' in request.args:
             payload.data = json.dumps(j, indent=4)
@@ -80,8 +84,21 @@ def _rewrite_schema_links(j):
 
 
 def _remove_unnecessary_links(item):
-    if 'related' in item['_links']:
+    if 'related' in item.get('_links', {}):
         del item['_links']['related']
+
+
+def _add_missing_slashes(item):
+    if '_links' not in item:
+        return
+    for rel in item['_links']:
+        link = item['_links'][rel]:
+        if (
+            not link['href'].startswith('/')
+            and not link['href'].startswith('http://')
+            and not link['href'].starswith('https://')
+        ):
+            link['href'] = '/' + link['href']
 
 
 def _edit_collection_link(request, item):

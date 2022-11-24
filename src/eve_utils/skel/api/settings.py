@@ -58,6 +58,7 @@ X_HEADERS = [
     'Cache-Control'
 ]
 
+UPLOAD_FOLDER = 'uploads/'
 RETURN_MEDIA_AS_BASE64_STRING = False
 RETURN_MEDIA_AS_URL = True
 
@@ -65,6 +66,6 @@ if 'ES_MEDIA_BASE_URL' in SETTINGS.keys():
     MEDIA_BASE_URL = SETTINGS.get('ES_MEDIA_BASE_URL')
 EXTENDED_MEDIA_INFO = ['content_type', 'name', 'length']
 
+AUTH_FIELD = '_tenant'
 DOMAIN = domain.DOMAIN
 
-UPLOAD_FOLDER = 'uploads/'

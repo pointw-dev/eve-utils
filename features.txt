@@ -97,6 +97,8 @@ commands
         grants all usernames no matter what password,
         admin if root (unless accounts is used, then account.role=='admin')
         used as backdoor - to harden modify es_auth.process_claims and auth_handlers.basic()
+    - multi-tenant: see note at the end of auth/es_auth.py:process_claims()
+    - permissions: see auth/es_auth.py:process_claims()
 - add_val
     - adds custom validation class
     - two validation rules added

@@ -47,9 +47,11 @@ def bearer(token, **kwargs):
         }
 
         claims_namespace = SETTINGS['AUTH0_CLAIMS_NAMESPACE']
+        claims = parsed.get(f'{claims_namespace}/claims')
+        rtn['permissions'] = parsed.get('permissions', [])
 
-        for claim in ['roles', 'acl', 'email', 'name', 'nickname']:
-            value = parsed.get(f'{claims_namespace}/{claim}')
+        for claim in ['id', 'name', 'nickname', 'email', 'roles']:
+            value = claims.get(claim)
             if value:
                 rtn[claim] = value
         if 'roles' in rtn:

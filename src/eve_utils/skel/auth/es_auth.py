@@ -37,4 +37,9 @@ class EveServiceAuth(NegotiableAuth):
         if resource in ['accounts', 'roles'] and not is_admin:
             authorized = False
 
+        # NOTE: To set the tenant value, pass it to self.set_request_auth_value(), for example:
+        # tenent_field = 'replace this with the name of the field'
+        # tenent = claims[tenent_field].upper() if tenent_field in claims else 'unknown'
+        # self.set_request_auth_value(tenent)
+
         return authorized
