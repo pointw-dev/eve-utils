@@ -8,7 +8,8 @@
 <body>
 <script type="text/javascript">
 $(document).ready(function() {
-	var socket = io.connect('ws://localhost:2112/', {path: '/_ws/socket.io'});
+        var hostname = window.location.host;
+        var socket = io.connect('ws://'+ hostname +'/', {path: '/_ws/socket.io'});
 	socket.on('connect', function() {
 		socket.send('User has connected!');
 	});

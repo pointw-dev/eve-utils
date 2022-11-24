@@ -7,6 +7,7 @@ rm -rf eve_utils.egg-info
 
 grep version setup.py
 
-python setup.py sdist bdist_wheel
+## WHY DOES THIS NOT WORK? IS IT EVEN NEEDED?  python setup.py sdist bdist_wheel
+python setup.py bdist_wheel
 rm README.md
 
