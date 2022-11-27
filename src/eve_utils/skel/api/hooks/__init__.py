@@ -92,7 +92,7 @@ def _add_missing_slashes(item):
     if '_links' not in item:
         return
     for rel in item['_links']:
-        link = item['_links'][rel]:
+        link = item['_links'][rel]
         if (
             not link['href'].startswith('/')
             and not link['href'].startswith('http://')

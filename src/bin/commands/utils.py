@@ -4,7 +4,9 @@ import subprocess
 from distutils.dir_util import copy_tree, remove_tree
 import eve_utils
 
-
+def jump_to_api_root():
+    pass
+    
 def insert_import(original_body, addition):
     rtn = []
     state = 'on-top'

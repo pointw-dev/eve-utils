@@ -8,7 +8,7 @@ if not exist \Envs\%1\Lib\site-packages\eve_utils\nul goto usage
 
 :dev
 echo publishing to %1 virtual environment
-copy %~dp0\bin\* \envs\%1\scripts /Y >nul
+xcopy %~dp0\bin\* \envs\%1\scripts /s/Y >nul
 xcopy %~dp0\eve_utils\* \Envs\%1\Lib\site-packages\eve_utils /s/Y >nul
 
 goto :end
