@@ -5,7 +5,7 @@ import glob
 from pathlib import Path
 from libcst import *
 from singplu import get_pair
-from .code_gen import DomainDefinitionInserter, HooksInserter
+from code_gen import DomainDefinitionInserter, HooksInserter
 from . import utils
 
 

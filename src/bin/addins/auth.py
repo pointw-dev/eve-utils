@@ -100,7 +100,7 @@ class EveServiceInserter(CSTTransformer):
                 ),
             ])
 
-        new_body = eve_utils.insert_import(updated_node.body, addition)
+        new_body = utils.insert_import(updated_node.body, addition)
 
         return updated_node.with_changes(
             body = new_body
@@ -190,8 +190,8 @@ def add():
         print('This command must be run in an eve_service API folder structure')
         return
 
-    eve_utils.copy_skel(settings['project_name'], 'auth')
-    eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add_auth')
+    utils.copy_skel(settings['project_name'], 'auth')
+    utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add_auth')
     # eve_negotiable_auth also installs authparser and pyparsing    
     # cryptography also installs cffi, pycparser
     # requests also installs certifi, chardet, idna, urllib3

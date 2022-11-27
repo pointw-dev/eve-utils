@@ -1,5 +1,6 @@
 import os
 import json
+import functools
 import click
 from distutils.dir_util import copy_tree, remove_tree
 import importlib
@@ -66,12 +67,32 @@ def _create_api(project_name):
     utils.replace_project_name(project_name, '.')
     
     
-def _add_addins(add_git, add_docker):
-    if add_git:
-        addins.git.add(add_git)
+def _add_addins(kwargs):
+    for keyword in [kw for kw in kwargs.keys() if kwargs[kw]]:
+        addin = keyword[4:]  # remove "add_"
+        if addin == 'git':
+            continue
+        print(f'===== adding {addin}')
+        addin_module = importlib.import_module(f'addins.{addin}')
+        add = getattr(addin_module, 'add')
+        if kwargs[keyword] == 'n/a':
+            add()
+        else:
+            add(kwargs[keyword])
         
-    if add_docker:
-        addins.docker.add()
+    if kwargs['add_git']:
+        print(f'===== adding git')    
+        addins.git.add(kwargs['add_git'])
+
+
+def addin_params(func):
+    @click.option('--add_git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
+    @click.option('--add_docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container', flag_value='n/a')
+    @click.option('--add_auth', '-a', is_flag=True, help='add authorization class and supporting files', flag_value='n/a')
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
 
 
 @click.group(name='api')
@@ -81,16 +102,16 @@ def commands():
 
 @commands.command(cls=CommandWithOptionalFlagValues, name='create', short_help="<name> or '.' to use the current folder's name")
 @click.argument('project_name', metavar='<name>')
-@click.option('--add_git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
-@click.option('--add_docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container', flag_value='n/a')
-def create(project_name, add_git, add_docker):
+@addin_params
+def create(**kwargs):
     """<name> or "." to use the current folder's name"""
-    _create_api(project_name)
-    _add_addins(add_git, add_docker)
+    _create_api(kwargs['project_name'])
+    del kwargs['project_name']
+    _add_addins(kwargs)
 
 
-@commands.command(cls=CommandWithOptionalFlagValues, short_help="short help")
-@click.option('--add_git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
-@click.option('--add_docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container')
-def addin(add_git, add_docker):
-    _add_addins(add_git, add_docker)
+@commands.command(cls=CommandWithOptionalFlagValues, short_help="Add an addin to an already created API")
+@addin_params
+def addin(**kwargs):
+    """Add an addin to an already created API"""
+    _add_addins(kwargs)
