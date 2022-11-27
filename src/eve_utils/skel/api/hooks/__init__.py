@@ -50,7 +50,7 @@ def _fix_links(resource, request, payload):
                 _add_missing_slashes(item)
         else:
             _remove_unnecessary_links(j)
-            _add_missing_slashes(item)
+            _add_missing_slashes(j)
 
         if 'pretty' in request.args:
             payload.data = json.dumps(j, indent=4)

@@ -30,7 +30,7 @@ class HooksInserter(CSTTransformer):
             ),
         )
 
-        new_body = utils.insert_import(updated_node.body, addition)
+        new_body = insert_import(updated_node.body, addition)
 
         return updated_node.with_changes(
             body = new_body

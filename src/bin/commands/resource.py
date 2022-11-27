@@ -1,146 +1,12 @@
 import os
 import click
 import itertools
+import glob
+from pathlib import Path
 from libcst import *
 from singplu import get_pair
-from .code_gen import DomainDefinitionInserter
+from .code_gen import DomainDefinitionInserter, HooksInserter
 from . import utils
-
-
-class HooksInserter(CSTTransformer):
-    def __init__(self, resource):
-        self.resource = resource
-
-    def leave_Module(self, original_node, updated_node):
-        addition = SimpleStatementLine(
-            body=[
-                Import(
-                    names=[ImportAlias(name=Attribute(value=Name(value='hooks'), attr=Name(value=f'{self.resource}')))],
-                    semicolon=MaybeSentinel.DEFAULT,
-                    whitespace_after_import=SimpleWhitespace(
-                        value=' ',
-                    ),
-                ),
-            ],
-            leading_lines=[],
-            trailing_whitespace=TrailingWhitespace(
-                whitespace=SimpleWhitespace(
-                    value='',
-                ),
-                comment=None,
-                newline=Newline(
-                    value=None,
-                ),
-            ),
-        )
-
-        new_body = utils.insert_import(updated_node.body, addition)
-
-        return updated_node.with_changes(
-            body = new_body
-        )
-
-    def leave_FunctionDef(self, original_node, updated_node):
-        if not original_node.name.value == 'add_hooks':
-            return original_node
-
-        addition = SimpleStatementLine(
-            body=[
-                Expr(
-                    value=Call(
-                        func=Attribute(
-                            value=Attribute(
-                                value=Name(
-                                    value='hooks',
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                attr=Name(
-                                    value=f'{self.resource}',
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                dot=Dot(
-                                    whitespace_before=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    whitespace_after=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                ),
-                                lpar=[],
-                                rpar=[],
-                            ),
-                            attr=Name(
-                                value='add_hooks',
-                                lpar=[],
-                                rpar=[],
-                            ),
-                            dot=Dot(
-                                whitespace_before=SimpleWhitespace(
-                                    value='',
-                                ),
-                                whitespace_after=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        args=[
-                            Arg(
-                                value=Name(
-                                    value='app',
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                keyword=None,
-                                equal=MaybeSentinel.DEFAULT,
-                                comma=MaybeSentinel.DEFAULT,
-                                star='',
-                                whitespace_after_star=SimpleWhitespace(
-                                    value='',
-                                ),
-                                whitespace_after_arg=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                        ],
-                        lpar=[],
-                        rpar=[],
-                        whitespace_after_func=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_before_args=SimpleWhitespace(
-                            value='',
-                        ),
-                    ),
-                    semicolon=MaybeSentinel.DEFAULT,
-                ),
-            ],
-            leading_lines=[],
-            trailing_whitespace=TrailingWhitespace(
-                whitespace=SimpleWhitespace(
-                    value='',
-                ),
-                comment=None,
-                newline=Newline(
-                    value=None,
-                ),
-            ),
-        )
-
-        new_body = []
-        for item in itertools.chain(updated_node.body.body, [addition]):  # TODO: if addition is first, prepend with newline
-            new_body.append(item)
-
-        return updated_node.with_changes(
-            body=updated_node.body.with_changes(
-                body=new_body
-            )
-        )
-
-
 
 
 def create_resource_domain_file(resource, add_common):
@@ -151,7 +17,7 @@ Defines the {resource} resource.
 ''')
 
         if add_common:
-            file.write('from domain.common import COMMON_FIELDS\n\n\n')
+            file.write('from domain._common import COMMON_FIELDS\n\n\n')
 
         file.write('''SCHEMA = {
     'name': {
@@ -250,31 +116,47 @@ def insert_hooks(resource):
         source.write(new_tree.code)
 
 
-
-
 @click.group(name='resource')
 def commands():
     pass
 
+
 @commands.command(name='create')
 @click.argument('resource_name', metavar='<name>')
-#    parser.add_argument('-c', '--no_common', help='Do not add common fields to this resource', action='store_true', default=False)
-def create(resource_name):
-    """<name> of the resource to create"""
-    singular, plural = get_pair(resource_name)
-    add_common = True  # not args.no_common
+@click.option('--no_common', '-c', is_flag=True, help='Do not add common fields to this resource')
+def create(resource_name, no_common):
+    """<name> of the resource to create"""  
+    try:
+        utils.jump_to_api_folder('src/{project_name}')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        return
 
-    if os.path.exists('eve_service.py') and os.path.exists('domain'):
-        print(f'Creating {plural} resource')
-        create_resource_domain_file(plural, add_common)
-        insert_domain_definition(plural)
-        create_resource_hook_file(singular, plural)
-        insert_hooks(plural)
+    singular, plural = get_pair(resource_name)    
+    add_common = not no_common
+    
+    print(f'Creating {plural} resource')
+    create_resource_domain_file(plural, add_common)
+    insert_domain_definition(plural)
+    create_resource_hook_file(singular, plural)
+    insert_hooks(plural)
 
 
 @commands.command(name='list')
 def list():
-    click.echo('list')
+    try:
+        utils.jump_to_api_folder('src/{project_name}/domain')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        return
+        
+    files = glob.glob('./*.py')
+    for file in files:
+        resource = Path(file).stem
+        if resource.startswith('_'):
+            continue
+        print('- ' + file[2:-3])
+        
 
 
 @commands.command(name='remove')

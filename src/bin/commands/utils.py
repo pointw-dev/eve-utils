@@ -1,12 +1,33 @@
 import os
 import sys
 import subprocess
+import json
 from distutils.dir_util import copy_tree, remove_tree
 import eve_utils
 
-def jump_to_api_root():
-    pass
+def jump_to_api_folder(path=None):
+    keep_going = True
+    while keep_going:
+        if os.path.isfile('.eve-utils'):
+            keep_going = False
+            break
+            
+        if os.path.isdir('..'):
+            os.chdir('..')
+        else:
+            raise RuntimeError('Not in an eve_service API folder')
+
+    with open('.eve-utils', 'r') as f:
+        settings = json.load(f)
+
+    if path:
+        project_name = settings['project_name']
+        path = eval("f'" + f'{path}' + "'")
+        os.chdir(path)
     
+    return settings
+
+
 def insert_import(original_body, addition):
     rtn = []
     state = 'on-top'

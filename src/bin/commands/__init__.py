@@ -1,6 +1,5 @@
 import click
 
-# from . import utils
 from . import api
 from . import resource
 from . import rel

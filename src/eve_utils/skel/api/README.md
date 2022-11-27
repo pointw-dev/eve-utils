@@ -124,7 +124,7 @@ If using auth (e.g. `mkapi {$project_name} --with_auth` or `add_auth` )
 | **configuration**  |   |
 | &nbsp;&nbsp; \_\_init\_\_.py      | Settings used by the application (some set default Eve values in `settings.py` . |
 | **domain**         | Where your domain resources will be created when you use `mkresource` . |
-| &nbsp;&nbsp; common.py        | Fields applied to all resources (skipped if API was created with `--no_common` ). |
+| &nbsp;&nbsp; _common.py        | Fields applied to all resources (skipped if API was created with `--no_common` ). |
 | &nbsp;&nbsp; _settings.py     | Defines the `/_settings` endpoint, which you GET to see the application settings. |
 | &nbsp;&nbsp; \_\_init\_\_.py      | Wires up all resources and makes them available to `EveService` . |
 | **hooks**            | Wires up [Eve event hooks](https://docs.python-eve.org/en/stable/features.html#eventhooks) for logging, relationship navigation, etc. |
