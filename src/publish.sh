@@ -16,6 +16,7 @@ if [ "$opt" = "TEST" ]; then
 elif [ ! -z $opt ] && [ -d $opt/bin ]; then
     echo "Publishing to $opt"
     cp ./bin/* $opt/bin
+    # TODO: remove old contents
     find $opt/lib/ -type d -name eve_utils -exec cp -r ./eve_utils/* {} \;
 else
     echo "Publishing to PROD"

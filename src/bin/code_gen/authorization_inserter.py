@@ -1,55 +1,9 @@
-#!/usr/bin/env python
-"""Adds custom validation module to the API project.
-
-This also adds two new validation rules
-- unique_to_parent
-    - the field must be unique amongst other resources with the same parent_ref, but can
-      be repeated within other parents
-- unique_ignorecase
-    - prevents the same value being considered unique when the only difference is case
-      e.g. 'station #1' will be considered the same as 'Station #1', the rule will
-      prevent whichever is second from being inserted.
-
-Usage:
-    add_val [-h|--help]
-      NOTE: Must be run in the project folder
-
-Examples:
-    add_val
-
-License:
-    MIT License
-
-    Copyright (c) 2021 Michael Ottoson
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-"""
-
-import os
-import argparse
 import itertools
 from libcst import *
-import importlib
-import eve_utils
+from commands import utils
 
 
-class EveServiceInserter(CSTTransformer):
+class AuthorizationInserter(CSTTransformer):
     def __init__(self):
         pass
 
@@ -59,12 +13,12 @@ class EveServiceInserter(CSTTransformer):
                 ImportFrom(
                     module=Attribute(
                         value=Name(
-                            value='validation',
+                            value='auth',
                             lpar=[],
                             rpar=[],
                         ),
                         attr=Name(
-                            value='validator',
+                            value='es_auth',
                             lpar=[],
                             rpar=[],
                         ),
@@ -82,7 +36,7 @@ class EveServiceInserter(CSTTransformer):
                     names=[
                         ImportAlias(
                             name=Name(
-                                value='EveValidator',
+                                value='EveAuthorization',
                                 lpar=[],
                                 rpar=[],
                             ),
@@ -106,7 +60,7 @@ class EveServiceInserter(CSTTransformer):
                 ),
             ])
 
-        new_body = eve_utils.insert_import(updated_node.body, addition)
+        new_body = utils.insert_import(updated_node.body, addition)
 
         return updated_node.with_changes(
             body = new_body
@@ -129,12 +83,12 @@ class EveServiceInserter(CSTTransformer):
     def leave_Assign(self, original_node, updated_node):
         addition = Arg(
             value=Name(
-                value='EveValidator',
+                value='EveAuthorization',
                 lpar=[],
                 rpar=[],
             ),
             keyword=Name(
-                value='validator',
+                value='auth',
                 lpar=[],
                 rpar=[],
             ),
@@ -178,44 +132,3 @@ class EveServiceInserter(CSTTransformer):
         )
 
 
-def wire_up_service():
-    with open('eve_service.py', 'r') as source:
-        tree = parse_module(source.read())
-    
-    inserter = EveServiceInserter()
-    new_tree = tree.visit(inserter)
-    
-    with open('eve_service.py', 'w') as source:
-        source.write(new_tree.code)
-        
-        
-def add_validation():        
-    project_name = os.path.basename(os.getcwd())
-    eve_utils.copy_skel(project_name, 'validation')
-    eve_utils.install_packages(['isodate'], 'add_val')
-    wire_up_service()
-
-
-def main():
-    parser = argparse.ArgumentParser('add_val', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    args = parser.parse_args()
-
-    if not os.path.exists('./requirements.txt'):
-        print('requirements.txt missing - must be run in the API folder')
-        quit(1)
-        
-    if not os.path.exists('./domain'):
-        print('domain folder missing - must be run in the API folder')
-        quit(2)
-        
-    if os.path.exists('./validation'):
-        print('validation folder already exists')
-        quit(3)
-        
-    add_validation()
-
-    print('validation module added')
-
-
-if __name__ == '__main__':
-    main()

@@ -1,11 +1,20 @@
 #!/usr/bin/env python
-"""Adds web socket functionality to API
+"""Adds custom validation module to the API project.
+
+This also adds two new validation rules
+- unique_to_parent
+    - the field must be unique amongst other resources with the same parent_ref, but can
+      be repeated within other parents
+- unique_ignorecase
+    - prevents the same value being considered unique when the only difference is case
+      e.g. 'station #1' will be considered the same as 'Station #1', the rule will
+      prevent whichever is second from being inserted.
 
 Usage:
-    add_web_socket
+    add_val
 
 Examples:
-    add_web_socket
+    add_val
 
 License:
     MIT License
@@ -32,34 +41,23 @@ License:
 """
 
 import os
-import sys
-import argparse
-from distutils.dir_util import copy_tree
-
-
+import itertools
+from libcst import *
+from code_gen import ValidationInserter
 from commands import utils
 
 
-def modify_eve_service():
-    with open('./eve_service.py', 'r') as f:
-        lines = f.readlines()
+def wire_up_service():
+    with open('eve_service.py', 'r') as source:
+        tree = parse_module(source.read())
+    
+    inserter = ValidationInserter()
+    new_tree = tree.visit(inserter)
+    
+    with open('eve_service.py', 'w') as source:
+        source.write(new_tree.code)
         
-    with open('./eve_service.py', 'w') as f:
-        for line in lines:
-            if 'from flask_cors import CORS' in line:
-                f.write(line)
-                f.write('from flask_socketio import SocketIO\n')
-                f.write('import web_socket\n')
-            elif 'hooks.add_hooks(self._app)' in line:
-                f.write(line)
-                f.write("        self._socket = SocketIO(self._app, async_mode=None, path='/_ws/socket.io', cors_allowed_origins='*')\n")
-                f.write("        web_socket.initialize(self._app, self._socket)\n")
-            elif 'self._app.run' in line:
-                f.write("            self._socket.run(self._app, host='0.0.0.0', port=SETTINGS.get('ES_API_PORT'), allow_unsafe_werkzeug=True)\n")
-            else:
-                f.write(line)
-
-
+        
 def add():
     try:
         settings = utils.jump_to_api_folder('src/{project_name}')
@@ -67,10 +65,12 @@ def add():
         print('This command must be run in an eve_service API folder structure')
         return
 
-    if os.path.exists('./web_socket'):
-        print('web_socket folder already exists')
+    if os.path.exists('./validation'):
+        print('validation has already been added')
         return
 
-    modify_eve_service()
-    utils.copy_skel(settings['project_name'], 'web_socket', '.')
-    utils.install_packages(['Flask-SocketIO'], 'add_web_socket')
+    utils.copy_skel(settings['project_name'], 'validation')
+    utils.install_packages(['isodate'], 'add_validation')
+    wire_up_service()
+
+    print('validation module added')

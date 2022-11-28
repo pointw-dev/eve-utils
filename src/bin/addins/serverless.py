@@ -35,11 +35,9 @@ License:
 
 import os
 import sys
-import argparse
+import click
 from subprocess import Popen, PIPE
-from distutils.dir_util import copy_tree
-
-import eve_utils
+from commands import utils
 
 
 def warning():
@@ -73,6 +71,7 @@ Before you deploy
   to serverless.yml, then you can leave off the --config...
 
 ''')
+    click.confirm('Do you want to continue?', abort=True)
 
 
 
@@ -158,45 +157,29 @@ def ensure_serverless_plugins_installed():
     return True
 
 
-def add_serverless(project_name):
-    print(f'Adding serverless files for {project_name} API')
-
+def add():
     warning()
 
-    skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/serverless')
-
-    if not os.path.exists(f'{project_name}'):
-        print(f'Please run this in the folder above {project_name}')
+    try:
+        settings = utils.jump_to_api_folder('src')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        return
+        
+    utils.copy_skel(settings['project_name'], 'serverless', '.')
+    utils.replace_project_name(settings['project_name'], '.')
+    
+    if not is_node_installed():
         return
 
-    copy_tree(skel, f'./{project_name}')
-    eve_utils.replace_project_name(project_name)
-
-    if not is_node_installed():
-        quit(1)
-
     if not ensure_serverless_is_installed():
-        quit(2)
+        return
 
-    os.chdir(f'./{project_name}')
-    eve_utils.install_packages(['dnspython'], 'add_serverless')
+    os.chdir(f"./{settings['project_name']}")
+    utils.install_packages(['dnspython'], 'add_serverless')
 
     if not ensure_node_initialized():
-        quit(3)
+        return
 
     if not ensure_serverless_plugins_installed():
-        quit(4)
-
-
-
-def main():
-    parser = argparse.ArgumentParser('add_serverless', description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('api_name', help='The name of the API to add serverless to.')
-
-    args = parser.parse_args()
-    project_name = args.api_name  # TODO: validate, safe name, etc.
-    add_serverless(project_name)
-
-
-if __name__ == '__main__':
-    main()
+        return

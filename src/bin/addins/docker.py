@@ -43,7 +43,6 @@ def add():
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
         return
-    
-    docker_skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/docker')
-    copy_tree(docker_skel, '.')
+
+    utils.copy_skel(settings['project_name'], 'docker', '.')
     utils.replace_project_name(settings['project_name'], '.')
