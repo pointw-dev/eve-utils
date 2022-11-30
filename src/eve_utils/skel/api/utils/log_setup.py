@@ -9,10 +9,10 @@ import platform
 from eve import __version__ as eve_version
 from cerberus import __version__ as cerberus_version
 from werkzeug.utils import secure_filename
-from configuration import SETTINGS
+from configuration import SETTINGS, VERSION
 
 # TODO: refactor lengthy method
-def get_configured_logger(version):
+def _configure_logger():
     api_name = SETTINGS.get('ES_API_NAME')
 
     logging_config = {
@@ -104,7 +104,7 @@ def get_configured_logger(version):
     logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
     LOG = logging.getLogger('configuration')
-    LOG.info('%s version:  %s', api_name, version)
+    LOG.info('%s version:  %s', api_name, VERSION)
     LOG.info('Eve version:      %s', eve_version)
     LOG.info('Cerberus version: %s', cerberus_version)
     LOG.info('Python version:   %s', platform.sys.version)
@@ -120,7 +120,7 @@ def get_configured_logger(version):
         '''
 
         email_format += f'''
-        {api_name} version:  {version}
+        {api_name} version:  {VERSION}
         Eve version:      {eve_version}
         Cerberus version: {cerberus_version}
         Python version:   {platform.sys.version}
@@ -136,4 +136,5 @@ def get_configured_logger(version):
         smtp_handler = [x for x in handlers if x.name == 'smtp'][0]
         smtp_handler.setFormatter(logging.Formatter(email_format))
 
-    return LOG
+
+_configure_logger()

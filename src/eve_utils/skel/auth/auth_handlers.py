@@ -39,7 +39,7 @@ def bearer(token, **kwargs):
     try:
         headers = jwt.get_unverified_header(token)
         options['algorithms'] = [headers['alg']]
-        signing_key = SIGNING_KEYS[headers['kid']]
+        signing_key = SIGNING_KEYS[headers['kid']]  # TODO: this will fail if SETTINGS not properly configured - except key error? test then raise?
 
         parsed = jwt.decode(token, signing_key, **options)
         rtn = {

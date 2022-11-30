@@ -1,10 +1,12 @@
 import logging
-from configuration import SETTINGS, VERSION
-from utils.log_setup import get_configured_logger
-LOG  = get_configured_logger(VERSION)
+import utils.log_setup
+from configuration import SETTINGS
 from eve import Eve
 from flask_cors import CORS
 import hooks
+
+
+LOG = logging.getLogger('run')
 
 
 class EveService:

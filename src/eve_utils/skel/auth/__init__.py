@@ -27,10 +27,13 @@ SETTINGS.create('AUTH0', {
     'CLIENT_SECRET': '--your-client-secret--'
 })
 
-JWK_CLIENT = jwt.PyJWKClient(f'https://{SETTINGS["ES-AUTH_JWT_DOMAIN"]}/.well-known/jwks.json')
-_jwks = JWK_CLIENT.get_signing_keys()
-SIGNING_KEYS = {jwk.key_id: jwk.key for jwk in _jwks}
-
+try:
+    JWK_CLIENT = jwt.PyJWKClient(f'https://{SETTINGS["ES-AUTH_JWT_DOMAIN"]}/.well-known/jwks.json')
+    _jwks = JWK_CLIENT.get_signing_keys()
+    SIGNING_KEYS = {jwk.key_id: jwk.key for jwk in _jwks}
+except jwt.exceptions.PyJWKClientError:
+    LOG.warning('The auth addin is installed but not properly configured.')
+    SIGNING_KEYS = {}
 
 ## # cancellable
 ## if SETTINGS['ES-AUTH_JWT_AUDIENCE'] == '':
