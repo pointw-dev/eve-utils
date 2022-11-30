@@ -1,6 +1,6 @@
 @echo off
 
-grep -o version setup.py
+grep version setup.py
 echo Removing build artifacts
 
 rd dist /s/q >nul 2>nul

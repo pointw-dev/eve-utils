@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import commands
+from eve_utils.commands import initialize
 
 
 if __name__ == '__main__':
-    commands.initialize()
+    initialize()
