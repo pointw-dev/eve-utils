@@ -103,13 +103,13 @@ multitenant
 
 ## Backdoor
 
-If the `ishowroom-catalog-api` is configured with `ES_AUTH_ADD_BASIC` enabled, then there is an additional scheme available: Basic auth.  This provides a dev/qa backdoor to authenticate without Auth0.
+If the `ishowroom-catalog-api` is configured with `ES-AUTH_ADD_BASIC` enabled, then there is an additional scheme available: Basic auth.  This provides a dev/qa backdoor to authenticate without Auth0.
 
 
 
 There are four users available this way:
 
-* `root` - equivalent to a user with CRI Admin role, i.e. with multitenant permission (only if `ES_AUTH_ENABLE_ROOT_USER` is also enabled)
+* `root` - equivalent to a user with CRI Admin role, i.e. with multitenant permission (only if `ES-AUTH_ENABLE_ROOT_USER` is also enabled)
 * ~~`cm_us` - equivalent to a user with Content Manager role whose region is US~~
 
 * ~~`cm_us_no_publish` - equivalent to a user with Content Manager role whose region is US, but without the publish permission~~
@@ -119,7 +119,7 @@ There are four users available this way:
 
 
 
-The default password for each of these users is `password`, and is configurable with ES_AUTH_ROOT_PASSWORD
+The default password for each of these users is `password`, and is configurable with ES-AUTH_ROOT_PASSWORD
 
 
 

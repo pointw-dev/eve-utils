@@ -1,9 +1,10 @@
 import json
-from utils import is_enabled, echo_message
+from utils import echo_message
 import hooks._error_handlers
 import hooks._settings
 import hooks._logs
 from log_trace.decorators import trace
+from configuration import SETTINGS
 
 
 @trace
@@ -12,7 +13,7 @@ def add_hooks(app):
     app.on_post_POST += _post_POST
     app.on_post_PATCH += _fix_links
 
-    if is_enabled('ES_ADD_ECHO'):
+    if SETTINGS.is_enabled('ES_ADD_ECHO'):
         @app.route('/_echo', methods=['PUT'])
         def _echo_message():
             return echo_message()
@@ -96,7 +97,7 @@ def _add_missing_slashes(item):
         if (
             not link['href'].startswith('/')
             and not link['href'].startswith('http://')
-            and not link['href'].starswith('https://')
+            and not link['href'].startswith('https://')
         ):
             link['href'] = '/' + link['href']
 

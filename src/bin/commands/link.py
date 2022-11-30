@@ -7,56 +7,12 @@ from code_gen import ChildLinksInserter, ParentLinksInserter, DomainChildrenDefi
 from commands import utils
 
 
-def _add_links_to_child_hooks(parent, child, parents, children, parent_ref):
-    with open(f'hooks/{children}.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = ChildLinksInserter(parent, child, parents, children, parent_ref)
-    new_tree = tree.visit(inserter)
-
-    with open(f'hooks/{children}.py', 'w') as source:
-        source.write(new_tree.code)
-
-
-def _add_links_to_parent_hooks(parent, child, parents, children, parent_ref):
-    with open(f'hooks/{parents}.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = ParentLinksInserter(parent, child, parents, children, parent_ref)
-    new_tree = tree.visit(inserter)
-
-    with open(f'hooks/{parents}.py', 'w') as source:
-        source.write(new_tree.code)
-
-
-def _add_to_domain_init(parent, child, parents, children, parent_ref):
-    with open('domain/__init__.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = DomainRelationsInserter(parent, child, parents, children, parent_ref)
-    new_tree = tree.visit(inserter)
-
-    with open('domain/__init__.py', 'w') as source:
-        source.write(new_tree.code)
-
-
-def _add_to_domain_child(parent, child, parents, children, parent_ref):
-    with open(f'domain/{children}.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = DomainChildrenDefinitionInserter(parent, child, parents, children, parent_ref)
-    new_tree = tree.visit(inserter)
-
-    with open(f'domain/{children}.py', 'w') as source:
-        source.write(new_tree.code)
-
-
-@click.group(name='rel')
+@click.group(name='link', help='Manage parent/child links amongst resources.')
 def commands():
     pass
 
 
-@commands.command(name='create')
+@commands.command(name='create', help='Create a parent/child link between two resources.')
 @click.argument('parent', metavar='<parent>')
 @click.argument('child', metavar='<child>')
 @click.option('--as_parent_ref', '-p', is_flag=True, help='change name of related ref to "parent" (instead of the name of the parent)')
@@ -79,7 +35,8 @@ def create(parent, child, as_parent_ref):
     _add_links_to_child_hooks(parent, child, parents, children, parent_ref)
 
 
-@commands.command(name='list', help='list the relationships amongst the resources')
+# TODO: refactor/SLAP
+@commands.command(name='list', help='List the relationships amongst the resources.')
 @click.option('--plant_uml', '-p', is_flag=True, help='output the rels in PlantUML class notation')
 def list(plant_uml):    
     try:
@@ -142,6 +99,50 @@ def list(plant_uml):
             for item in rels[rel].get('children', []):
                 print(f'- have {item}')
 
-@commands.command(name='remove')
+@commands.command(name='remove', help='(not yet implemented)')
 def remove():
     click.echo('remove')
+
+
+def _add_links_to_child_hooks(parent, child, parents, children, parent_ref):
+    with open(f'hooks/{children}.py', 'r') as source:
+        tree = parse_module(source.read())
+
+    inserter = ChildLinksInserter(parent, child, parents, children, parent_ref)
+    new_tree = tree.visit(inserter)
+
+    with open(f'hooks/{children}.py', 'w') as source:
+        source.write(new_tree.code)
+
+
+def _add_links_to_parent_hooks(parent, child, parents, children, parent_ref):
+    with open(f'hooks/{parents}.py', 'r') as source:
+        tree = parse_module(source.read())
+
+    inserter = ParentLinksInserter(parent, child, parents, children, parent_ref)
+    new_tree = tree.visit(inserter)
+
+    with open(f'hooks/{parents}.py', 'w') as source:
+        source.write(new_tree.code)
+
+
+def _add_to_domain_init(parent, child, parents, children, parent_ref):
+    with open('domain/__init__.py', 'r') as source:
+        tree = parse_module(source.read())
+
+    inserter = DomainRelationsInserter(parent, child, parents, children, parent_ref)
+    new_tree = tree.visit(inserter)
+
+    with open('domain/__init__.py', 'w') as source:
+        source.write(new_tree.code)
+
+
+def _add_to_domain_child(parent, child, parents, children, parent_ref):
+    with open(f'domain/{children}.py', 'r') as source:
+        tree = parse_module(source.read())
+
+    inserter = DomainChildrenDefinitionInserter(parent, child, parents, children, parent_ref)
+    new_tree = tree.visit(inserter)
+
+    with open(f'domain/{children}.py', 'w') as source:
+        source.write(new_tree.code)

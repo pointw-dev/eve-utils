@@ -9,6 +9,54 @@ from code_gen import DomainDefinitionInserter, HooksInserter
 from . import utils
 
 
+@click.group(name='resource', help='Manage the resources that make up the domain of the service.')
+def commands():
+    pass
+
+
+@commands.command(name='create', help='Create a new resource and add it to the domain.')
+@click.argument('resource_name', metavar='<name>')
+@click.option('--no_common', '-c', is_flag=True, help='Do not add common fields to this resource')
+def create(resource_name, no_common):
+    """<name> of the resource to create"""  
+    try:
+        utils.jump_to_api_folder('src/{project_name}')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        return
+
+    singular, plural = get_pair(resource_name)    
+    add_common = not no_common
+    
+    print(f'Creating {plural} resource')
+    create_resource_domain_file(plural, add_common)
+    insert_domain_definition(plural)
+    create_resource_hook_file(singular, plural)
+    insert_hooks(plural)
+
+
+@commands.command(name='list', help='List the resources in the domain.')
+def list():
+    try:
+        utils.jump_to_api_folder('src/{project_name}/domain')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        return
+        
+    files = glob.glob('./*.py')
+    for file in files:
+        resource = Path(file).stem
+        if resource.startswith('_'):
+            continue
+        print('- ' + file[2:-3])
+        
+
+
+@commands.command(name='remove', help='(not yet implemented)')
+def remove():
+    click.echo('remove')
+
+
 def create_resource_domain_file(resource, add_common):
     with open(f'domain/{resource}.py', 'w') as file:
         file.write(f'''"""
@@ -114,51 +162,3 @@ def insert_hooks(resource):
 
     with open('hooks/__init__.py', 'w') as source:
         source.write(new_tree.code)
-
-
-@click.group(name='resource')
-def commands():
-    pass
-
-
-@commands.command(name='create')
-@click.argument('resource_name', metavar='<name>')
-@click.option('--no_common', '-c', is_flag=True, help='Do not add common fields to this resource')
-def create(resource_name, no_common):
-    """<name> of the resource to create"""  
-    try:
-        utils.jump_to_api_folder('src/{project_name}')
-    except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        return
-
-    singular, plural = get_pair(resource_name)    
-    add_common = not no_common
-    
-    print(f'Creating {plural} resource')
-    create_resource_domain_file(plural, add_common)
-    insert_domain_definition(plural)
-    create_resource_hook_file(singular, plural)
-    insert_hooks(plural)
-
-
-@commands.command(name='list')
-def list():
-    try:
-        utils.jump_to_api_folder('src/{project_name}/domain')
-    except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        return
-        
-    files = glob.glob('./*.py')
-    for file in files:
-        resource = Path(file).stem
-        if resource.startswith('_'):
-            continue
-        print('- ' + file[2:-3])
-        
-
-
-@commands.command(name='remove')
-def remove():
-    click.echo('remove')

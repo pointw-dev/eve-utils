@@ -8,7 +8,7 @@ def basic(token, **kwargs):
         username, password = b64decode(token).decode().split(':', 1)
         is_root = False
         if username.lower() == 'root':
-            if password == SETTINGS.get('ES_AUTH_ROOT_PASSWORD'):
+            if password == SETTINGS.get('ES-AUTH_ROOT_PASSWORD'):
                 is_root = True
             else:
                 return {}
@@ -26,8 +26,8 @@ def basic(token, **kwargs):
 
 # TODO: detect opaque token, then handle accordingly (how?)
 def bearer(token, **kwargs):
-    audience = SETTINGS.get('ES_AUTH_JWT_AUDIENCE')
-    issuer = SETTINGS.get('ES_AUTH_JWT_ISSUER')
+    audience = SETTINGS.get('ES-AUTH_JWT_AUDIENCE')
+    issuer = SETTINGS.get('ES-AUTH_JWT_ISSUER')
 
     options = {}
 

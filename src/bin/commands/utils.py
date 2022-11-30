@@ -67,7 +67,7 @@ def install_packages(packages, command):
         f.write(f'# end: added by {command}\n')
 
 
-def copy_skel(project_name, skel_folder, target_folder=None):
+def copy_skel(project_name, skel_folder, target_folder=None, replace=None):
     print(f'Adding {skel_folder} to {project_name} API')
 
     source = os.path.join(os.path.dirname(eve_utils.__file__), f'skel/{skel_folder}')
@@ -79,26 +79,32 @@ def copy_skel(project_name, skel_folder, target_folder=None):
 
     # TODO: can the following remove_tree calls be obviated if skel is packaged differently?
     remove_if_exists(os.path.join(destination, '__pycache__'))
-
-    for dname, dirs, files in os.walk(destination):
-        for fname in files:
-            fpath = os.path.join(dname, fname)
-            if fname.endswith('.pyc') or fname.endswith('.ico'):
-                continue
-            with open(fpath, 'r') as f:
-                try:
-                    s = f.read()
-                except UnicodeDecodeError as ex:
+    
+    if replace is None:
+        replace = {}
+    replace['project_name'] = project_name
+    
+    for item in replace:
+        for dname, dirs, files in os.walk(destination):
+            for fname in files:
+                fpath = os.path.join(dname, fname)
+                if fname.endswith('.pyc') or fname.endswith('.ico'):
                     continue
-            changed = False
-            if '{$project_name}' in s:
-                s = s.replace("{$project_name}", project_name)
-                changed = True
-            if changed:
-                with open(fpath, "w") as f:
-                    f.write(s)
+                with open(fpath, 'r') as f:
+                    try:
+                        s = f.read()
+                    except UnicodeDecodeError as ex:
+                        continue
+                changed = False
+                if f'{{${item}}}' in s:
+                    s = s.replace(f'{{${item}}}', replace[item])
+                    changed = True
+                if changed:
+                    with open(fpath, 'w') as f:
+                        f.write(s)
 
 
+# TODO: refactor with similar functionality in copy_skel()
 def replace_project_name(project_name, folder=None):
     if not folder:
         folder = f'./{project_name}'
@@ -118,7 +124,6 @@ def replace_project_name(project_name, folder=None):
                   f.write(s)
             except UnicodeDecodeError as ex:
               print(f'Skipping unprocessable file: {dname}/{fname}')
-
 
 
 def remove_if_exists(folder):

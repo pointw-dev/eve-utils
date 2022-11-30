@@ -35,7 +35,7 @@ def _trace(target):
     return _wrapper
 
 
-if SETTINGS.get('ES_TRACE_LOGGING') == 'Enabled':
+if SETTINGS.is_enabled('ES_TRACE_LOGGING'):
     trace = _trace
 else:
     trace: Callable[[Any], Any] = lambda fn: fn

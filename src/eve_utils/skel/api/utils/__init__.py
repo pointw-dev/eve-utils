@@ -1,7 +1,7 @@
 import logging
 from flask import jsonify, make_response
 from flask import current_app, request
-
+from . import log_setup
 
 LOG = logging.getLogger('utils')
 
@@ -48,21 +48,6 @@ def make_error_response(message, code, issues=[], **kwargs):
         resp['_issues'] = issues
 
     return make_response(jsonify(resp), code)
-
-
-def is_enabled(setting):
-    return setting[0].lower() in 'yte'
-    # i.e. the following means setting is enabled:
-    # - 'Yes' or 'yes' or 'Y' or 'y'
-    # - 'True' or 'true' or 'T' or 't'
-    # - 'Enabled' or 'enabled' or 'E' or 'e'
-
-
-def log_settings(log, settings):
-    for setting in sorted(settings):
-        key = setting.upper()
-        if ('PASSWORD' not in key) and ('SECRET' not in key):
-            log.info(f'{setting}: {settings[setting]}')
 
 
 def echo_message():

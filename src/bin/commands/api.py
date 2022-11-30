@@ -6,23 +6,45 @@ from distutils.dir_util import copy_tree, remove_tree
 import importlib
 from shutil import copyfile
 from . import utils
+from .optional_flags import OptionalFlags
 import addins
 
 import eve_utils
 
-class CommandWithOptionalFlagValues(click.Command):
-    def parse_args(self, ctx, args):        
-        """ Translate any flag `--opt=value` as flag `--opt` with changed flag_value=value """
-        # filter flags
-        flags = [o for o in self.params if isinstance(o, click.Option) and o.is_flag and not isinstance(o.flag_value, bool)]
-        prefixes = {p: o for o in flags for p in o.opts if p.startswith('--')}
-        for i, flag in enumerate(args):
-            flag = flag.split('=')
-            if flag[0] in prefixes and len(flag) > 1:
-                prefixes[flag[0]].flag_value = flag[1]
-                args[i] = flag[0]
+@click.group(name='api', help='Create and manage the API service itself.')
+def commands():
+    pass
 
-        return super(CommandWithOptionalFlagValues, self).parse_args(ctx, args)
+
+def addin_params(func):
+    @click.option('--add_git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
+    @click.option('--add_docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container', flag_value='n/a')
+    @click.option('--add_auth', '-a', is_flag=True, help='add authorization class and supporting files', flag_value='n/a')
+    @click.option('--add_validation', '-v', is_flag=True, help='add custom validation class that you can extend', flag_value='n/a')
+    @click.option('--add_web_socket', '-w', is_flag=True, help='add web socket and supporting files', flag_value='n/a')
+    @click.option('--add_serverless', '-s', is_flag=True, help='add serverless framework and supporting files', flag_value='n/a')
+    
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@commands.command(cls=OptionalFlags, name='create', short_help="<name> or '.' to use the current folder's name")
+@click.argument('project_name', metavar='<name>')
+@addin_params
+def create(**kwargs):
+    """<name> or "." to use the current folder's name"""
+    _create_api(kwargs['project_name'])
+    del kwargs['project_name']
+    _add_addins(kwargs)
+
+
+@commands.command(cls=OptionalFlags, short_help="Add an addin to an already created API")
+@addin_params
+def addin(**kwargs):
+    """Add an addin to an already created API"""
+    _add_addins(kwargs)
 
 
 def _create_api(project_name):
@@ -39,7 +61,7 @@ def _create_api(project_name):
         
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
     readme_filename = os.path.join(skel, 'doc/README.md')
-    copyfile(readme_filename, './README.md')   
+    copyfile(readme_filename, './README.md')
     os.mkdir('doc')
     readme_filename = os.path.join(skel, 'doc/Setup-Dev-Environment.md')
     copyfile(readme_filename, './doc/Setup-Dev-Environment.md')   
@@ -85,37 +107,3 @@ def _add_addins(kwargs):
         addins.git.add(kwargs['add_git'])
 
 
-def addin_params(func):
-    @click.option('--add_git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
-    @click.option('--add_docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container', flag_value='n/a')
-    @click.option('--add_auth', '-a', is_flag=True, help='add authorization class and supporting files', flag_value='n/a')
-    @click.option('--add_validation', '-v', is_flag=True, help='add custom validation class that you can extend', flag_value='n/a')
-    @click.option('--add_web_socket', '-w', is_flag=True, help='add web socket and supporting files', flag_value='n/a')
-    @click.option('--add_serverless', '-s', is_flag=True, help='add serverless framework and supporting files', flag_value='n/a')
-    
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapper
-
-
-@click.group(name='api')
-def commands():
-    pass
-
-
-@commands.command(cls=CommandWithOptionalFlagValues, name='create', short_help="<name> or '.' to use the current folder's name")
-@click.argument('project_name', metavar='<name>')
-@addin_params
-def create(**kwargs):
-    """<name> or "." to use the current folder's name"""
-    _create_api(kwargs['project_name'])
-    del kwargs['project_name']
-    _add_addins(kwargs)
-
-
-@commands.command(cls=CommandWithOptionalFlagValues, short_help="Add an addin to an already created API")
-@addin_params
-def addin(**kwargs):
-    """Add an addin to an already created API"""
-    _add_addins(kwargs)

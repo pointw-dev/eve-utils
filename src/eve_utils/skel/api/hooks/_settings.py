@@ -30,14 +30,19 @@ def _fetch_settings(response):
     del response['_meta']
 
     response['versions'] = {}
-    response['settings'] = {}
+    response['settings'] = []
 
     response['versions']['{$project_name}'] = VERSION
     response['versions']['eve'] = eve_version
     response['versions']['cerberus'] = cerberus_version
     response['versions']['python'] = platform.sys.version
 
-    for env in sorted(SETTINGS):
-        key = env.upper()
-        if ('PASSWORD' not in key) and ('SECRET' not in key):
-            response['settings'][env] = SETTINGS[env]
+
+    for prefix in SETTINGS.settings:
+        section = {
+            'description': f'{SETTINGS.prefix_descriptions.get(prefix, "")}',
+            'settings': {}
+        }
+        for setting in SETTINGS.settings[prefix]:
+            section['settings'][f'{prefix}_{setting}'] = SETTINGS.settings[prefix][setting]
+        response['settings'].append(section)

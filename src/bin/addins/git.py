@@ -35,7 +35,10 @@ License:
 """
 
 import os
+from shutil import copyfile
 from commands import utils
+
+import eve_utils
 
 
 def add(remote):
@@ -48,6 +51,10 @@ def add(remote):
     if os.path.isdir('./.git'):
         print('git has already been added')
         return
+
+    skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
+    gitignore_filename = os.path.join(skel, 'git/.gitignore')
+    copyfile(gitignore_filename, './.gitignore')   
 
     os.system('git init')
     os.system('git add . --all > nul 2> nul')

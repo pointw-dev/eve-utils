@@ -74,7 +74,8 @@ docker stop {$project_name}
     ```bash
     ES_TRACE_LOGGING=Disabled
     ES_LOG_TO_FOLDER=Disabled
-    ES_AUTH_ADD_BASIC=Yes
+    ES-AUTH_ADD_BASIC=Yes
+    ES-AUTH_ENABLE_ROOT_USER=Yes
     ```
 
 * Open `run.py`

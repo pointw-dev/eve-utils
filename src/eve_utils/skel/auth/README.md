@@ -5,11 +5,11 @@ This module adds authentication to your API
 ## Settings
 | Variable               | Description                                                  | Default                                          |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
-| ES_AUTH_ADD_BASIC      | When enabled, allows a basic authentication scheme with root/password | No                                               |
-| ES_AUTH_ROOT_PASSWORD  | When ES_AUTH_ADD_BASIC is enabled, this is the password the root user uses to gain access to the API. | password                                         |
-| ES_AUTH_REALM          | Appears in the `WWW-Authenticate` header in unauthorized requests. | {$project_name}.pointw.com                       |
-| ES_AUTH_JWT_DOMAIN     |                                                              | {$project_name}.us.auth0.com                     |
-| ES_AUTH_JWT_AUDIENCE   | This is the identifier a client uses when requesting a token from the auth provider.  It is a URI only (identifier only), not an actual URL (i.e. no requests are made to it) | https://pointw.com/{$project_name}               |
+| ES-AUTH_ADD_BASIC      | When enabled, allows a basic authentication scheme with root/password | No                                               |
+| ES-AUTH_ROOT_PASSWORD  | When ES-AUTH_ADD_BASIC is enabled, this is the password the root user uses to gain access to the API. | password                                         |
+| ES-AUTH_REALM          | Appears in the `WWW-Authenticate` header in unauthorized requests. | {$project_name}.pointw.com                       |
+| ES-AUTH_JWT_DOMAIN     |                                                              | {$project_name}.us.auth0.com                     |
+| ES-AUTH_JWT_AUDIENCE   | This is the identifier a client uses when requesting a token from the auth provider.  It is a URI only (identifier only), not an actual URL (i.e. no requests are made to it) | https://pointw.com/{$project_name}               |
 | AUTH0_API_AUDIENCE     | When {$project_name} requests a token to use the Auth0 API, this is the audience for the token. | https://{$project_name}.us.auth0.com/api/v2/     |
 | AUTH0_API_BASE_URL     | The base of the Auth0 API                                    | https://{$project_name}.us.auth0.com/api/v2      |
 | AUTH0_CLAIMS_NAMESPACE | If you configure Auth0 to insert additional claims, use this value as a namespace (prefix). | https://pointw.com/{$project_name}               |
@@ -21,8 +21,8 @@ This module adds authentication to your API
 
 * [Login to Auth0](https://auth0.com/auth/login) with your management credentials
 * Create a tenant
-  * Name: ($project_name)
-    * Used in  `ES_AUTH_JWT_DOMAIN`, `AUTH0_API_AUDIENCE`, `AUTH0_API_BASE_URL`, `AUTH0_TOKEN_ENDPOINT`
+  * Name: {$project_name}
+    * Used in  `ES-AUTH_JWT_DOMAIN`, `AUTH0_API_AUDIENCE`, `AUTH0_API_BASE_URL`, `AUTH0_TOKEN_ENDPOINT`
   * Logo (optional) 200px x 60px
     (e.g. https://app.cri.com/images/cri-wide.png)
   * Default audience (optional - makes using Postman easier)
@@ -44,7 +44,7 @@ This module adds authentication to your API
   * Decide whether to disable google-oauth2 (in Connections tab of the application)
 * Create API
   * Identifier (e.g. https://pointw.com/{$project_name} )
-    * use the value you specified in ES_AUTH_JWT_AUDIENCE
+    * use the value you specified in ES-AUTH_JWT_AUDIENCE
   * Signing Algorithm: RS256
   * Allow Skipping User Consent (why doesn't this work?)
 * Branding->Universal Login
