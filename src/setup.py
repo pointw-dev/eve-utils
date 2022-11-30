@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='eve-utils',
-    version='0.9.31',
+    version='0.9.32',
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
     long_description=open('../README.md').read(),
     long_description_content_type='text/markdown',
@@ -29,6 +29,11 @@ setup(
         'inflect',
         'click'
     ],
-    scripts=glob('bin/*'),
+    entry_points='''
+        [console_scripts]
+        eu=eve_utils.commands:initialize
+        eve-utils=eve_utils.commands:initialize
+    ''',
+    # scripts=glob('bin/*'),
     zip_safe=False
 )
