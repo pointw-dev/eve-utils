@@ -69,6 +69,11 @@ _settings endpoint
     - GET from API call
 
 
+folders
+    - src, doc, etc
+    - designed with more than simple api in mind (e.g. scripts)
+    - FAQ why my-api/src/my-api ?
+
 logging
     - /var/log/*app-name*
     - dumps settings, incl. key version numbers

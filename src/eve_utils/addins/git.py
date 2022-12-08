@@ -54,9 +54,9 @@ def add(remote):
     gitignore_filename = os.path.join(skel, 'git/.gitignore')
     copyfile(gitignore_filename, './.gitignore')   
 
-    os.system('git init')
-    os.system('git add . --all > nul 2> nul')
-    os.system('git commit -m "Initial commit" > nul 2> nul')
+    os.system('git init --quiet')
+    os.system('git add . --quiet')
+    os.system('git commit -m "Initial commit" --quiet')
     os.system('git branch -M main')
     os.system('git status')
     

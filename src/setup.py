@@ -27,7 +27,8 @@ setup(
     install_requires=[
         'libcst',
         'inflect',
-        'click'
+        'click',
+        'shellingham'
     ],
     entry_points='''
         [console_scripts]
