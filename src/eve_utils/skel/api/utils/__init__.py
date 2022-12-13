@@ -1,7 +1,10 @@
 import logging
+import requests
+import json
 from flask import jsonify, make_response
 from flask import current_app, request
 from . import log_setup
+from configuration import SETTINGS
 
 LOG = logging.getLogger('utils')
 
@@ -48,6 +51,49 @@ def make_error_response(message, code, issues=[], **kwargs):
         resp['_issues'] = issues
 
     return make_response(jsonify(resp), code)
+
+
+def register_with_gateway(app):
+    if not SETTINGS['ES_API_GATEWAY']:
+        return
+
+    if not SETTINGS['ES_BASE_URL']:
+        LOG.warning('ES_API_GATEWAY is set, but cannot register with gateway because ES_BASE_URL is not set')
+        return
+
+    url = f"{SETTINGS['ES_API_GATEWAY']}/registrations"
+    name = SETTINGS['ES_API_NAME'] if not SETTINGS['ES_API_GATEWAY_NAME'] else SETTINGS['ES_API_GATEWAY_NAME']
+    base_url = SETTINGS['ES_BASE_URL']
+    LOG.info(f'registering with gateway as {name} at {base_url} to {url}')
+    api = app.test_client()
+    response = api.get('/')
+    j = response.json
+    rels = j.get('_links', {})
+
+    if rels:
+        body = {
+            'name': name,
+            'baseUrl': base_url,
+            'rels': rels
+        }
+        data = json.dumps(body)
+        headers = {'content-type': 'application/json'}
+
+        response = requests.get(url + '/' + name)
+        if response.status_code == 404:
+            response = requests.post(url, data=data, headers=headers)
+        else:
+            etag = response.json()['_etag']
+            url = f"{SETTINGS['ES_API_GATEWAY']}/{response.json()['_links']['self']['href']}"
+            headers = {
+                'content-type': 'application/json',
+                'If-Match': etag
+            }
+            print('=====>', data, '<====')
+            response = requests.put(url, data=data, headers=headers)
+        # TODO: handle response
+    else:
+        LOG.warning('No rels to register - cancelling')
 
 
 def echo_message():

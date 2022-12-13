@@ -37,6 +37,9 @@ SETTINGS.create('ES', {
 })
 
 # optional settings...
+SETTINGS.create('ES', 'BASE_URL', is_optional=True)
+SETTINGS.create('ES', 'API_GATEWAY', is_optional=True)
+SETTINGS.create('ES', 'API_GATEWAY_NAME', is_optional=True)
 SETTINGS.create('ES', 'URL_PREFIX', is_optional=True)
 SETTINGS.create('ES', 'CACHE_CONTROL', is_optional=True)
 SETTINGS.create('ES', 'CACHE_EXPIRES', is_optional=True, default_value=0)

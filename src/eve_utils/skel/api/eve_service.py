@@ -1,5 +1,6 @@
 import logging
 import utils.log_setup
+from utils import register_with_gateway
 from configuration import SETTINGS
 from eve import Eve
 from flask_cors import CORS
@@ -23,6 +24,7 @@ class EveService:
         LOG.info(border)
         SETTINGS.dump(callback=LOG.info)
         try:
+            register_with_gateway(self._app)
             self._app.run(host='0.0.0.0', port=SETTINGS.get('ES_API_PORT'), threaded=True)
         except Exception as ex:  # pylint: disable=broad-except
             LOG.exception(ex)

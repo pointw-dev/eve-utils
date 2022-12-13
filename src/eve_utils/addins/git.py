@@ -35,6 +35,7 @@ License:
 """
 
 import os
+import platform
 from shutil import copyfile
 import eve_utils
 
@@ -53,9 +54,13 @@ def add(remote):
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
     gitignore_filename = os.path.join(skel, 'git/.gitignore')
     copyfile(gitignore_filename, './.gitignore')   
+    
+    silent = ' > /dev/null 2> /dev/null'
+    if platform.system() == 'Windows':
+        silent = ' > nul 2> nul'
 
     os.system('git init --quiet')
-    os.system('git add . --quiet')
+    os.system(f'git add . --all {silent}')
     os.system('git commit -m "Initial commit" --quiet')
     os.system('git branch -M main')
     os.system('git status')

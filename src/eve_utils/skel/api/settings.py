@@ -28,7 +28,7 @@ if "ES_CACHE_EXPIRES" in SETTINGS:
 # the default BLACKLIST is ['$where', '$regex'] - the following line turns on regex
 MONGO_QUERY_BLACKLIST = ['$where']
 
-RENDERERS = ['eve.render.JSONRenderer']  # removed eve.render.XMLRenderer
+RENDERERS = ['utils.render.HALRenderer']
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 PAGINATION_LIMIT = SETTINGS.get('ES_PAGINATION_LIMIT')

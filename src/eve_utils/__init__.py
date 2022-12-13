@@ -15,9 +15,12 @@ def jump_to_api_folder(path=None):
         if os.path.isfile('.eve-utils'):
             keep_going = False
             break
-            
+
+        current_dir = os.getcwd()
         if os.path.isdir('..'):
             os.chdir('..')
+            if os.getcwd() == current_dir:
+                raise RuntimeError('Not in an eve_service API folder')            
         else:
             raise RuntimeError('Not in an eve_service API folder')
 
