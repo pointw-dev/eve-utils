@@ -1,5 +1,8 @@
 @echo off
 setlocal
+grep version setup.py
+dir dist /b
+echo.
 
 if "x%1"=="x" goto real
 if "x%1"=="xtest" goto test
