@@ -32,6 +32,7 @@ License:
 """
 
 import os
+import sys
 import argparse
 import itertools
 from libcst import *
@@ -58,7 +59,7 @@ def add():
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
 
     eve_utils.copy_skel(settings['project_name'], 'auth')
     eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add_auth')

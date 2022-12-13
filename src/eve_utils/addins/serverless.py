@@ -35,6 +35,7 @@ License:
 
 import os
 import sys
+import sys
 import click
 from subprocess import Popen, PIPE
 import eve_utils
@@ -164,22 +165,22 @@ def add():
         settings = eve_utils.jump_to_api_folder('src')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
         
     eve_utils.copy_skel(settings['project_name'], 'serverless', '.')
     eve_utils.replace_project_name(settings['project_name'], '.')
     
     if not is_node_installed():
-        return
+        sys.exit(201)
 
     if not ensure_serverless_is_installed():
-        return
+        sys.exit(202)
 
     os.chdir(f"./{settings['project_name']}")
     eve_utils.install_packages(['dnspython'], 'add_serverless')
 
     if not ensure_node_initialized():
-        return
+        sys.exit(203)
 
     if not ensure_serverless_plugins_installed():
-        return
+        sys.exit(204)

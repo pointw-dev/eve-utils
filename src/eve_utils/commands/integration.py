@@ -1,4 +1,5 @@
 import os
+import sys
 import click
 import eve_utils
 
@@ -30,11 +31,11 @@ def create(integration, name, prefix):
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
         
     if integration == 'empty' and name is None:
         print('You must supply a name when choosing the "empty" integration.')
-        return
+        sys.exit(501)
 
     if name is None:
         name = integration
@@ -43,7 +44,7 @@ def create(integration, name, prefix):
     
     if os.path.exists(f'integration/{name}'):
         print(f'There already is an integration named "{name}".')
-        return
+        sys.exit(502)
 
     print(f'creating {name} integration')
 
@@ -69,11 +70,11 @@ def list():
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
         
     if not os.path.exists('integration'):
         print('No integrations have been added')
-        return
+        sys.exit(0)
     
     integrations =  [name for name in os.listdir('./integration') ]
     for integration in integrations:

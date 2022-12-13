@@ -33,6 +33,7 @@ License:
 
 import os
 import sys
+import sys
 import argparse
 from distutils.dir_util import copy_tree
 import eve_utils
@@ -63,11 +64,11 @@ def add():
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
 
     if os.path.exists('./web_socket'):
         print('web_socket folder already exists')
-        return
+        sys.exit(401)
 
     modify_eve_service()
     eve_utils.copy_skel(settings['project_name'], 'web_socket', '.')

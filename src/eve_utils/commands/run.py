@@ -1,4 +1,5 @@
 import os
+import sys
 import click
 import eve_utils
 import platform
@@ -9,7 +10,7 @@ def commands():
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
         
     try:
         import eve

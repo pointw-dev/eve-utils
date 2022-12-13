@@ -41,6 +41,7 @@ License:
 """
 
 import os
+import sys
 import itertools
 from libcst import *
 from eve_utils.code_gen import ValidationInserter
@@ -63,11 +64,11 @@ def add():
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
 
     if os.path.exists('./validation'):
         print('validation has already been added')
-        return
+        sys.exit(301)
 
     eve_utils.copy_skel(settings['project_name'], 'validation')
     eve_utils.install_packages(['isodate'], 'add_validation')

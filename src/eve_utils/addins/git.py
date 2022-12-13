@@ -35,6 +35,7 @@ License:
 """
 
 import os
+import sys
 import platform
 from shutil import copyfile
 import eve_utils
@@ -45,11 +46,11 @@ def add(remote):
         eve_utils.jump_to_api_folder()
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
 
     if os.path.isdir('./.git'):
         print('git has already been added')
-        return
+        sys.exit(101)
 
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
     gitignore_filename = os.path.join(skel, 'git/.gitignore')

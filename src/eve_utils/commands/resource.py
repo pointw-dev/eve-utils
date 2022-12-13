@@ -1,4 +1,5 @@
 import os
+import sys
 import click
 import itertools
 import glob
@@ -23,7 +24,7 @@ def create(resource_name, no_common):
         eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
 
     singular, plural = get_pair(resource_name)    
     add_common = not no_common
@@ -41,7 +42,7 @@ def list():
         eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
         
     files = glob.glob('./*.py')
     for file in files:

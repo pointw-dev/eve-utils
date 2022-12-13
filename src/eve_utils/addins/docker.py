@@ -32,6 +32,7 @@ License:
 """
 
 import os
+import sys
 from distutils.dir_util import copy_tree
 import eve_utils
 
@@ -40,7 +41,7 @@ def add():
         settings = eve_utils.jump_to_api_folder('src')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
 
     eve_utils.copy_skel(settings['project_name'], 'docker', '.')
     eve_utils.replace_project_name(settings['project_name'], '.')

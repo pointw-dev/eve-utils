@@ -1,4 +1,5 @@
 import os
+import sys
 import click
 import importlib
 from libcst import parse_module
@@ -21,7 +22,7 @@ def create(parent, child, as_parent_ref):
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
         
     parent, parents = singular, plural = get_pair(parent)  # TODO: validate, safe name, etc.
     child, children = singular, plural = get_pair(child)  # TODO: validate, safe name, etc.
@@ -43,7 +44,7 @@ def list(plant_uml):
         settings = eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
-        return
+        sys.exit(1)
         
     with open('__init__.py', 'r') as f:
         lines = f.readlines()
