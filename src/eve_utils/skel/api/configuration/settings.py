@@ -88,6 +88,7 @@ class Settings():
     """
     def __init__(self):
         self.settings = {}
+        self.optional_settings = {}
         self.prefix_descriptions = {}
 
     # __OVERLOADS__
@@ -110,17 +111,23 @@ class Settings():
         prefix = prefix.upper()
         if prefix not in self.settings:
             self.settings[prefix] = {}
-        if type(setting_name) is dict:
+        if is_optional and prefix not in self.optional_settings:
+            self.optional_settings[prefix] = {}
+        
+        if type(setting_name) is dict:  # is_optional is ignored
             settings = setting_name
             for setting_name in settings:
                 if setting_name.upper() in self.settings[prefix]:
                     raise ValueError(f'settings[{prefix}][{setting_name.upper()}] already exists')
                 self.settings[prefix][setting_name.upper()] = settings[setting_name]
         else:
-            setting_name = setting_name.upper()
+            setting_name = setting_name.upper()            
             if setting_name in self.settings[prefix]:
                 raise ValueError(f'settings[{prefix}][{setting_name}] already exists')
-            self.settings[prefix][setting_name] = default_value
+            if is_optional:
+                self.optional_settings[prefix][setting_name] = default_value
+            else:
+                self.settings[prefix][setting_name] = default_value
 
     def set_prefix_description(self, prefix, description):
         prefix = prefix.upper()
@@ -171,7 +178,7 @@ class Settings():
 
         for prefix in self.settings:
             for setting_name in self.settings[prefix]:
-                old_value = self.settings[prefix][setting_name]
+                old_value = self.settings[prefix][setting_name]  # TODO: refactor with optional below
                 new_value = os.environ.get(f'{prefix}_{setting_name}', self.settings[prefix][setting_name])
                 if old_value and not isinstance(old_value, str):
                     try:
@@ -179,6 +186,20 @@ class Settings():
                     except ValueError:
                         raise TypeError(f'attempt to set {prefix}_{setting_name} to a different type than its default value (should be {type(old_value)}).')
                 self.settings[prefix][setting_name] = new_value
+                
+        for prefix in self.optional_settings:
+            for setting_name in self.optional_settings[prefix]:
+                old_value = self.optional_settings[prefix][setting_name]  # TODO: refactor with non-optional above
+                new_value = os.environ.get(f'{prefix}_{setting_name}')
+                if new_value:
+                    if not isinstance(old_value, str) and not isinstance(old_value, type(None)):
+                        try:
+                            new_value = type(old_value)(new_value)
+                        except ValueError:
+                            raise TypeError(f'attempt to set {prefix}_{setting_name} to a different type than its default value (should be {type(old_value)}).')
+
+                    if new_value:
+                        self.settings[prefix][setting_name] = new_value
 
     def _parse_setting_name(self, setting_name):
         first_underscore = setting_name.index('_')
@@ -197,10 +218,6 @@ class Settings():
 
 
 
-
-
-
-# TODO: handle optional values
 # TODO: handle cancellable values
 if __name__ == '__main__':
     settings = Settings.instance()
