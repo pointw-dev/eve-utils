@@ -150,3 +150,28 @@ utils
 - make_error_response()
 - get_db()
 
+
+
+
+errorlevel
+1 - not run in API folder structure
+
+10x - git
+101 - git already added
+
+20x - serverless
+201 - node not installed
+202 - serverless not installed
+203 - node not initialized
+204 - serverless plugin not installed
+
+30x - validation
+301 - validation already installed
+
+40x - web_socket
+401 - web_socket already installed
+
+50x - integration
+501 - name required when choosing empty integration
+502 - integration already exists
+
