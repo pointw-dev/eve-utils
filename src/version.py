@@ -39,7 +39,7 @@ def main():
         print(f'creating git tag {current_version}')
         today = date.today()
         comment = f'Released {today}'
-        os.system('git tag -a {current_version} -m "{comment}"')
+        os.system(f'git tag -a {current_version} -m "{comment}"')
 
 
 if __name__ == '__main__':
