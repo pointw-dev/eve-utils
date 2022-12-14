@@ -1,9 +1,11 @@
 from glob import glob
-from setuptools import setup
+from setuptools import setup, find_packages
+from version import VERSION
+
 
 setup(
     name='eve-utils',
-    version='0.9.33',
+    version=VERSION,
     description='Templates and scripts to rapidly spin up a production-ready Eve-based API.',
     long_description=open('../README.md').read(),
     long_description_content_type='text/markdown',

@@ -10,6 +10,8 @@ from . import setting
 from . import run
 
 @click.group()
+@click.version_option(package_name='eve-utils')
+# @click.version_option()
 def main():
     pass
 
