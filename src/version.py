@@ -7,7 +7,7 @@ from datetime import date
 
 
 # do not change version manually here, use this script which keeps eve-utils in sync
-VERSION = '0.9.35'
+VERSION = '0.9.36'
 
 
 def main():

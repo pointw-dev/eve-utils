@@ -43,7 +43,7 @@ import eve_utils
 
 def add(remote):
     try:
-        eve_utils.jump_to_api_folder()
+        settings = eve_utils.jump_to_api_folder()
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
@@ -54,7 +54,9 @@ def add(remote):
 
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
     gitignore_filename = os.path.join(skel, 'git/.gitignore')
-    copyfile(gitignore_filename, './.gitignore')   
+    copyfile(gitignore_filename, './.gitignore')
+    eve_utils.replace_project_name(settings['project_name'], '.')
+    
     
     silent = ' > /dev/null 2> /dev/null'
     if platform.system() == 'Windows':

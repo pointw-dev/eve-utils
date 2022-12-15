@@ -11,7 +11,12 @@ build/
 *.egg-info
 *.egg
 
-.idea/
+
+!/src/{$project_name}/.idea
+/src/{$project_name}/.idea/*
+!/src/{$project_name}/.idea/icon.png
+!/src/{$project_name}/.idea/icon_dark.png
+
 .vscode/
 venv/
 node_modules/

@@ -103,6 +103,8 @@ def replace_project_name(project_name, folder=None):
               continue
             if '__pycache__' in dname:
               continue
+            if '.idea' in dname:
+              continue
             fpath = os.path.join(dname, fname)
             try:
               with open(fpath) as f:
