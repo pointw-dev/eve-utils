@@ -9,4 +9,7 @@ build/
 *.egg-info
 *.egg
 
-.idea/
+!/src/eve-utils/skel/.idea
+/src/eve-utils/skel/.idea/*
+!/src/eve-utils/skel/.idea/icon.png
+!/src/eve-utils/skel/.idea/icon_dark.png
