@@ -4,25 +4,24 @@ An Eve-based API, created with **[eve-utils](https://pointw.com/rapid-api-creati
 
 ## Getting Started
 
-If you have created this api with docker support (`mkapi {$project_name} --with_docker`) then to launch your API with docker-compose:
+To launch the service (I recommend you first create a [virtual environment](https://realpython.com/python-virtual-environments-a-primer/)):
 
-`docker-compose up -d`
+```bash
+eve-utils run
+```
 
-If you have created this api with serverless support (`mkapi {$project_name} --with_serverless`) then to launch your API:
+If you have created this api with docker support (`eve-utils api create {$project_name} --add_docker`) then to launch the service with docker-compose:
+
+`docker compose up -d`
+
+If you have created this api with serverless support (`eve-utils api create {$project_name} --add_serverless`) then launch with:
 
 `sls wsgi serve -p 2112`
 
-If you did not add docker or serverless support, do the following (I recommend you first create a [virtual environment](https://realpython.com/python-virtual-environments-a-primer/)):
-
-```bash
-cd {$project_name}
-pip install -r requirements.txt
-python run.py
-```
 
 Either way, the API is now running and its base endpoint is
 
-http://localhost:2112 (for docker or for `python run.py`)
+http://localhost:2112
 
 
 After making changes to the API, you must stop/start the API service.
@@ -63,11 +62,11 @@ The base variables are prefixed with ES_ for Eve Service.  The environment varia
 
 | Variable                  | Description                                                  | Default                                                     |
 | ------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
-| ES_API_NAME               | The name of your API.  Appears in logs and emails.           | The name you used with `mkapi` (i.e. {$project_name})                              |
+| ES_API_NAME               | The name of your API.  Appears in logs and emails.           | The name you used with `eve-utils api create` (i.e. {$project_name})                              |
 | ES_MONGO_ATLAS            | Set to Enabled (or True, or Yes) to use the following Mongo values to construct the MONGO_URI.  If disabled, will use a non-Atlas connection. | Disabled                                                    |
 | ES_MONGO_HOST             |                                                              | localhost                                                   |
 | ES_MONGO_PORT             | (ignored if ES_MONGO_ATLAS is enabled)                       | 27017                                                       |
-| ES_MONGO_DBNAME           |                                                              | The name you used with `mkapi` (i.e. {$project_name})                             |
+| ES_MONGO_DBNAME           |                                                              | The name you used with `eve-utils api create` (i.e. {$project_name})                             |
 | ES_API_PORT               |                                                              | 2112                                                        |
 | ES_INSTANCE_NAME          | This name appears in logs and in error emails                | The hostname the API is running on (`socket.gethostname()`) |
 | ES_TRACE_LOGGING          | When enabled, causes logs to include enter/exit/exception details for each method - not something to have enabled in production. | Enabled                                                     |
@@ -94,7 +93,7 @@ Optional environment variables
 | ES_ADD_ECHO          | If enabled, an undocumented endpoint will be created off of the root resource: `_echo`.  PUT {"message": {}, "status_code: int"} to this endpoint and it will be echoed back to you and logged (`.info` if < 400, `.warning` if < 500, else `.error`).  Useful to test the behaviour of error codes (e.g. with logging configurations) |
 
 
-If using auth (e.g. `mkapi {$project_name} --with_auth` or `add_auth` )
+If using auth (e.g. `eve-utils api create {$project_name} --add_auth` )
 
 | Variable               | Description                                                  | Default                                          |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
@@ -123,7 +122,7 @@ If using auth (e.g. `mkapi {$project_name} --with_auth` or `add_auth` )
 | win_service.py     | *under development* - Lets you deploy the API as a windows service. |
 | **configuration**  |   |
 | &nbsp;&nbsp; \_\_init\_\_.py      | Settings used by the application (some set default Eve values in `settings.py` . |
-| **domain**         | Where your domain resources will be created when you use `mkresource` . |
+| **domain**         | Where your domain resources will be created when you use `eve-utils resource create` . |
 | &nbsp;&nbsp; _common.py        | Fields applied to all resources (skipped if API was created with `--no_common` ). |
 | &nbsp;&nbsp; _settings.py     | Defines the `/_settings` endpoint, which you GET to see the application settings. |
 | &nbsp;&nbsp; \_\_init\_\_.py      | Wires up all resources and makes them available to `EveService` . |
