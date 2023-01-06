@@ -9,6 +9,34 @@ from .optional_flags import OptionalFlags
 from eve_utils import addins
 import eve_utils
 
+
+def restrict_create(proj_name, path=None):
+    keep_going = True
+    while keep_going:
+        if os.path.isfile('.eve-utils'):
+            with open('.eve-utils', 'r') as f:
+                settings = json.load(f)
+                if settings["project_name"] == proj_name:
+                    raise RuntimeError('API with this name already exists')
+                else:
+                    os.chdir("..")
+                    os.mkdir(proj_name)
+                    os.chdir(proj_name)
+                    return
+
+        current_dir = os.getcwd()
+        if os.path.isdir('..'):
+            os.chdir('..')
+            if os.getcwd() == current_dir:
+                if current_dir == "/":
+                    os.chdir(path)
+                    return
+                raise RuntimeError('Not in an eve_service API folder')            
+        else:
+            raise RuntimeError('Not in an eve_service API folder')
+
+
+
 @click.group(name='api', help='Create and manage the API service itself.')
 def commands():
     pass
@@ -50,6 +78,7 @@ def _create_api(project_name):
     if project_name == '.':
         project_name = os.path.basename(os.getcwd())
 
+    restrict_create(project_name, os.getcwd())
     click.echo(f'Creating {project_name} api')
     settings = {
         'project_name': project_name
