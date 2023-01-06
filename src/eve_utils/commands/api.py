@@ -8,34 +8,14 @@ from shutil import copyfile
 from .optional_flags import OptionalFlags
 from eve_utils import addins
 import eve_utils
+from ..__init__ import jump_to_api_folder
 
-
-def restrict_api_creation(proj_name, path=None):
-    keep_going = True
-    while keep_going:
-        if os.path.isfile('.eve-utils'):
-            with open('.eve-utils', 'r') as f:
-                settings = json.load(f)
-                if settings["project_name"] == proj_name:
-                    raise RuntimeError('API with this name already exists')
-                else:
-                    os.chdir("..")
-                    os.mkdir(proj_name)
-                    os.chdir(proj_name)
-                    return
-
-        current_dir = os.getcwd()
-        if os.path.isdir('..'):
-            os.chdir('..')
-            if os.getcwd() == current_dir:
-                if current_dir == "/":
-                    os.chdir(path)
-                    return
-                raise RuntimeError('Not in an eve_service API folder')            
-        else:
-            raise RuntimeError('Not in an eve_service API folder')
-
-
+def does_an_api_already_exist():
+    try:
+        jump_to_api_folder()
+        return True
+    except RuntimeError:
+        return False
 
 @click.group(name='api', help='Create and manage the API service itself.')
 def commands():
@@ -49,7 +29,7 @@ def addin_params(func):
     @click.option('--add_validation', '-v', is_flag=True, help='add custom validation class that you can extend', flag_value='n/a')
     @click.option('--add_web_socket', '-w', is_flag=True, help='add web socket and supporting files', flag_value='n/a')
     @click.option('--add_serverless', '-s', is_flag=True, help='add serverless framework and supporting files', flag_value='n/a')
-    
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
@@ -77,28 +57,29 @@ def _create_api(project_name):
     # TODO: ensure folder is empty? or at least warn if not?
     if project_name == '.':
         project_name = os.path.basename(os.getcwd())
-
-    restrict_api_creation(project_name, os.getcwd())
+    if does_an_api_already_exist():
+      click.echo("Please run in a folder that does not already contain an API service")
+      return
     click.echo(f'Creating {project_name} api')
     settings = {
         'project_name': project_name
     }
     with open('.eve-utils', 'w') as f:
         json.dump(settings, f, indent=4)
-        
+
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
     readme_filename = os.path.join(skel, 'doc/README.md')
     copyfile(readme_filename, './README.md')
     os.mkdir('doc')
     readme_filename = os.path.join(skel, 'doc/Setup-Dev-Environment.md')
-    copyfile(readme_filename, './doc/Setup-Dev-Environment.md')   
-        
+    copyfile(readme_filename, './doc/Setup-Dev-Environment.md')
+
     os.mkdir('src')
     os.chdir('src')
     os.mkdir('scripts')
     scripts_folder = os.path.join(skel, 'scripts')
     copy_tree(scripts_folder, 'scripts')
-    
+
     api_folder = os.path.join(skel, 'api')
 
     os.mkdir(project_name)
@@ -115,8 +96,8 @@ def _create_api(project_name):
 
     os.chdir('..')
     eve_utils.replace_project_name(project_name, '.')
-    
-    
+
+
 def _add_addins(kwargs):
     for keyword in [kw for kw in kwargs.keys() if kwargs[kw]]:
         addin = keyword[4:]  # remove "add_"
@@ -129,9 +110,9 @@ def _add_addins(kwargs):
             add()
         else:
             add(kwargs[keyword])
-        
+
     if kwargs['add_git']:
-        print(f'===== adding git')    
+        print(f'===== adding git')
         addins.git.add(kwargs['add_git'])
 
 
