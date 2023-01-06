@@ -10,7 +10,7 @@ from eve_utils import addins
 import eve_utils
 
 
-def restrict_create(proj_name, path=None):
+def restrict_api_creation(proj_name, path=None):
     keep_going = True
     while keep_going:
         if os.path.isfile('.eve-utils'):
@@ -78,7 +78,7 @@ def _create_api(project_name):
     if project_name == '.':
         project_name = os.path.basename(os.getcwd())
 
-    restrict_create(project_name, os.getcwd())
+    restrict_api_creation(project_name, os.getcwd())
     click.echo(f'Creating {project_name} api')
     settings = {
         'project_name': project_name
