@@ -69,3 +69,7 @@ def add():
     wire_up_service()
     
     print('auth modules added')
+    settings["auth"] = "added"
+    os.chdir("..")
+    os.chdir("..")
+    eve_utils.update_settings(settings)

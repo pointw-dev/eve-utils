@@ -75,3 +75,7 @@ def add():
     wire_up_service()
 
     print('validation module added')
+
+    settings["validation"] = "added"
+    os.chdir("..")
+    eve_utils.update_settings(settings)

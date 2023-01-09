@@ -45,3 +45,7 @@ def add():
 
     eve_utils.copy_skel(settings['project_name'], 'docker', '.')
     eve_utils.replace_project_name(settings['project_name'], '.')
+
+    settings["docker"] = "added"
+    os.chdir("..")
+    eve_utils.update_settings(settings)

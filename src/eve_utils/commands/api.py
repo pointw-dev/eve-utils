@@ -89,10 +89,14 @@ def _create_api(project_name):
     
     
 def _add_addins(kwargs):
+    settings = eve_utils.jump_to_api_folder()
     for keyword in [kw for kw in kwargs.keys() if kwargs[kw]]:
         addin = keyword[4:]  # remove "add_"
         if addin == 'git':
             continue
+        if addin in settings:
+            print(f"{addin} is already there")
+            return
         print(f'===== adding {addin}')
         addin_module = importlib.import_module(f'eve_utils.addins.{addin}')
         add = getattr(addin_module, 'add')
