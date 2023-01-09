@@ -66,7 +66,6 @@ def add():
     # eve_negotiable_auth also installs authparser and pyparsing    
     # cryptography also installs cffi, pycparser
     # requests also installs certifi, chardet, idna, urllib3
-    
     wire_up_service()
     
     print('auth modules added')
