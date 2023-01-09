@@ -55,11 +55,13 @@ def addin(**kwargs):
 
 def _create_api(project_name):
     # TODO: ensure folder is empty? or at least warn if not?
+    current_dir = os.getcwd()
     if project_name == '.':
         project_name = os.path.basename(os.getcwd())
     if does_an_api_already_exist():
       click.echo("Please run in a folder that does not already contain an API service")
       return
+    os.chdir(current_dir)
     click.echo(f'Creating {project_name} api')
     settings = {
         'project_name': project_name
