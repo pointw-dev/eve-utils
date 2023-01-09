@@ -7,6 +7,56 @@ from .singplu import get_pair
 from eve_utils.code_gen import ChildLinksInserter, ParentLinksInserter, DomainChildrenDefinitionInserter, DomainRelationsInserter
 import eve_utils
 
+def link_already_exist(parents, children):
+    rels = parent_child_relations()
+    if parents in rels and "children" in rels[parents]:
+        if children in rels[parents]["children"]:
+            return True
+    eve_utils.jump_to_api_folder('src/{project_name}')
+    return False
+
+def parent_child_relations():
+    try:
+        settings = eve_utils.jump_to_api_folder('src/{project_name}/domain')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        sys.exit(1)
+
+    with open('__init__.py', 'r') as f:
+        lines = f.readlines()
+
+    listening = False
+    rels = {}
+    for line in lines:
+        if 'DOMAIN_RELATIONS' in line:
+            listening = True
+            continue
+
+        if not listening:
+            continue
+
+        if line.startswith('}'):
+            break
+
+        if line.startswith("    '"):
+            rel_name = line.split("'")[1]
+            parent, child = rel_name.split('_')
+            parent, parents = get_pair(parent)
+            child, children = get_pair(child)
+
+            if parents not in rels:
+                rels[parents] = {}
+            if 'children' not in rels[parents]:
+                rels[parents]['children'] = set()
+            rels[parents]['children'].add(children)
+
+            if children not in rels:
+                rels[children] = {}
+            if 'parents' not in rels[children]:
+                rels[children]['parents'] = set()
+            rels[children]['parents'].add(parent)
+    return rels
+
 
 @click.group(name='link', help='Manage parent/child links amongst resources.')
 def commands():
@@ -23,63 +73,35 @@ def create(parent, child, as_parent_ref):
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
-        
+
     parent, parents = singular, plural = get_pair(parent)  # TODO: validate, safe name, etc.
     child, children = singular, plural = get_pair(child)  # TODO: validate, safe name, etc.
     parent_ref = '_parent_ref' if as_parent_ref else f'_{parent}_ref'
 
     print(f'Creating link rel from {parent} (parent) to {child} (child)')
 
-    _add_to_domain_init(parent, child, parents, children, parent_ref)
-    _add_to_domain_child(parent, child, parents, children, parent_ref)
-    _add_links_to_parent_hooks(parent, child, parents, children, parent_ref)
-    _add_links_to_child_hooks(parent, child, parents, children, parent_ref)
+    if link_already_exist(parents, children):
+        print('This link already exist')
+        sys.exit(1)
+    else:
+        _add_to_domain_init(parent, child, parents, children, parent_ref)
+        _add_to_domain_child(parent, child, parents, children, parent_ref)
+        _add_links_to_parent_hooks(parent, child, parents, children, parent_ref)
+        _add_links_to_child_hooks(parent, child, parents, children, parent_ref)
 
 
 # TODO: refactor/SLAP
 @commands.command(name='list', help='List the relationships amongst the resources.')
 @click.option('--plant_uml', '-p', is_flag=True, help='output the rels in PlantUML class notation')
-def list(plant_uml):    
+def list(plant_uml):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
-        
-    with open('__init__.py', 'r') as f:
-        lines = f.readlines()
-        
-    listening = False
-    rels = {}
-    for line in lines:
-        if 'DOMAIN_RELATIONS' in line:
-            listening = True
-            continue
-            
-        if not listening:
-            continue
-            
-        if line.startswith('}'):
-            break
-            
-        if line.startswith("    '"):
-            rel_name = line.split("'")[1]
-            parent, child = rel_name.split('_')
-            parent, parents = get_pair(parent)
-            child, children = get_pair(child)
-            
-            if parents not in rels:
-                rels[parents] = {}
-            if 'children' not in rels[parents]:
-                rels[parents]['children'] = set()
-            rels[parents]['children'].add(children)
-            
-            if children not in rels:
-                rels[children] = {}
-            if 'parents' not in rels[children]:
-                rels[children]['parents'] = set()
-            rels[children]['parents'].add(parent)    
-        
+
+    rels = parent_child_relations()
+
     if plant_uml:
         print('@startuml')
         print('hide <<resource>> circle')
