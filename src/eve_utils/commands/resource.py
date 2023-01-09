@@ -9,12 +9,14 @@ from .singplu import get_pair
 from eve_utils.code_gen import DomainDefinitionInserter, HooksInserter
 import eve_utils
 
+
 def resource_already_exist(resource_name):
     resources_list = resources()
     if resource_name in resources_list:
-            return True
+        return True
     eve_utils.jump_to_api_folder('src/{project_name}')
     return False
+
 
 @click.group(name='resource', help='Manage the resources that make up the domain of the service.')
 def commands():
@@ -37,7 +39,7 @@ def create(resource_name, no_common):
 
     print(f'Creating {plural} resource')
     if resource_already_exist(resource_name):
-        print('This link already exist')
+        print('This resource already exist')
         sys.exit(1)
     else:
         create_resource_domain_file(plural, add_common)
@@ -52,6 +54,7 @@ def list():
     for resource in resources_list:
         print('- ' + resource)
 
+
 def resources():
     try:
         eve_utils.jump_to_api_folder('src/{project_name}/domain')
@@ -60,14 +63,13 @@ def resources():
         sys.exit(1)
 
     files = glob.glob('./*.py')
-    resources  =[]
+    resources = []
     for file in files:
         resource = Path(file).stem
         if resource.startswith('_'):
             continue
         resources.append(file[2:-3])
     return resources
-
 
 
 @commands.command(name='remove', help='(not yet implemented)')
