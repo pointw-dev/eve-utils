@@ -61,6 +61,10 @@ def add():
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
 
+    if os.path.exists('./auth'):
+        print('auth has already been added')
+        sys.exit(401)
+
     eve_utils.copy_skel(settings['project_name'], 'auth')
     eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add_auth')
     # eve_negotiable_auth also installs authparser and pyparsing    
@@ -69,7 +73,3 @@ def add():
     wire_up_service()
     
     print('auth modules added')
-    settings["auth"] = "added"
-    os.chdir("..")
-    os.chdir("..")
-    eve_utils.update_settings(settings)

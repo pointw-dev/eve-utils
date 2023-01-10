@@ -73,7 +73,3 @@ def add():
     modify_eve_service()
     eve_utils.copy_skel(settings['project_name'], 'web_socket', '.')
     eve_utils.install_packages(['Flask-SocketIO'], 'add_web_socket')
-
-    settings["web_socket"] = "added"
-    os.chdir("..")
-    eve_utils.update_settings(settings)

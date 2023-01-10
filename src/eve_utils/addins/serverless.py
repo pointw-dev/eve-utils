@@ -184,7 +184,3 @@ def add():
 
     if not ensure_serverless_plugins_installed():
         sys.exit(204)
-
-    settings["serverless"] = "added"
-    os.chdir("..")
-    eve_utils.update_settings(settings)

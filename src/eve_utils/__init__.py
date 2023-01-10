@@ -120,10 +120,3 @@ def replace_project_name(project_name, folder=None):
 def remove_if_exists(folder):
     if os.path.exists(folder):
         remove_tree(folder)
-
-
-def update_settings(settings):
-    print("updating the file")
-    with open('.eve-utils', 'w') as f:
-        json.dump(settings, f, indent=4)
-        f.close()

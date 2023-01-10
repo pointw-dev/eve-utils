@@ -43,9 +43,9 @@ def add():
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
 
+    if os.path.exists('./Dockerfile'):
+        print('docker has already been added')
+        sys.exit(401)
+
     eve_utils.copy_skel(settings['project_name'], 'docker', '.')
     eve_utils.replace_project_name(settings['project_name'], '.')
-
-    settings["docker"] = "added"
-    os.chdir("..")
-    eve_utils.update_settings(settings)
