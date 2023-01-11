@@ -40,7 +40,11 @@ def parent_child_relations():
 
         if line.startswith("    '"):
             rel_name = line.split("'")[1]
-            parent, child = rel_name.split('_')
+            continue
+
+        if line.startswith("        'resource_title':"):
+            child = line.split("'")[3]
+            parent = rel_name.replace(f"_{child}", "")
             parent, parents = get_pair(parent)
             child, children = get_pair(child)
 
@@ -105,7 +109,7 @@ def list(plant_uml):
     if plant_uml:
         print('@startuml')
         print('hide <<resource>> circle')
-        print('hide members')
+        print('hide members ')
         print()
         for rel in rels:
             print(f'class {rel} <<resource>>')
