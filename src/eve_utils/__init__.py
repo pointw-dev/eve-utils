@@ -62,7 +62,8 @@ def copy_skel(project_name, skel_folder, target_folder=None, replace=None):
     destination = skel_folder if not target_folder else target_folder
 
     if not target_folder:
-        os.mkdir(skel_folder)  # TODO: ensure doesn't already exist, etc
+        if not os.path.isdir(skel_folder):
+            os.mkdir(skel_folder)  # TODO: ensure doesn't already exist, etc
     copy_tree(source, destination)
 
     # TODO: can the following remove_tree calls be obviated if skel is packaged differently?
