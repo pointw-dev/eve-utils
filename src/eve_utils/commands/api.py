@@ -8,6 +8,14 @@ from shutil import copyfile
 from .optional_flags import OptionalFlags
 from eve_utils import addins
 import eve_utils
+from ..__init__ import jump_to_api_folder
+
+def api_already_exist():
+    try:
+        jump_to_api_folder()
+        return True
+    except RuntimeError:
+        return False
 
 @click.group(name='api', help='Create and manage the API service itself.')
 def commands():
@@ -21,7 +29,7 @@ def addin_params(func):
     @click.option('--add_validation', '-v', is_flag=True, help='add custom validation class that you can extend', flag_value='n/a')
     @click.option('--add_web_socket', '-w', is_flag=True, help='add web socket and supporting files', flag_value='n/a')
     @click.option('--add_serverless', '-s', is_flag=True, help='add serverless framework and supporting files', flag_value='n/a')
-    
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
@@ -47,29 +55,33 @@ def addin(**kwargs):
 
 def _create_api(project_name):
     # TODO: ensure folder is empty? or at least warn if not?
+    current_dir = os.getcwd()
     if project_name == '.':
         project_name = os.path.basename(os.getcwd())
-
+    if api_already_exist():
+      click.echo("Please run in a folder that does not already contain an API service")
+      return
+    os.chdir(current_dir)
     click.echo(f'Creating {project_name} api')
     settings = {
         'project_name': project_name
     }
     with open('.eve-utils', 'w') as f:
         json.dump(settings, f, indent=4)
-        
+
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
     readme_filename = os.path.join(skel, 'doc/README.md')
     copyfile(readme_filename, './README.md')
     os.mkdir('doc')
     readme_filename = os.path.join(skel, 'doc/Setup-Dev-Environment.md')
-    copyfile(readme_filename, './doc/Setup-Dev-Environment.md')   
-        
+    copyfile(readme_filename, './doc/Setup-Dev-Environment.md')
+
     os.mkdir('src')
     os.chdir('src')
     os.mkdir('scripts')
     scripts_folder = os.path.join(skel, 'scripts')
     copy_tree(scripts_folder, 'scripts')
-    
+
     api_folder = os.path.join(skel, 'api')
 
     os.mkdir(project_name)
@@ -86,8 +98,8 @@ def _create_api(project_name):
 
     os.chdir('..')
     eve_utils.replace_project_name(project_name, '.')
-    
-    
+
+
 def _add_addins(kwargs):
     for keyword in [kw for kw in kwargs.keys() if kwargs[kw]]:
         addin = keyword[4:]  # remove "add_"
@@ -100,9 +112,9 @@ def _add_addins(kwargs):
             add()
         else:
             add(kwargs[keyword])
-        
+
     if kwargs['add_git']:
-        print(f'===== adding git')    
+        print(f'===== adding git')
         addins.git.add(kwargs['add_git'])
 
 

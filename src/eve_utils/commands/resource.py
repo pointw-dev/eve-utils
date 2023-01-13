@@ -10,6 +10,14 @@ from eve_utils.code_gen import DomainDefinitionInserter, HooksInserter
 import eve_utils
 
 
+def resource_already_exist(resource_name):
+    resources_list = resources()
+    if resource_name in resources_list:
+        return True
+    eve_utils.jump_to_api_folder('src/{project_name}')
+    return False
+
+
 @click.group(name='resource', help='Manage the resources that make up the domain of the service.')
 def commands():
     pass
@@ -19,38 +27,49 @@ def commands():
 @click.argument('resource_name', metavar='<name>')
 @click.option('--no_common', '-c', is_flag=True, help='Do not add common fields to this resource')
 def create(resource_name, no_common):
-    """<name> of the resource to create"""  
+    """<name> of the resource to create"""
     try:
         eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
 
-    singular, plural = get_pair(resource_name)    
+    singular, plural = get_pair(resource_name)
     add_common = not no_common
-    
+
     print(f'Creating {plural} resource')
-    create_resource_domain_file(plural, add_common)
-    insert_domain_definition(plural)
-    create_resource_hook_file(singular, plural)
-    insert_hooks(plural)
+    if resource_already_exist(resource_name):
+        print('This resource already exist')
+        sys.exit(1)
+    else:
+        create_resource_domain_file(plural, add_common)
+        insert_domain_definition(plural)
+        create_resource_hook_file(singular, plural)
+        insert_hooks(plural)
 
 
 @commands.command(name='list', help='List the resources in the domain.')
 def list():
+    resources_list = resources()
+    for resource in resources_list:
+        print('- ' + resource)
+
+
+def resources():
     try:
         eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
-        
+
     files = glob.glob('./*.py')
+    resources = []
     for file in files:
         resource = Path(file).stem
         if resource.startswith('_'):
             continue
-        print('- ' + file[2:-3])
-        
+        resources.append(file[2:-3])
+    return resources
 
 
 @commands.command(name='remove', help='(not yet implemented)')
