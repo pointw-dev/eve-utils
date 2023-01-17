@@ -10,8 +10,8 @@ from eve_utils.code_gen import DomainDefinitionInserter, HooksInserter
 import eve_utils
 
 
-def resource_already_exist(resource_name):
-    resources_list = resources()
+def resource_already_exists(resource_name):
+    resources_list = get_resources_list()
     if resource_name in resources_list:
         return True
     eve_utils.jump_to_api_folder('src/{project_name}')
@@ -38,9 +38,9 @@ def create(resource_name, no_common):
     add_common = not no_common
 
     print(f'Creating {plural} resource')
-    if resource_already_exist(resource_name):
+    if resource_already_exists(plural):
         print('This resource already exist')
-        sys.exit(1)
+        sys.exit(701)
     else:
         create_resource_domain_file(plural, add_common)
         insert_domain_definition(plural)
@@ -50,12 +50,12 @@ def create(resource_name, no_common):
 
 @commands.command(name='list', help='List the resources in the domain.')
 def list():
-    resources_list = resources()
+    resources_list = get_resource_list()
     for resource in resources_list:
         print('- ' + resource)
 
 
-def resources():
+def get_resource_list():
     try:
         eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:

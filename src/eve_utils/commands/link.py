@@ -15,6 +15,7 @@ def link_already_exist(parents, children):
     eve_utils.jump_to_api_folder('src/{project_name}')
     return False
 
+
 def parent_child_relations():
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}/domain')
@@ -86,7 +87,7 @@ def create(parent, child, as_parent_ref):
 
     if link_already_exist(parents, children):
         print('This link already exist')
-        sys.exit(1)
+        sys.exit(801)
     else:
         _add_to_domain_init(parent, child, parents, children, parent_ref)
         _add_to_domain_child(parent, child, parents, children, parent_ref)

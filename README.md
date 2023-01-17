@@ -549,22 +549,37 @@ HAL media type
   10x - git
   101 - git already added
 
-  20x - serverless
-  201 - node not installed
-  202 - serverless not installed
-  203 - node not initialized
-  204 - serverless plugin not installed
-
+  20x - auth
+  201 - auth already added
+  
   30x - validation
   301 - validation already installed
-
-  40x - web_socket
-  401 - web_socket already installed
-
-  50x - integration
-  501 - name required when choosing empty integration
-  502 - integration already exists
-
+  
+  40x - docker
+  401 - docker already installed
+  
+  50x - web_socket
+  501 - web_socket already installed
+  
+  60x - serverless
+  601 - serverless already added
+  602 - node not installed
+  603 - serverless not installed
+  604 - node not initialized
+  605 - serverless plugin not installed
+  
+  70x - resource
+  701 - resource already exists
+  
+  80x - link
+  801 - link already exists
+  
+  90x - integration
+  901 - integration already exists
+  902 - name required when choosing empty integration
+  
+  
+  
 * organized folder structure
   - designed with more than simple api in mind (e.g. scripts)
   - src, doc, etc

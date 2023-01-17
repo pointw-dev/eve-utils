@@ -67,8 +67,8 @@ def add():
         sys.exit(1)
 
     if os.path.exists('./web_socket'):
-        print('web_socket folder already exists')
-        sys.exit(401)
+        print('web_socket has already been added')
+        sys.exit(501)
 
     modify_eve_service()
     eve_utils.copy_skel(settings['project_name'], 'web_socket', '.')

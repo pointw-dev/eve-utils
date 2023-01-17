@@ -8,14 +8,15 @@ from shutil import copyfile
 from .optional_flags import OptionalFlags
 from eve_utils import addins
 import eve_utils
-from ..__init__ import jump_to_api_folder
+
 
 def api_already_exist():
     try:
-        jump_to_api_folder()
+        eve_utils.jump_to_api_folder()
         return True
     except RuntimeError:
         return False
+
 
 @click.group(name='api', help='Create and manage the API service itself.')
 def commands():
@@ -120,5 +121,3 @@ def _add_addins(kwargs):
     if kwargs['add_git']:
         print(f'===== adding git')
         addins.git.add(kwargs['add_git'])
-
-

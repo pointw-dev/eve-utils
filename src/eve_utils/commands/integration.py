@@ -35,7 +35,7 @@ def create(integration, name, prefix):
         
     if integration == 'empty' and name is None:
         print('You must supply a name when choosing the "empty" integration.')
-        sys.exit(501)
+        sys.exit(902)
 
     if name is None:
         name = integration
@@ -44,7 +44,7 @@ def create(integration, name, prefix):
     
     if os.path.exists(f'integration/{name}'):
         print(f'There already is an integration named "{name}".')
-        sys.exit(502)
+        sys.exit(901)
 
     print(f'creating {name} integration')
 

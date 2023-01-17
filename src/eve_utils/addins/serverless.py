@@ -167,20 +167,25 @@ def add():
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
         
+    if os.path.exists('./serverless.py'):
+        print('serverless has already been added')
+        sys.exit(601)
+
+        
     eve_utils.copy_skel(settings['project_name'], 'serverless', '.')
     eve_utils.replace_project_name(settings['project_name'], '.')
     
     if not is_node_installed():
-        sys.exit(201)
+        sys.exit(602)
 
     if not ensure_serverless_is_installed():
-        sys.exit(202)
+        sys.exit(603)
 
     os.chdir(f"./{settings['project_name']}")
     eve_utils.install_packages(['dnspython'], 'add_serverless')
 
     if not ensure_node_initialized():
-        sys.exit(203)
+        sys.exit(604)
 
     if not ensure_serverless_plugins_installed():
-        sys.exit(204)
+        sys.exit(605)

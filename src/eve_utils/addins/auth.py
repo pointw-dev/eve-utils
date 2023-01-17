@@ -63,7 +63,7 @@ def add():
 
     if os.path.exists('./auth'):
         print('auth has already been added')
-        sys.exit(401)
+        sys.exit(201)
 
     eve_utils.copy_skel(settings['project_name'], 'auth')
     eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add_auth')
