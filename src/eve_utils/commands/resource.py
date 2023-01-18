@@ -11,7 +11,7 @@ import eve_utils
 
 
 def resource_already_exists(resource_name):
-    resources_list = get_resources_list()
+    resources_list = get_resource_list()
     if resource_name in resources_list:
         return True
     eve_utils.jump_to_api_folder('src/{project_name}')
