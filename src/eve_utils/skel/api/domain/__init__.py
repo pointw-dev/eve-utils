@@ -10,6 +10,9 @@ DOMAIN_DEFINITIONS = {
 
 
 DOMAIN_RELATIONS = {
+    "create_json_form": {
+        "url": 'create-form/<regex("[\w]+"):_resource>',
+    },
 }
 
 
