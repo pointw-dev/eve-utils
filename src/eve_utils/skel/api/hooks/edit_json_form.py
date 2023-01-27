@@ -18,8 +18,6 @@ class JSONEncoder(json.JSONEncoder):
 
 
 def get_instance(resource_name, resource_id):
-    if resource_name == "inventory":
-        resource_name = "vehicles"
     resources = eval(f"get_db().{resource_name}")
     resource = resources.find_one({"_id": ObjectId(resource_id)})
     return resource
