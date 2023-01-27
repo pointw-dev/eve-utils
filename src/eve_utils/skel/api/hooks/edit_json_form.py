@@ -1,7 +1,7 @@
 import json
 from datetime import date, datetime
 from bson.objectid import ObjectId
-from create_json_form import generate_json_form, remove_unnecessary_keys
+from .create_json_form import generate_json_form, remove_unnecessary_keys
 from domain import DOMAIN
 from log_trace.decorators import trace
 from utils import get_db

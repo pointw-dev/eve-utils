@@ -13,7 +13,7 @@ def generate_json_form(schema):
     This function generated JSON Form of resource's schema
     """
     ui_schema_element_list = []
-    type_mapping = {"float": "number", "int": "number", "list": "array", "objectid": "string"}
+    type_mapping = {"float": "number", "integer": "number", "int": "number", "list": "array", "objectid": "string"}
     for key in schema:
         property_dict = dict()
         property_dict["type"] = type_mapping.get(schema[key]["type"], schema[key]["type"])
