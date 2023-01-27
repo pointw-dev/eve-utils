@@ -25,11 +25,11 @@ def get_instance(resource_name, resource_id):
 
 @trace
 def add_hooks(app):
-    app.on_post_GET_edit_json_form += post_get_callback_item
+    app.on_post_GET_edit_json_form += post_get_callback
 
 
 @trace
-def post_get_callback_item(request, payload):
+def post_get_callback(request, payload):
     schema_name = request.path.split("/")[2]
     obj_id = request.path.split("/")[3]
     if schema_name not in DOMAIN:

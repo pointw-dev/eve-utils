@@ -29,11 +29,11 @@ def generate_json_form(schema):
 
 @trace
 def add_hooks(app):
-    app.on_post_GET_create_json_form += post_get_callback_item
+    app.on_post_GET_create_json_form += post_get_callback
 
 
 @trace
-def post_get_callback_item(request, payload):
+def post_get_callback(request, payload):
     schema_name = request.path.split("/")[2]
     if schema_name not in DOMAIN:
         payload.status_code = 204
