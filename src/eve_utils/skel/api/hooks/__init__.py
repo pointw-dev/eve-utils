@@ -4,6 +4,7 @@ import hooks._error_handlers
 import hooks._settings
 import hooks._logs
 import hooks.create_json_form
+import hooks.edit_json_form
 from log_trace.decorators import trace
 from configuration import SETTINGS
 
@@ -23,6 +24,7 @@ def add_hooks(app):
     hooks._settings.add_hooks(app)
     hooks._logs.add_hooks(app)
     hooks.create_json_form.add_hooks(app)
+    hooks.edit_json_form.add_hooks(app)
 
 
 def _post_POST(resource, request, payload):

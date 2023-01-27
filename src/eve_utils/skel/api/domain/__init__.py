@@ -13,6 +13,9 @@ DOMAIN_RELATIONS = {
     "create_json_form": {
         "url": 'create-form/<regex("[\w]+"):_resource>',
     },
+    "edit_json_form": {
+        "url": 'edit-form/<regex("[\w]+"):_resource>/<regex("[a-f0-9]{24}"):_resource_ref>/',
+    },
 }
 
 

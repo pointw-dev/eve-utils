@@ -2,6 +2,12 @@ import json
 from log_trace.decorators import trace
 from domain import DOMAIN
 
+def remove_unnecessary_keys(resource_obj):
+    fields_to_remove = ["_x", "_tags", "_tenant"]
+    for field in fields_to_remove:
+        resource_obj.pop(field, None)
+    return resource_obj
+
 def generate_json_form(schema):
     """
     This function generated JSON Form of resource's schema
@@ -31,10 +37,9 @@ def post_get_callback_item(request, payload):
     schema_name = request.path.split("/")[2]
     if schema_name not in DOMAIN:
         payload.status_code = 204
-    else:
-        to_convert = DOMAIN[schema_name]["schema"].copy()
-        fields_to_remove = ["_x", "_tags", "_tenant"]
-        for field in fields_to_remove:
-            to_convert.pop(field, None)
-        json_schema, ui_schema = generate_json_form(to_convert)
-        payload.data = json.dumps({"json_schema": json_schema, "ui_schema": ui_schema})
+        return
+
+    cerberus_schema = DOMAIN[schema_name]["schema"].copy()
+    remove_unnecessary_keys(cerberus_schema)
+    json_schema, ui_schema = generate_json_form(cerberus_schema)
+    payload.data = json.dumps({"json_schema": json_schema, "ui_schema": ui_schema})
