@@ -1,6 +1,7 @@
 import json
 from log_trace.decorators import trace
 from domain import DOMAIN
+from utils import get_type_mapping_dict
 
 def remove_unnecessary_keys(resource_obj):
     fields_to_remove = ["_x", "_tags", "_tenant"]
@@ -14,7 +15,7 @@ def generate_json_form(schema):
     """
     ui_schema_element_list = []
     required_fields = []
-    type_mapping = {"float": "number", "integer": "number", "int": "number", "list": "array", "objectid": "string"}
+    type_mapping = get_type_mapping_dict()
     for key in schema:
         property_dict = dict()
         if "required" in schema[key] and schema[key]["required"] == True:

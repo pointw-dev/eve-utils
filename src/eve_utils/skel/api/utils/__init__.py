@@ -69,3 +69,8 @@ def echo_message():
         log.error(message)
 
     return make_response(jsonify(message), status_code)
+
+
+def get_type_mapping_dict():
+    type_mapping = {"float": "number", "integer": "number", "int": "number", "list": "array", "objectid": "string"}
+    return type_mapping
