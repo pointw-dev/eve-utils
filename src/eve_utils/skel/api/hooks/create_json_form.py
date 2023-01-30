@@ -13,17 +13,28 @@ def generate_json_form(schema):
     This function generated JSON Form of resource's schema
     """
     ui_schema_element_list = []
+    required_fields = []
     type_mapping = {"float": "number", "integer": "number", "int": "number", "list": "array", "objectid": "string"}
     for key in schema:
         property_dict = dict()
+        if "required" in schema[key] and schema[key]["required"] == True:
+            required_fields.append(key)
+        if "minlength" in schema[key]:
+            property_dict["minLength"] = schema[key]["minlength"]
+        if "maxlength" in schema[key]:
+            property_dict["maxLength"] = schema[key]["maxlength"]
+        if "allowed" in schema[key]:
+            property_dict["enum"] = schema[key]["allowed"]
         property_dict["type"] = type_mapping.get(schema[key]["type"], schema[key]["type"])
         schema[key] = property_dict
         ui_schema_element_list.append({"type": "Control", "scope": f"#/properties/{key}"})
     json_schema = {
         "type": "object",
+        "required": required_fields,
         "properties": {**schema},
     }
     ui_schema = {"type": "VerticalLayout", "elements": ui_schema_element_list}
+
     return json_schema, ui_schema
 
 
