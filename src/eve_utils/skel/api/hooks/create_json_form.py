@@ -9,6 +9,7 @@ def remove_unnecessary_keys(resource_obj):
         resource_obj.pop(field, None)
     return resource_obj
 
+
 def generate_json_form(schema):
     """
     This function generated JSON Form of resource's schema
@@ -18,7 +19,7 @@ def generate_json_form(schema):
     type_mapping = get_type_mapping_dict()
     for key in schema:
         property_dict = dict()
-        if "required" in schema[key] and schema[key]["required"] == True:
+        if "required" in schema[key] and schema[key]["required"]:
             required_fields.append(key)
         if "minlength" in schema[key]:
             property_dict["minLength"] = schema[key]["minlength"]
@@ -26,9 +27,16 @@ def generate_json_form(schema):
             property_dict["maxLength"] = schema[key]["maxlength"]
         if "allowed" in schema[key]:
             property_dict["enum"] = schema[key]["allowed"]
-        property_dict["type"] = type_mapping.get(schema[key]["type"], schema[key]["type"])
+        property_dict["type"] = type_mapping.get(
+            schema[key]["type"], schema[key]["type"]
+        )
+        if property_dict["type"] is "object" and "schema" in schema[key]:
+            json_schema, ui_schema = generate_json_form(schema[key]["schema"])
+            property_dict["properties"] = json_schema["properties"]
         schema[key] = property_dict
-        ui_schema_element_list.append({"type": "Control", "scope": f"#/properties/{key}"})
+        ui_schema_element_list.append(
+            {"type": "Control", "scope": f"#/properties/{key}"}
+        )
     json_schema = {
         "type": "object",
         "required": required_fields,
