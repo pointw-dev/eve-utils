@@ -1,7 +1,7 @@
 import json
 from log_trace.decorators import trace
 from domain import DOMAIN
-from utils import get_type_mapping_dict
+from utils import get_type_mapping_dict, add_validations
 
 def remove_unnecessary_keys(resource_obj):
     fields_to_remove = ["_x", "_tags", "_tenant"]
@@ -21,12 +21,7 @@ def generate_json_form(schema):
         property_dict = dict()
         if "required" in schema[key] and schema[key]["required"]:
             required_fields.append(key)
-        if "minlength" in schema[key]:
-            property_dict["minLength"] = schema[key]["minlength"]
-        if "maxlength" in schema[key]:
-            property_dict["maxLength"] = schema[key]["maxlength"]
-        if "allowed" in schema[key]:
-            property_dict["enum"] = schema[key]["allowed"]
+        add_validations(property_dict, schema[key])
         property_dict["type"] = type_mapping.get(
             schema[key]["type"], schema[key]["type"]
         )

@@ -74,5 +74,19 @@ def get_type_mapping_dict():
         "list": "array",
         "objectid": "string",
         "dict": "object",
+        "datetime": "string"
     }
     return type_mapping
+
+
+def add_validations(property_dict, schema_key):
+    if "minlength" in schema_key:
+        property_dict["minLength"] = schema_key["minlength"]
+    if "maxlength" in schema_key:
+        property_dict["maxLength"] = schema_key["maxlength"]
+    if "allowed" in schema_key:
+        property_dict["enum"] = schema_key["allowed"]
+    if "min" in schema_key:
+        property_dict["minimum"] = schema_key["min"]
+    if "max" in schema_key:
+        property_dict["maximum"] = schema_key["max"]

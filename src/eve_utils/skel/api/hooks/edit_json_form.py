@@ -32,13 +32,13 @@ def add_hooks(app):
 def post_get_callback(request, payload):
     schema_name = request.path.split("/")[2]
     obj_id = request.path.split("/")[3]
-    if schema_name not in DOMAIN:
+    instance = get_instance(schema_name, obj_id)
+    if schema_name not in DOMAIN or instance == None:
         payload.status_code = 204
         return
 
     cerberus_schema = DOMAIN[schema_name]["schema"].copy()
     remove_unnecessary_keys(cerberus_schema)
-    instance = get_instance(schema_name, obj_id)
     json_schema, ui_schema = generate_json_form(cerberus_schema)
     payload.data = json.dumps(
         {
