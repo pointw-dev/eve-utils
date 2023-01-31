@@ -3,6 +3,7 @@ from log_trace.decorators import trace
 from domain import DOMAIN
 from utils import get_type_mapping_dict, add_validations
 
+
 def remove_unnecessary_keys(resource_obj):
     fields_to_remove = ["_x", "_tags", "_tenant"]
     for field in fields_to_remove:
@@ -14,7 +15,6 @@ def generate_json_form(schema):
     """
     This function generated JSON Form of resource's schema
     """
-    ui_schema_element_list = []
     required_fields = []
     type_mapping = get_type_mapping_dict()
     for key in schema:
@@ -25,21 +25,19 @@ def generate_json_form(schema):
         property_dict["type"] = type_mapping.get(
             schema[key]["type"], schema[key]["type"]
         )
+        if schema[key]["type"] == "datetime":
+            property_dict["format"] = "date"
         if property_dict["type"] is "object" and "schema" in schema[key]:
-            json_schema, ui_schema = generate_json_form(schema[key]["schema"])
+            json_schema = generate_json_form(schema[key]["schema"])
             property_dict["properties"] = json_schema["properties"]
         schema[key] = property_dict
-        ui_schema_element_list.append(
-            {"type": "Control", "scope": f"#/properties/{key}"}
-        )
     json_schema = {
         "type": "object",
         "required": required_fields,
         "properties": {**schema},
     }
-    ui_schema = {"type": "VerticalLayout", "elements": ui_schema_element_list}
 
-    return json_schema, ui_schema
+    return json_schema
 
 
 @trace
@@ -56,5 +54,5 @@ def post_get_callback(request, payload):
 
     cerberus_schema = DOMAIN[schema_name]["schema"].copy()
     remove_unnecessary_keys(cerberus_schema)
-    json_schema, ui_schema = generate_json_form(cerberus_schema)
-    payload.data = json.dumps({"json_schema": json_schema, "ui_schema": ui_schema})
+    json_schema = generate_json_form(cerberus_schema)
+    payload.data = json.dumps({"json_schema": json_schema})

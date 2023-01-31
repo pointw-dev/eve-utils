@@ -39,11 +39,10 @@ def post_get_callback(request, payload):
 
     cerberus_schema = DOMAIN[schema_name]["schema"].copy()
     remove_unnecessary_keys(cerberus_schema)
-    json_schema, ui_schema = generate_json_form(cerberus_schema)
+    json_schema = generate_json_form(cerberus_schema)
     payload.data = json.dumps(
         {
             "json_schema": json_schema,
-            "ui_schema": ui_schema,
             "data": json.loads(JSONEncoder().encode(instance)),
         }
     )
