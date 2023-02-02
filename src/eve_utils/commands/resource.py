@@ -149,6 +149,10 @@ def _post_{plural}(request, payload):
 
 @trace
 def _add_links_to_{plural}_collection({plural}_collection):
+    {plural}_collection["_links"]["create-form"] = {{
+        'href': f"/create-form/{plural}",
+        'title': '{plural}_create_form'
+    }}
     for {singular} in {plural}_collection['_items']:
         _add_links_to_{singular}({singular})
 
@@ -158,6 +162,10 @@ def _add_links_to_{singular}({singular}):
     {singular}['_links']['self'] = {{
         'href': f"/{plural}/{{{singular}['_id']}}",
         'title': '{singular}'
+    }}
+    {singular}['_links']["edit-form"] = {{
+        'href': f"/edit-form/{plural}/{{{singular}['_id']}}",
+        'title': '{singular}_edit_form'
     }}
 ''')
 
