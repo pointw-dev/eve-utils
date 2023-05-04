@@ -120,3 +120,52 @@ def replace_project_name(project_name, folder=None):
 def remove_if_exists(folder):
     if os.path.exists(folder):
         remove_tree(folder)
+
+
+def parent_child_relations():
+    try:
+        settings = jump_to_api_folder('src/{project_name}/domain')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        sys.exit(1)
+
+    with open('__init__.py', 'r') as f:
+        lines = f.readlines()
+
+    listening = False
+    rels = {}
+    for line in lines:
+        if 'DOMAIN_RELATIONS' in line:
+            listening = True
+            continue
+
+        if not listening:
+            continue
+
+        if line.startswith('}'):
+            break
+
+        if line.startswith("    '"):
+            rel_name = line.split("'")[1]
+            continue
+
+        if line.startswith("        'resource_title':"):
+            child = line.split("'")[3]
+            parent = rel_name.replace(f"_{child}", "")
+            parent, parents = commands.singplu.get_pair(parent)
+            child, children = commands.singplu.get_pair(child)
+
+            if parents not in rels:
+                rels[parents] = {}
+            if 'children' not in rels[parents]:
+                rels[parents]['children'] = set()
+            rels[parents]['children'].add(children)
+
+            if children not in rels:
+                rels[children] = {}
+            if 'parents' not in rels[children]:
+                rels[children]['parents'] = set()
+            rels[children]['parents'].add(parent)
+    return rels
+
+

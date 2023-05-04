@@ -3,12 +3,9 @@ from libcst import *
 import eve_utils
 
 class DomainRelationsInserter(CSTTransformer):
-    def __init__(self, parent, child, parents, children, parent_ref):
-        self.parent = parent
-        self.child = child
-        self.parents = parents
-        self.children = children
-        self.parent_ref = parent_ref
+    def __init__(self, adder):
+        super().__init__()
+        self.adder = adder
 
     def visit_SimpleStatementLine(self, node):
         if not isinstance(node.body[0], Assign):
@@ -25,7 +22,7 @@ class DomainRelationsInserter(CSTTransformer):
         if original_node.value.elements:
             for item in original_node.value.elements[:-1]:
                 new_elements.append(item)
-            new_elements.append(original_node.value.elements[-1].with_changes (comma=eve_utils.code_gen.get_comma()))
+            new_elements.append(original_node.value.elements[-1].with_changes (comma=eve_utils.code_gen.COMMA))
         new_elements.append(self.make_domain_relation())
 
         relations = Dict(elements=new_elements,
@@ -75,7 +72,7 @@ class DomainRelationsInserter(CSTTransformer):
     def make_domain_relation(self):
         return DictElement(
             key=SimpleString(
-                value=f"'{self.parents}_{self.children}'",
+                value=f"'{self.adder.parents}_{self.adder.children}'",
                 lpar=[],
                 rpar=[],
             ),
@@ -89,7 +86,7 @@ class DomainRelationsInserter(CSTTransformer):
                         ),
                         value=Attribute(
                             value=Name(
-                                value=f'{self.children}',
+                                value=f'{self.adder.children}',
                                 lpar=[],
                                 rpar=[],
                             ),
@@ -144,7 +141,7 @@ class DomainRelationsInserter(CSTTransformer):
                             rpar=[],
                         ),
                         value=SimpleString(
-                            value=f'\'{self.parents}/<regex("[a-f0-9]{{24}}"):{self.parent_ref}>/{self.children}\'',
+                            value=f'\'{self.adder.parents}/<regex("[a-f0-9]{{24}}"):{self.adder.parent_ref}>/{self.adder.children}\'',
                             lpar=[],
                             rpar=[],
                         ),
@@ -183,7 +180,7 @@ class DomainRelationsInserter(CSTTransformer):
                             rpar=[],
                         ),
                         value=SimpleString(
-                            value=f"'{self.children}'",
+                            value=f"'{self.adder.children}'",
                             lpar=[],
                             rpar=[],
                         ),
@@ -230,7 +227,7 @@ class DomainRelationsInserter(CSTTransformer):
                                         rpar=[],
                                     ),
                                     value=SimpleString(
-                                        value=f"'{self.children}'",
+                                        value=f"'{self.adder.children}'",
                                         lpar=[],
                                         rpar=[],
                                     ),

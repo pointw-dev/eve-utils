@@ -13,16 +13,8 @@ class AuthorizationInserter(CSTTransformer):
             body=[
                 ImportFrom(
                     module=Attribute(
-                        value=Name(
-                            value='auth',
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        attr=Name(
-                            value='es_auth',
-                            lpar=[],
-                            rpar=[],
-                        ),
+                        value=Name(value='auth'),
+                        attr=Name(value='es_auth'),
                         dot=Dot(
                             whitespace_before=SimpleWhitespace(
                                 value='',
@@ -41,8 +33,7 @@ class AuthorizationInserter(CSTTransformer):
                                 lpar=[],
                                 rpar=[],
                             ),
-                            asname=None,
-                            comma=MaybeSentinel.DEFAULT,
+                            asname=None
                         ),
                     ],
                     relative=[],
@@ -101,8 +92,6 @@ class AuthorizationInserter(CSTTransformer):
                     value='',
                 ),
             ),
-            comma=MaybeSentinel.DEFAULT,
-            star='',
             whitespace_after_star=SimpleWhitespace(
                 value='',
             ),

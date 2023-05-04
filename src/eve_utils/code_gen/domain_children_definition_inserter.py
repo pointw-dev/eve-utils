@@ -3,12 +3,9 @@ import eve_utils
 
 
 class DomainChildrenDefinitionInserter(CSTTransformer):
-    def __init__(self, parent, child, parents, children, parent_ref):
-        self.parent = parent
-        self.child = child
-        self.parents = parents
-        self.children = children
-        self.parent_ref = parent_ref
+    def __init__(self, adder):
+        super().__init__()
+        self.adder = adder
 
     def visit_SimpleStatementLine(self, node):
         if not isinstance(node.body[0], Assign):
@@ -24,7 +21,7 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
         new_elements = []
         for item in original_node.value.elements[:-1]:
             new_elements.append(item)
-        new_elements.append(original_node.value.elements[-1].with_changes (comma=eve_utils.code_gen.get_comma()))
+        new_elements.append(original_node.value.elements[-1].with_changes (comma=eve_utils.code_gen.COMMA))
         new_elements.append(self.make_parent_ref())
 
         members = Dict(elements=new_elements,
@@ -74,7 +71,7 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
     def make_parent_ref(self):
         return DictElement(
             key=SimpleString(
-                value=f"'{self.parent_ref}'",
+                value=f"'{self.adder.parent_ref}'",
                 lpar=[],
                 rpar=[],
             ),
@@ -134,7 +131,7 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
                                         rpar=[],
                                     ),
                                     value=SimpleString(
-                                        value=f"'{self.parents}'",
+                                        value=f"'{self.adder.parents}'",
                                         lpar=[],
                                         rpar=[],
                                     ),

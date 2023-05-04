@@ -8,28 +8,18 @@ from .parent_links_inserter import ParentLinksInserter
 from .domain_children_definition_inserter import DomainChildrenDefinitionInserter
 from .domain_relations_inserter import DomainRelationsInserter
 
-def get_comma():
-    return Comma(
-        whitespace_before=SimpleWhitespace(
-            value='',
-        ),
-        whitespace_after=ParenthesizedWhitespace(
-            first_line=TrailingWhitespace(
-                whitespace=SimpleWhitespace(
-                    value='',
-                ),
-                comment=None,
-                newline=Newline(
-                    value=None,
-                ),
-            ),
-            empty_lines=[],
-            indent=True,
-            last_line=SimpleWhitespace(
-                value='    ',
-            ),
-        ),
+
+TWNL = TrailingWhitespace(
+    newline=Newline(),
+)
+
+COMMA = Comma(
+    whitespace_after=ParenthesizedWhitespace(
+        first_line=TWNL,
+        indent=True,
+        last_line=SimpleWhitespace('    ')
     )
+)
 
 
 def insert_import(original_body, addition):
@@ -49,3 +39,109 @@ def insert_import(original_body, addition):
         rtn.append(item)
 
     return rtn
+
+
+def get_link_statement_line(resource, rel, href, title):
+    """ Creates the following
+            resource['_links']['rel'] = {
+                'href': 'href',
+                'title': 'title'
+            }
+        where href is
+            either a CST object that resolves to a quoted string
+                e.g. SimpleString("'https://example.com'"
+            or an array to insert into the parts of a FormattedString, to build a href on base_url
+                e.g. [FormattedStringText(f'/{self.adder.children}')]
+                    or the BinaryOperator return value of parent_links_inserter:_get_href_value()
+    """
+
+    if isinstance(href, list):
+        value = FormattedString(
+            start="f'",
+            parts=[
+                FormattedStringExpression(expression=Name('base_url')),
+                *href
+            ],
+            end="'"
+        )
+    else:
+        value = href
+
+    href_element = DictElement(
+        key=SimpleString("'href'"),
+        value=value,
+        comma=Comma(
+            whitespace_after=ParenthesizedWhitespace(
+                first_line=TrailingWhitespace(
+                    newline=Newline(),
+                ),
+                indent=True,
+                last_line=SimpleWhitespace('    ')  # four spaces
+            )
+        )
+    )
+
+    # Create the dictionary element with the 'title' key and simple string value.
+    title_element = DictElement(
+        key=SimpleString("'title'"),
+        value=SimpleString(f"'{title}'")
+    )
+
+    # Create the dictionary with the above elements and left and right braces.
+    link_dict = Dict(
+        elements=[
+            href_element,
+            title_element
+        ],
+        lbrace=LeftCurlyBrace(
+            whitespace_after=ParenthesizedWhitespace(
+                first_line=TrailingWhitespace(
+                    whitespace=SimpleWhitespace(''),
+                    newline=Newline(),
+                ),
+                indent=True,
+                last_line=SimpleWhitespace('    ')
+            ),
+        ),
+        rbrace=RightCurlyBrace(
+            whitespace_before=ParenthesizedWhitespace(
+                first_line=TrailingWhitespace(
+                    whitespace=SimpleWhitespace(''),
+                    newline=Newline()
+                ),
+                indent=True
+            )
+        )
+    )
+
+    # Create the assignment statement with the 'links' subscript target and link_dict value.
+    assign_statement = Assign(
+        value=link_dict,
+        targets=[
+            AssignTarget(
+                target=Subscript(
+                    value=Subscript(
+                        value=Name(resource),
+                        slice=[SubscriptElement(slice=Index(SimpleString("'_links'")))]
+                    ),
+                    slice=[SubscriptElement(slice=Index(SimpleString(f"'{rel}'")))],
+                    lbracket=LeftSquareBracket(),
+                    rbracket=RightSquareBracket()
+                ),
+                whitespace_before_equal=SimpleWhitespace(' '),
+                whitespace_after_equal=SimpleWhitespace(' ')
+            )
+        ]
+    )
+
+    return SimpleStatementLine(
+        body=[
+            assign_statement
+        ],
+        trailing_whitespace=TWNL
+    )
+
+
+
+
+

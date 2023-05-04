@@ -1,5 +1,4 @@
-from glob import glob
-from setuptools import setup, find_packages
+from setuptools import setup
 from version import VERSION
 
 
@@ -36,6 +35,5 @@ setup(
         eu=eve_utils.commands:initialize
         eve-utils=eve_utils.commands:initialize
     ''',
-    # scripts=glob('bin/*'),
     zip_safe=False
 )

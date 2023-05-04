@@ -1,0 +1,129 @@
+import os
+import os
+from libcst import parse_module
+from .singplu import get_pair
+from eve_utils.code_gen import \
+    ChildLinksInserter, \
+    ParentLinksInserter, \
+    DomainChildrenDefinitionInserter, \
+    DomainRelationsInserter
+import eve_utils
+
+
+class LinkAdder:
+    def __init__(self, parent, child, as_parent_ref):
+        self.remote_parent = self.remote_child = False
+
+        if ':' in parent:
+            parent = parent.split(':')[1]
+            self.remote_parent = True
+
+        if ':' in child:
+            child = child.split(':')[1]
+            self.remote_child = True
+
+        self.parent, self.parents = get_pair(parent)  # TODO: validate, safe name, etc.
+        self.child, self.children = get_pair(child)  # TODO: validate, safe name, etc.
+        self.parent_ref = '_parent_ref' if as_parent_ref else f'_{parent}_ref'
+
+    def _add_links_to_child_hooks(self):
+        with open(f'hooks/{self.children}.py', 'r') as source:
+            tree = parse_module(source.read())
+
+        inserter = ChildLinksInserter(self)
+        new_tree = tree.visit(inserter)
+
+        with open(f'hooks/{self.children}.py', 'w') as source:
+            source.write(new_tree.code)
+
+    def _add_links_to_parent_hooks(self):
+        with open(f'hooks/{self.parents}.py', 'r') as source:
+            tree = parse_module(source.read())
+
+        inserter = ParentLinksInserter(self)
+        new_tree = tree.visit(inserter)
+
+        with open(f'hooks/{self.parents}.py', 'w') as source:
+            source.write(new_tree.code)
+
+    def _add_to_domain_init(self):
+        with open('domain/__init__.py', 'r') as source:
+            tree = parse_module(source.read())
+
+        inserter = DomainRelationsInserter(self)
+        new_tree = tree.visit(inserter)
+
+        with open('domain/__init__.py', 'w') as source:
+            source.write(new_tree.code)
+
+    def _add_to_domain_child(self):
+        with open(f'domain/{self.children}.py', 'r') as source:
+            tree = parse_module(source.read())
+
+        inserter = DomainChildrenDefinitionInserter(self)
+        new_tree = tree.visit(inserter)
+
+        with open(f'domain/{self.children}.py', 'w') as source:
+            source.write(new_tree.code)
+
+    def _link_already_exists(self):
+        if self.remote_parent or self.remote_child:
+            print('WARNING: Cannot yet ensure this is not a duplicate for remote links - skipping duplicate link check.')
+            return False  # i.e. link doesn't exist, even though it actually might
+        rels = eve_utils.parent_child_relations()
+        if self.parents in rels and "children" in rels[self.parents]:
+            if self.children in rels[self.parents]["children"]:
+                return True  # i.e. link does exist
+        return False  # i.e. link does not exist
+
+    def _list_missing_resources(self):
+        rtn = ''
+        eve_utils.jump_to_api_folder('src/{project_name}/domain')
+        if not self.remote_parent and not os.path.exists(f'./{self.parents}.py'):
+            rtn += self.parents
+
+        if not self.remote_child and not os.path.exists(f'./{self.children}.py'):
+            if rtn:
+                rtn += ', '
+
+            rtn += self.children
+
+        return rtn
+
+    def _validate(self):
+        if self._link_already_exists():  # TODO this doesn't work if one is remote
+            raise LinkAdderException(801, 'This link already exists')
+
+        missing = self._list_missing_resources()
+        if missing:
+            raise LinkAdderException(802, f'missing resource: {missing}')
+
+        if self.remote_parent and self.remote_child:
+            raise LinkAdderException(803, 'Both parent and child cannot be remote')
+
+    def execute(self):
+        self._validate()
+        eve_utils.jump_to_api_folder('src/{project_name}')
+
+        print(
+            f'Creating link rel from {"remote " if self.remote_parent else ""}{self.parent} (parent) '
+            f'to {"remote " if self.remote_child else ""}{self.children} (children)'
+        )
+
+        # update parent code
+        if not self.remote_parent:
+            self._add_links_to_parent_hooks()
+
+        # update child code
+        if not self.remote_child:
+            self._add_to_domain_init()
+            self._add_to_domain_child()
+            self._add_links_to_child_hooks()
+
+
+class LinkAdderException(Exception):
+    def __init__(self, exit_code, message):
+        super().__init__(message)
+        self.exit_code = exit_code
+
+

@@ -155,10 +155,25 @@ def _add_links_to_{plural}_collection({plural}_collection):
 
 @trace
 def _add_links_to_{singular}({singular}):
+    base_url = SETTINGS.get('ES_BASE_URL')
+
+    if base_url == None:
+        base_url = ''
+        
+    _add_remote_children_links({singular})
+
     {singular}['_links']['self'] = {{
-        'href': f"/{plural}/{{{singular}['_id']}}",
+        'href': f"{{base_url}}/{plural}/{{{singular}['_id']}}",
         'title': '{singular}'
     }}
+
+    
+@trace
+def _add_remote_children_links({singular}):
+    if not SETTINGS['ES_API_GATEWAY']:
+        return
+        
+    # eve-utils adds remote links here:    
 ''')
 
 

@@ -1,16 +1,14 @@
 from libcst import *
-
+import eve_utils
 
 class ParentLinksInserter(CSTTransformer):
-    def __init__(self, parent, child, parents, children, parent_ref):
-        self.parent = parent
-        self.child = child
-        self.parents = parents
-        self.children = children
-        self.parent_ref = parent_ref
+    def __init__(self, adder):
+        super().__init__()
+        self.adder = adder
 
     def leave_FunctionDef(self, original_node, updated_node):
-        if not original_node.name.value == f'_add_links_to_{self.parent}':
+        method_name = '_add_remote_children_links' if self.adder.remote_child else f'_add_links_to_{self.adder.parent}'
+        if not original_node.name.value == method_name:
             return original_node
 
         new_body = []
@@ -24,252 +22,58 @@ class ParentLinksInserter(CSTTransformer):
             )
         )
 
-    def make_children_link(self):
-        return SimpleStatementLine(
-            body=[
-                Assign(
-                    targets=[
-                        AssignTarget(
-                            target=Subscript(
-                                value=Subscript(
-                                    value=Name(
-                                        value=f'{self.parent}',
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    slice=[
-                                        SubscriptElement(
-                                            slice=Index(
-                                                value=SimpleString(
-                                                    value="'_links'",
-                                                    lpar=[],
-                                                    rpar=[],
-                                                ),
-                                            ),
-                                            comma=MaybeSentinel.DEFAULT,
-                                        ),
-                                    ],
-                                    lbracket=LeftSquareBracket(
-                                        whitespace_after=SimpleWhitespace(
-                                            value='',
-                                        ),
-                                    ),
-                                    rbracket=RightSquareBracket(
-                                        whitespace_before=SimpleWhitespace(
-                                            value='',
-                                        ),
-                                    ),
-                                    lpar=[],
-                                    rpar=[],
-                                    whitespace_after_value=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                ),
-                                slice=[
-                                    SubscriptElement(
-                                        slice=Index(
-                                            value=SimpleString(
-                                                value=f"'{self.children}'",
-                                                lpar=[],
-                                                rpar=[],
-                                            ),
-                                        ),
-                                        comma=MaybeSentinel.DEFAULT,
-                                    ),
-                                ],
-                                lbracket=LeftSquareBracket(
-                                    whitespace_after=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                ),
-                                rbracket=RightSquareBracket(
-                                    whitespace_before=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                ),
-                                lpar=[],
-                                rpar=[],
-                                whitespace_after_value=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                            whitespace_before_equal=SimpleWhitespace(
-                                value=' ',
-                            ),
-                            whitespace_after_equal=SimpleWhitespace(
-                                value=' ',
-                            ),
-                        ),
+    def _get_href_value(self):
+        return BinaryOperation(
+            # href to REMOTE child
+            left=BinaryOperation(
+                left=SimpleString(f'\'{{SETTINGS["ES_API_GATEWAY"]}}/{self.adder.children}?where={{"_id":"\''),
+                operator=Add(
+                    whitespace_before=SimpleWhitespace(' '),
+                    whitespace_after=SimpleWhitespace(' ')
+                ),
+                right=Subscript(
+                    value=Name('person'),
+                    slice=[
+                        SubscriptElement(
+                            slice=Index(SimpleString("'_id'"))
+                        )
                     ],
-                    value=Dict(
-                        elements=[
-                            DictElement(
-                                key=SimpleString(
-                                    value="'href'",
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                value=FormattedString(  # ding (make_children_link)
-                                    parts=[
-                                        FormattedStringText(
-                                            value=f'/{self.parents}/',
-                                        ),
-                                        FormattedStringExpression(
-                                            expression=Subscript(
-                                                value=Name(
-                                                    value=f'{self.parent}',
-                                                    lpar=[],
-                                                    rpar=[],
-                                                ),
-                                                slice=[
-                                                    SubscriptElement(
-                                                        slice=Index(
-                                                            value=SimpleString(
-                                                                value='"_id"',  ####### ding
-                                                                lpar=[],
-                                                                rpar=[],
-                                                            ),
-                                                        ),
-                                                        comma=MaybeSentinel.DEFAULT,
-                                                    ),
-                                                ],
-                                                lbracket=LeftSquareBracket(
-                                                    whitespace_after=SimpleWhitespace(
-                                                        value='',
-                                                    ),
-                                                ),
-                                                rbracket=RightSquareBracket(
-                                                    whitespace_before=SimpleWhitespace(
-                                                        value='',
-                                                    ),
-                                                ),
-                                                lpar=[],
-                                                rpar=[],
-                                                whitespace_after_value=SimpleWhitespace(
-                                                    value='',
-                                                ),
-                                            ),
-                                            conversion=None,
-                                            format_spec=None,
-                                            whitespace_before_expression=SimpleWhitespace(
-                                                value='',
-                                            ),
-                                            whitespace_after_expression=SimpleWhitespace(
-                                                value='',
-                                            ),
-                                            equal=None,
-                                        ),
-                                        FormattedStringText(
-                                            value=f'/{self.children}',
-                                        ),
-                                    ],
-                                    start="f'",
-                                    end="'",
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                comma=Comma(
-                                    whitespace_before=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    whitespace_after=ParenthesizedWhitespace(
-                                        first_line=TrailingWhitespace(
-                                            whitespace=SimpleWhitespace(
-                                                value='',
-                                            ),
-                                            comment=None,
-                                            newline=Newline(
-                                                value=None,
-                                            ),
-                                        ),
-                                        empty_lines=[],
-                                        indent=True,
-                                        last_line=SimpleWhitespace(
-                                            value='    ',
-                                        ),
-                                    ),
-                                ),
-                                whitespace_before_colon=SimpleWhitespace(
-                                    value='',
-                                ),
-                                whitespace_after_colon=SimpleWhitespace(
-                                    value=' ',
-                                ),
-                            ),
-                            DictElement(
-                                key=SimpleString(
-                                    value="'title'",
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                value=SimpleString(
-                                    value=f"'{self.children}'",
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                comma=MaybeSentinel.DEFAULT,
-                                whitespace_before_colon=SimpleWhitespace(
-                                    value='',
-                                ),
-                                whitespace_after_colon=SimpleWhitespace(
-                                    value=' ',
-                                ),
-                            ),
-                        ],
-                        lbrace=LeftCurlyBrace(
-                            whitespace_after=ParenthesizedWhitespace(
-                                first_line=TrailingWhitespace(
-                                    whitespace=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    comment=None,
-                                    newline=Newline(
-                                        value=None,
-                                    ),
-                                ),
-                                empty_lines=[],
-                                indent=True,
-                                last_line=SimpleWhitespace(
-                                    value='    ',
-                                ),
-                            ),
-                        ),
-                        rbrace=RightCurlyBrace(
-                            whitespace_before=ParenthesizedWhitespace(
-                                first_line=TrailingWhitespace(
-                                    whitespace=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    comment=None,
-                                    newline=Newline(
-                                        value=None,
-                                    ),
-                                ),
-                                empty_lines=[],
-                                indent=True,
-                                last_line=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                        ),
-                        lpar=[],
-                        rpar=[],
-                    ),
-                    semicolon=MaybeSentinel.DEFAULT,
-                ),
-            ],
-            leading_lines=[],
-            trailing_whitespace=TrailingWhitespace(
-                whitespace=SimpleWhitespace(
-                    value='    ',
-                ),
-                comment=None,
-                newline=Newline(
-                    value=None,
-                ),
+                    lbracket=LeftSquareBracket(),
+                    rbracket=RightSquareBracket()
+                )
             ),
+            operator=Add(
+                whitespace_before=SimpleWhitespace(' '),
+                whitespace_after=SimpleWhitespace(' ')
+            ),
+            right=SimpleString('\'"}\''),
+        ) if self.adder.remote_child else [
+            FormattedStringText(f'/{self.adder.parents}/'),
+            FormattedStringExpression(
+                expression=Subscript(
+                    value=Name(f'{self.adder.parent}'),
+                    slice=[SubscriptElement(slice=Index(SimpleString('"_id"')))]
+                )
+            ),
+            FormattedStringText(f'/{self.adder.children}')
+        ]
+
+    def make_children_link(self):
+        """ This adds the following to hooks.parents:_add_links_to_parent()
+                parent['_links']['children'] = {
+                 'href': f'/parents/{parent["_id"]}/children',
+                 'title': 'children'
+                }
+            or this if the child is remote to hooks.parents:_add_remote_children_links()
+                parent['_links']['children'] = {
+                    'href': '{SETTINGS["ES_API_GATEWAY"]}/children?where={"_id":"' + parent['_id'] + '"}',
+                    'title': 'children'
+                }
+        """
+
+        return eve_utils.code_gen.get_link_statement_line(
+            resource=self.adder.parent,
+            rel=self.adder.children,
+            href=self._get_href_value(),
+            title=self.adder.children
         )
-
-
-
-
