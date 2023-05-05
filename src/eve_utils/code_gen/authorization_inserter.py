@@ -6,119 +6,54 @@ import eve_utils
 
 class AuthorizationInserter(CSTTransformer):
     def __init__(self):
-        pass
+        super().__init__()
 
     def leave_Module(self, original_node, updated_node):
+        """ Adds to the top of eve_service.py the following:
+                from auth.es_auth import EveAuthorization
+        """
+
         addition = SimpleStatementLine(
             body=[
                 ImportFrom(
                     module=Attribute(
-                        value=Name(value='auth'),
-                        attr=Name(value='es_auth'),
-                        dot=Dot(
-                            whitespace_before=SimpleWhitespace(
-                                value='',
-                            ),
-                            whitespace_after=SimpleWhitespace(
-                                value='',
-                            ),
-                        ),
-                        lpar=[],
-                        rpar=[],
+                        value=Name('auth'),
+                        dot=Dot(),
+                        attr=Name('es_auth')
                     ),
                     names=[
                         ImportAlias(
-                            name=Name(
-                                value='EveAuthorization',
-                                lpar=[],
-                                rpar=[],
-                            ),
-                            asname=None
-                        ),
+                            name=Name('EveAuthorization')
+                        )
                     ],
-                    relative=[],
-                    lpar=None,
-                    rpar=None,
-                    semicolon=MaybeSentinel.DEFAULT,
-                    whitespace_after_from=SimpleWhitespace(
-                        value=' ',
-                    ),
-                    whitespace_before_import=SimpleWhitespace(
-                        value=' ',
-                    ),
-                    whitespace_after_import=SimpleWhitespace(
-                        value=' ',
-                    ),
-                ),
+                    whitespace_after_from=SimpleWhitespace(' '),
+                    whitespace_before_import=SimpleWhitespace(' '),
+                    whitespace_after_import=SimpleWhitespace(' ')
+                )
             ])
 
         new_body = eve_utils.code_gen.insert_import(updated_node.body, addition)
 
         return updated_node.with_changes(
-            body = new_body
+            body=new_body
         )
 
     def visit_SimpleStatementLine(self, node):
-        if not isinstance(node.body[0], Assign):
-            return False
-            
-        target = node.body[0].targets[0].target
-        
-        if not isinstance(target, Attribute):
-            return False
-            
-        if not (target.value.value == 'self' and target.attr.value == '_app'):
-            return False
-            
-        return True
-        
+        return eve_utils.is_app_assignment(node)
+
     def leave_Assign(self, original_node, updated_node):
+        """ Adds the following kwarg to eve_service.py:EveService:__init__() self._app = Eve(...) assignment:
+                auth=EveAuthorization
+        """
+
         addition = Arg(
-            value=Name(
-                value='EveAuthorization',
-                lpar=[],
-                rpar=[],
-            ),
-            keyword=Name(
-                value='auth',
-                lpar=[],
-                rpar=[],
-            ),
-            equal=AssignEqual(
-                whitespace_before=SimpleWhitespace(
-                    value='',
-                ),
-                whitespace_after=SimpleWhitespace(
-                    value='',
-                ),
-            ),
-            whitespace_after_star=SimpleWhitespace(
-                value='',
-            ),
-            whitespace_after_arg=SimpleWhitespace(
-                value='',
-            ),
+            value=Name('EveAuthorization'),
+            equal=AssignEqual(),
+            keyword=Name('auth')
         )
         
-        comma = Comma(
-            whitespace_before=SimpleWhitespace(
-                value='',
-            ),
-            whitespace_after=SimpleWhitespace(
-                value=' ',
-            ),
-        )       
-
-        new_args = []
-        last_arg = updated_node.value.args[-1].with_changes(comma=comma)
-
-        for item in itertools.chain(updated_node.value.args[0:-1], [last_arg, addition]):
-            new_args.append(item)
-
-        new_value = updated_node.value.with_changes(args=new_args)
+        new_value = eve_utils.get_new_param_list(addition, updated_node)
 
         return updated_node.with_changes(
-            value = new_value
+            value=new_value
         )
-
-

@@ -5,38 +5,34 @@ import eve_utils
 
 class HooksInserter(CSTTransformer):
     def __init__(self, resource):
+        super().__init__()
         self.resource = resource
 
     def leave_Module(self, original_node, updated_node):
+        """ Adds the following to the top of hooks/__init__.py
+                import hooks.resource
+        """
+
         addition = SimpleStatementLine(
             body=[
                 Import(
-                    names=[ImportAlias(name=Attribute(value=Name(value='hooks'), attr=Name(value=f'{self.resource}')))],
-                    semicolon=MaybeSentinel.DEFAULT,
-                    whitespace_after_import=SimpleWhitespace(
-                        value=' ',
-                    ),
-                ),
+                    names=[ImportAlias(name=Attribute(Name('hooks'), attr=Name(f'{self.resource}')))],
+                    whitespace_after_import=SimpleWhitespace(' ')
+                )
             ],
-            leading_lines=[],
-            trailing_whitespace=TrailingWhitespace(
-                whitespace=SimpleWhitespace(
-                    value='',
-                ),
-                comment=None,
-                newline=Newline(
-                    value=None,
-                ),
-            ),
+            trailing_whitespace=eve_utils.code_gen.TWNL
         )
 
         new_body = eve_utils.code_gen.insert_import(updated_node.body, addition)
 
         return updated_node.with_changes(
-            body = new_body
+            body=new_body
         )
 
     def leave_FunctionDef(self, original_node, updated_node):
+        """ Adds the following to hooks/__init__.py:add_hooks():
+                hooks.resource.add_hooks(app)
+        """
         if not original_node.name.value == 'add_hooks':
             return original_node
 
@@ -46,84 +42,18 @@ class HooksInserter(CSTTransformer):
                     value=Call(
                         func=Attribute(
                             value=Attribute(
-                                value=Name(
-                                    value='hooks',
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                attr=Name(
-                                    value=f'{self.resource}',
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                dot=Dot(
-                                    whitespace_before=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    whitespace_after=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                ),
-                                lpar=[],
-                                rpar=[],
+                                value=Name('hooks'),
+                                dot=Dot(),
+                                attr=Name(f'{self.resource}'),
                             ),
-                            attr=Name(
-                                value='add_hooks',
-                                lpar=[],
-                                rpar=[],
-                            ),
-                            dot=Dot(
-                                whitespace_before=SimpleWhitespace(
-                                    value='',
-                                ),
-                                whitespace_after=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                            lpar=[],
-                            rpar=[],
+                            dot=Dot(),
+                            attr=Name('add_hooks'),
                         ),
-                        args=[
-                            Arg(
-                                value=Name(
-                                    value='app',
-                                    lpar=[],
-                                    rpar=[],
-                                ),
-                                keyword=None,
-                                equal=MaybeSentinel.DEFAULT,
-                                comma=MaybeSentinel.DEFAULT,
-                                star='',
-                                whitespace_after_star=SimpleWhitespace(
-                                    value='',
-                                ),
-                                whitespace_after_arg=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                        ],
-                        lpar=[],
-                        rpar=[],
-                        whitespace_after_func=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_before_args=SimpleWhitespace(
-                            value='',
-                        ),
-                    ),
-                    semicolon=MaybeSentinel.DEFAULT,
-                ),
+                        args=[Arg(Name('app'))]
+                    )
+                )
             ],
-            leading_lines=[],
-            trailing_whitespace=TrailingWhitespace(
-                whitespace=SimpleWhitespace(
-                    value='',
-                ),
-                comment=None,
-                newline=Newline(
-                    value=None,
-                ),
-            ),
+            trailing_whitespace=eve_utils.code_gen.TWNL
         )
 
         new_body = []

@@ -1,3 +1,4 @@
+import itertools
 from libcst import *
 from .domain_definition_inserter import DomainDefinitionInserter
 from .hooks_inserter import HooksInserter
@@ -9,9 +10,7 @@ from .domain_children_definition_inserter import DomainChildrenDefinitionInserte
 from .domain_relations_inserter import DomainRelationsInserter
 
 
-TWNL = TrailingWhitespace(
-    newline=Newline(),
-)
+TWNL = TrailingWhitespace(newline=Newline())
 
 COMMA = Comma(
     whitespace_after=ParenthesizedWhitespace(
@@ -142,6 +141,31 @@ def get_link_statement_line(resource, rel, href, title):
     )
 
 
+def get_new_param_list(addition, updated_node):
+    comma = Comma(whitespace_after=SimpleWhitespace(' '))
+
+    new_args = []
+
+    last_arg = updated_node.value.args[-1].with_changes(comma=comma)
+
+    for item in itertools.chain(updated_node.value.args[0:-1], [last_arg, addition]):
+        new_args.append(item)
+
+    new_value = updated_node.value.with_changes(args=new_args)
+
+    return new_value
 
 
+def is_app_assignment(node):
+    if not isinstance(node.body[0], Assign):
+        return False
 
+    target = node.body[0].targets[0].target
+
+    if not isinstance(target, Attribute):
+        return False
+
+    if not (target.value.value == 'self' and target.attr.value == '_app'):
+        return False
+
+    return True

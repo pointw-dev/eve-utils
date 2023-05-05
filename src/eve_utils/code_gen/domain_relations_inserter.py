@@ -1,6 +1,6 @@
-import itertools
 from libcst import *
 import eve_utils
+
 
 class DomainRelationsInserter(CSTTransformer):
     def __init__(self, adder):
@@ -16,7 +16,6 @@ class DomainRelationsInserter(CSTTransformer):
 
         return True
 
-
     def leave_Assign(self, original_node, updated_node):
         new_elements = []
         if original_node.value.elements:
@@ -25,289 +24,105 @@ class DomainRelationsInserter(CSTTransformer):
             new_elements.append(original_node.value.elements[-1].with_changes (comma=eve_utils.code_gen.COMMA))
         new_elements.append(self.make_domain_relation())
 
-        relations = Dict(elements=new_elements,
-                lbrace=LeftCurlyBrace(
-                    whitespace_after=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
-                        indent=True,
-                        last_line=SimpleWhitespace(
-                            value='    ',
-                        ),
-                    ),
-                ),
-                rbrace=RightCurlyBrace(
-                    whitespace_before=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
-                        indent=True,
-                        last_line=SimpleWhitespace(
-                            value='',
-                        ),
-                    ),
-                ),
-                lpar=[],
-                rpar=[],
-            )
-
-        return updated_node.with_changes (value=relations)
-
-
-    def make_domain_relation(self):
-        return DictElement(
-            key=SimpleString(
-                value=f"'{self.adder.parents}_{self.adder.children}'",
-                lpar=[],
-                rpar=[],
+        relations = Dict(
+            elements=new_elements,
+            lbrace=LeftCurlyBrace(
+                whitespace_after=ParenthesizedWhitespace(
+                    first_line=eve_utils.code_gen.TWNL,
+                    indent=True,
+                    last_line=SimpleWhitespace('    ')
+                )
             ),
-            value=Dict(
-                elements=[
-                    DictElement(
-                        key=SimpleString(
-                            value="'schema'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        value=Attribute(
-                            value=Name(
-                                value=f'{self.adder.children}',
-                                lpar=[],
-                                rpar=[],
-                            ),
-                            attr=Name(
-                                value='SCHEMA',
-                                lpar=[],
-                                rpar=[],
-                            ),
-                            dot=Dot(
-                                whitespace_before=SimpleWhitespace(
-                                    value='',
-                                ),
-                                whitespace_after=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        comma=Comma(
-                            whitespace_before=SimpleWhitespace(
-                                value='',
-                            ),
-                            whitespace_after=ParenthesizedWhitespace(
-                                first_line=TrailingWhitespace(
-                                    whitespace=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    comment=None,
-                                    newline=Newline(
-                                        value=None,
-                                    ),
-                                ),
-                                empty_lines=[],
-                                indent=True,
-                                last_line=SimpleWhitespace(
-                                    value='        ',
-                                ),
-                            ),
-                        ),
-                        whitespace_before_colon=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_after_colon=SimpleWhitespace(
-                            value=' ',
-                        ),
-                    ),
-                    DictElement(
-                        key=SimpleString(
-                            value="'url'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        value=SimpleString(
-                            value=f'\'{self.adder.parents}/<regex("[a-f0-9]{{24}}"):{self.adder.parent_ref}>/{self.adder.children}\'',
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        comma=Comma(
-                            whitespace_before=SimpleWhitespace(
-                                value='',
-                            ),
-                            whitespace_after=ParenthesizedWhitespace(
-                                first_line=TrailingWhitespace(
-                                    whitespace=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    comment=None,
-                                    newline=Newline(
-                                        value=None,
-                                    ),
-                                ),
-                                empty_lines=[],
-                                indent=True,
-                                last_line=SimpleWhitespace(
-                                    value='        ',
-                                ),
-                            ),
-                        ),
-                        whitespace_before_colon=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_after_colon=SimpleWhitespace(
-                            value=' ',
-                        ),
-                    ),
-                    DictElement(
-                        key=SimpleString(
-                            value="'resource_title'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        value=SimpleString(
-                            value=f"'{self.adder.children}'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        comma=Comma(
-                            whitespace_before=SimpleWhitespace(
-                                value='',
-                            ),
-                            whitespace_after=ParenthesizedWhitespace(
-                                first_line=TrailingWhitespace(
-                                    whitespace=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    comment=None,
-                                    newline=Newline(
-                                        value=None,
-                                    ),
-                                ),
-                                empty_lines=[],
-                                indent=True,
-                                last_line=SimpleWhitespace(
-                                    value='        ',
-                                ),
-                            ),
-                        ),
-                        whitespace_before_colon=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_after_colon=SimpleWhitespace(
-                            value=' ',
-                        ),
-                    ),
-                    DictElement(
-                        key=SimpleString(
-                            value="'datasource'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        value=Dict(
-                            elements=[
-                                DictElement(
-                                    key=SimpleString(
-                                        value="'source'",
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    value=SimpleString(
-                                        value=f"'{self.adder.children}'",
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    comma=MaybeSentinel.DEFAULT,
-                                    whitespace_before_colon=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    whitespace_after_colon=SimpleWhitespace(
-                                        value=' ',
-                                    ),
-                                ),
-                            ],
-                            lbrace=LeftCurlyBrace(
-                                whitespace_after=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                            rbrace=RightCurlyBrace(
-                                whitespace_before=SimpleWhitespace(
-                                    value='',
-                                ),
-                            ),
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        comma=MaybeSentinel.DEFAULT,
-                        whitespace_before_colon=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_after_colon=SimpleWhitespace(
-                            value=' ',
-                        ),
-                    ),
-                ],
-                lbrace=LeftCurlyBrace(
-                    whitespace_after=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
-                        indent=True,
-                        last_line=SimpleWhitespace(
-                            value='        ',
-                        ),
-                    ),
-                ),
-                rbrace=RightCurlyBrace(
-                    whitespace_before=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
-                        indent=True,
-                        last_line=SimpleWhitespace(
-                            value='    ',
-                        ),
-                    ),
-                ),
-                lpar=[],
-                rpar=[],
-            ),
-            comma=MaybeSentinel.DEFAULT,
-            whitespace_before_colon=SimpleWhitespace(
-                value='',
-            ),
-            whitespace_after_colon=SimpleWhitespace(
-                value=' ',
+            rbrace=RightCurlyBrace(
+                whitespace_before=ParenthesizedWhitespace(
+                    first_line=eve_utils.code_gen.TWNL,
+                    indent=True,
+                )
             )
         )
 
+        return updated_node.with_changes(value=relations)
 
+    def get_dict_element(self, key, value, with_comma=False):
+        kwargs = {
+            'key': SimpleString(f"'{key}'"),
+            'whitespace_after_colon': SimpleWhitespace(' '),
+            'value': value
+        }
+        if with_comma:
+            kwargs['comma'] = Comma(
+                whitespace_after=ParenthesizedWhitespace(
+                    first_line=eve_utils.code_gen.TWNL,
+                    indent=True,
+                    last_line=SimpleWhitespace('        ')
+                )
+            )
+        return DictElement(**kwargs)
+
+    def make_domain_relation(self):
+        """ Adds the following to domain/__init__.py's DOMAIN_RELATIONS:
+            'parents_children': {
+                'schema': children.SCHEMA,
+                'url': 'parents/<regex("[a-f0-9]{24}"):_parent_ref>/children',
+                'resource_title': 'children',
+                'datasource': {'source': 'children'}
+            }
+        """
+
+        return DictElement(
+            key=SimpleString(f"'{self.adder.parents}_{self.adder.children}'"),
+            whitespace_after_colon=SimpleWhitespace(' '),
+            value=Dict(
+                elements=[
+                    self.get_dict_element(
+                        key='schema',
+                        value=Attribute(
+                            value=Name(f'{self.adder.children}'),
+                            dot=Dot(),
+                            attr=Name('SCHEMA')
+                        ),
+                        with_comma=True
+                    ),
+                    self.get_dict_element(
+                        key='url',
+                        value=SimpleString(
+                            f'\'{self.adder.parents}/<regex("[a-f0-9]{{24}}"):'
+                            f'{self.adder.parent_ref}>/{self.adder.children}\''
+                        ),
+                        with_comma=True
+                    ),
+                    self.get_dict_element(
+                        key='resource_title',
+                        value=SimpleString(f"'{self.adder.children}'"),
+                        with_comma=True
+                    ),
+                    self.get_dict_element(
+                        key='datasource',
+                        value=Dict(
+                            elements=[
+                                self.get_dict_element(
+                                    key='source',
+                                    value=SimpleString(f"'{self.adder.children}'")
+                                )
+                            ],
+                            lbrace=LeftCurlyBrace(),
+                            rbrace=RightCurlyBrace()
+                        )
+                    )
+                ],
+                lbrace=LeftCurlyBrace(
+                    whitespace_after=ParenthesizedWhitespace(
+                        first_line=eve_utils.code_gen.TWNL,
+                        indent=True,
+                        last_line=SimpleWhitespace('        ')
+                    )
+                ),
+                rbrace=RightCurlyBrace(
+                    whitespace_before=ParenthesizedWhitespace(
+                        first_line=eve_utils.code_gen.TWNL,
+                        indent=True,
+                        last_line=SimpleWhitespace('    ')
+                    )
+                )
+            )
+        )

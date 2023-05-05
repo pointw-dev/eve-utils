@@ -27,254 +27,110 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
         members = Dict(elements=new_elements,
                 lbrace=LeftCurlyBrace(
                     whitespace_after=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
+                        first_line=eve_utils.code_gen.TWNL,
                         indent=True,
-                        last_line=SimpleWhitespace(
-                            value='    ',
-                        ),
-                    ),
+                        last_line=SimpleWhitespace('    ')
+                    )
                 ),
                 rbrace=RightCurlyBrace(
                     whitespace_before=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
-                        indent=True,
-                        last_line=SimpleWhitespace(
-                            value='',
-                        ),
-                    ),
-                ),
-                lpar=[],
-                rpar=[],
+                        first_line=eve_utils.code_gen.TWNL,
+                        indent=True
+                    )
+                )
             )
 
         return updated_node.with_changes (value=members)
 
-
     def make_parent_ref(self):
-        return DictElement(
-            key=SimpleString(
-                value=f"'{self.adder.parent_ref}'",
-                lpar=[],
-                rpar=[],
+        """ Adds the following to domain/children.py's SCHEMA:
+            '_parent_ref': {
+                'type': 'objectid',
+                'data_relation': {
+                    'resource': 'parents',
+                    'embeddable': True
+                }
+            }
+        """
+
+        type_element = DictElement(
+            key=SimpleString("'type'"),
+            whitespace_after_colon=SimpleWhitespace(' '),
+            value=SimpleString("'objectid'"),
+            comma=Comma(
+                whitespace_after=ParenthesizedWhitespace(
+                    first_line=eve_utils.code_gen.TWNL,
+                    indent=True,
+                    last_line=SimpleWhitespace('        ')
+                )
+            )
+        )
+
+        resource_element = DictElement(
+            key=SimpleString("'resource'"),
+            whitespace_after_colon=SimpleWhitespace(' '),
+            value=SimpleString(f"'{self.adder.parents}'"),
+            comma=Comma(
+                whitespace_after=ParenthesizedWhitespace(
+                    first_line=eve_utils.code_gen.TWNL,
+                    indent=True,
+                    last_line=SimpleWhitespace('            ')
+                )
             ),
+        )
+
+        embeddable_element = DictElement(
+            key=SimpleString("'embeddable'"),
+            whitespace_after_colon=SimpleWhitespace(' '),
+            value=Name('True')
+        )
+
+        data_relation_element = DictElement(
+            key=SimpleString("'data_relation'"),
+            whitespace_after_colon=SimpleWhitespace(' '),
             value=Dict(
                 elements=[
-                    DictElement(
-                        key=SimpleString(
-                            value="'type'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        value=SimpleString(
-                            value="'objectid'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        comma=Comma(
-                            whitespace_before=SimpleWhitespace(
-                                value='',
-                            ),
-                            whitespace_after=ParenthesizedWhitespace(
-                                first_line=TrailingWhitespace(
-                                    whitespace=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    comment=None,
-                                    newline=Newline(
-                                        value=None,
-                                    ),
-                                ),
-                                empty_lines=[],
-                                indent=True,
-                                last_line=SimpleWhitespace(
-                                    value='        ',
-                                ),
-                            ),
-                        ),
-                        whitespace_before_colon=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_after_colon=SimpleWhitespace(
-                            value=' ',
-                        ),
-                    ),
-                    DictElement(
-                        key=SimpleString(
-                            value="'data_relation'",
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        value=Dict(
-                            elements=[
-                                DictElement(
-                                    key=SimpleString(
-                                        value="'resource'",
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    value=SimpleString(
-                                        value=f"'{self.adder.parents}'",
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    comma=Comma(
-                                        whitespace_before=SimpleWhitespace(
-                                            value='',
-                                        ),
-                                        whitespace_after=ParenthesizedWhitespace(
-                                            first_line=TrailingWhitespace(
-                                                whitespace=SimpleWhitespace(
-                                                    value='',
-                                                ),
-                                                comment=None,
-                                                newline=Newline(
-                                                    value=None,
-                                                ),
-                                            ),
-                                            empty_lines=[],
-                                            indent=True,
-                                            last_line=SimpleWhitespace(
-                                                value='            ',
-                                            ),
-                                        ),
-                                    ),
-                                    whitespace_before_colon=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    whitespace_after_colon=SimpleWhitespace(
-                                        value=' ',
-                                    ),
-                                ),
-                                DictElement(
-                                    key=SimpleString(
-                                        value="'embeddable'",
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    value=Name(
-                                        value='True',
-                                        lpar=[],
-                                        rpar=[],
-                                    ),
-                                    comma=MaybeSentinel.DEFAULT,
-                                    whitespace_before_colon=SimpleWhitespace(
-                                        value='',
-                                    ),
-                                    whitespace_after_colon=SimpleWhitespace(
-                                        value=' ',
-                                    ),
-                                ),
-                            ],
-                            lbrace=LeftCurlyBrace(
-                                whitespace_after=ParenthesizedWhitespace(
-                                    first_line=TrailingWhitespace(
-                                        whitespace=SimpleWhitespace(
-                                            value='',
-                                        ),
-                                        comment=None,
-                                        newline=Newline(
-                                            value=None,
-                                        ),
-                                    ),
-                                    empty_lines=[],
-                                    indent=True,
-                                    last_line=SimpleWhitespace(
-                                        value='            ',
-                                    ),
-                                ),
-                            ),
-                            rbrace=RightCurlyBrace(
-                                whitespace_before=ParenthesizedWhitespace(
-                                    first_line=TrailingWhitespace(
-                                        whitespace=SimpleWhitespace(
-                                            value='',
-                                        ),
-                                        comment=None,
-                                        newline=Newline(
-                                            value=None,
-                                        ),
-                                    ),
-                                    empty_lines=[],
-                                    indent=True,
-                                    last_line=SimpleWhitespace(
-                                        value='        ',
-                                    ),
-                                ),
-                            ),
-                            lpar=[],
-                            rpar=[],
-                        ),
-                        comma=MaybeSentinel.DEFAULT,
-                        whitespace_before_colon=SimpleWhitespace(
-                            value='',
-                        ),
-                        whitespace_after_colon=SimpleWhitespace(
-                            value=' ',
-                        ),
-                    ),
+                    resource_element,
+                    embeddable_element
                 ],
                 lbrace=LeftCurlyBrace(
                     whitespace_after=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
+                        first_line=eve_utils.code_gen.TWNL,
                         indent=True,
-                        last_line=SimpleWhitespace(
-                            value='        ',
-                        ),
+                        last_line=SimpleWhitespace('            ')
                     ),
                 ),
                 rbrace=RightCurlyBrace(
                     whitespace_before=ParenthesizedWhitespace(
-                        first_line=TrailingWhitespace(
-                            whitespace=SimpleWhitespace(
-                                value='',
-                            ),
-                            comment=None,
-                            newline=Newline(
-                                value=None,
-                            ),
-                        ),
-                        empty_lines=[],
+                        first_line=eve_utils.code_gen.TWNL,
                         indent=True,
-                        last_line=SimpleWhitespace(
-                            value='    ',
-                        ),
-                    ),
+                        last_line=SimpleWhitespace('        ')
+                    )
+                )
+            )
+        )
+
+        return DictElement(
+            key=SimpleString(f"'{self.adder.parent_ref}'"),
+            value=Dict(
+                elements=[
+                    type_element,
+                    data_relation_element,
+                ],
+                lbrace=LeftCurlyBrace(
+                    whitespace_after=ParenthesizedWhitespace(
+                        first_line=eve_utils.code_gen.TWNL,
+                        indent=True,
+                        last_line=SimpleWhitespace('        ')
+                    )
                 ),
-                lpar=[],
-                rpar=[],
+                rbrace=RightCurlyBrace(
+                    whitespace_before=ParenthesizedWhitespace(
+                        first_line=eve_utils.code_gen.TWNL,
+                        indent=True,
+                        last_line=SimpleWhitespace('    '),
+                    )
+                )
             ),
-            comma=MaybeSentinel.DEFAULT,
-            whitespace_before_colon=SimpleWhitespace(
-                value='',
-            ),
-            whitespace_after_colon=SimpleWhitespace(
-                value=' ',
-            ),
+            whitespace_after_colon=SimpleWhitespace(' ')
         )
