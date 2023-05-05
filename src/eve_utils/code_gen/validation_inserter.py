@@ -36,7 +36,7 @@ class ValidationInserter(CSTTransformer):
         )
 
     def visit_SimpleStatementLine(self, node):
-        return eve_utils.is_app_assignment(node)
+        return eve_utils.code_gen.is_app_assignment(node)
 
     def leave_Assign(self, original_node, updated_node):
         """ Adds the following kwarg to eve_service.py:EveService:__init__() self._app = Eve(...) assignment:
@@ -45,11 +45,14 @@ class ValidationInserter(CSTTransformer):
 
         addition = Arg(
             value=Name('EveValidator'),
-            equal=AssignEqual(),
+            equal=AssignEqual(
+                whitespace_before=SimpleWhitespace(''),
+                whitespace_after=SimpleWhitespace('')
+            ),
             keyword=Name('validator')
         )
 
-        new_value = eve_utils.get_new_param_list(addition, updated_node)
+        new_value = eve_utils.code_gen.get_new_param_list(addition, updated_node)
 
         return updated_node.with_changes(
             value=new_value
