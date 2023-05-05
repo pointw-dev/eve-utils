@@ -6,8 +6,8 @@ from configuration import SETTINGS
 
 LOG = logging.getLogger('auth')
 
-SETTINGS.set_prefix_description('ES-AUTH', 'EveService authorization settings')
-SETTINGS.create('ES-AUTH', {
+SETTINGS.set_prefix_description('AUTH', 'EveService authorization settings')
+SETTINGS.create('AUTH', {
     'ADD_BASIC': 'No',  # [0] in 'yYtT', i.e. yes, Yes, true, True
     'ROOT_PASSWORD': 'password',
     'REALM': '{$project_name}.pointw.com',
@@ -28,7 +28,7 @@ SETTINGS.create('AUTH0', {
 })
 
 try:
-    JWK_CLIENT = jwt.PyJWKClient(f'https://{SETTINGS["ES-AUTH_JWT_DOMAIN"]}/.well-known/jwks.json')
+    JWK_CLIENT = jwt.PyJWKClient(f'https://{SETTINGS["AUTH_JWT_DOMAIN"]}/.well-known/jwks.json')
     _jwks = JWK_CLIENT.get_signing_keys()
     SIGNING_KEYS = {jwk.key_id: jwk.key for jwk in _jwks}
 except jwt.exceptions.PyJWKClientError:
@@ -36,5 +36,5 @@ except jwt.exceptions.PyJWKClientError:
     SIGNING_KEYS = {}
 
 ## # cancellable
-## if SETTINGS['ES-AUTH_JWT_AUDIENCE'] == '':
-##     del SETTINGS['ES-AUTH_JWT_AUDIENCE']
+## if SETTINGS['AUTH_JWT_AUDIENCE'] == '':
+##     del SETTINGS['AUTH_JWT_AUDIENCE']

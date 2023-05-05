@@ -8,9 +8,9 @@ from utils import get_db
 from . import SETTINGS
 from .auth_handlers import basic, bearer, bearer_challenge
 
-AUTH_PARSER.add_handler('Bearer', bearer, bearer_challenge, realm=f'{SETTINGS["ES-AUTH_REALM"]}')
-if SETTINGS.is_enabled('ES-AUTH_ADD_BASIC'):
-    AUTH_PARSER.add_handler('Basic', basic, realm=f'{SETTINGS["ES-AUTH_REALM"]}')
+AUTH_PARSER.add_handler('Bearer', bearer, bearer_challenge, realm=f'{SETTINGS["AUTH_REALM"]}')
+if SETTINGS.is_enabled('AUTH_ADD_BASIC'):
+    AUTH_PARSER.add_handler('Basic', basic, realm=f'{SETTINGS["AUTH_REALM"]}')
 
 
 class EveAuthorization(NegotiableAuth):

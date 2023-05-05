@@ -231,9 +231,9 @@ if __name__ == '__main__':
     })
 
     auth_settings = Settings.instance()
-    auth_settings.set_prefix_description('es-auth', 'EveService authorization settings')
-    auth_settings.create('es-auth', 'enable_Basic', 'Yes')
-    auth_settings.create('es-auth', 'root_password', 'swordfish')
+    auth_settings.set_prefix_description('auth', 'EveService authorization settings')
+    auth_settings.create('auth', 'enable_Basic', 'Yes')
+    auth_settings.create('auth', 'root_password', 'swordfish')
 
     settings.dump()
     print('==========\n')

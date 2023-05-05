@@ -96,12 +96,12 @@ Optional environment variables
 If using auth (e.g. `eve-utils api create {$project_name} --add_auth` )
 
 | Variable               | Description                                                  | Default                                          |
-| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
-| ES-AUTH_ADD_BASIC      | When enabled, allows a basic authentication scheme with root/password | No                                               |
-| ES-AUTH_ROOT_PASSWORD  | When ES-AUTH_ADD_BASIC is enabled, this is the password the root user uses to gain access to the API. | password                                         |
-| ES-AUTH_REALM          | Appears in the `WWW-Authenticate` header in unauthorized requests. | {$project_name}.pointw.com                       |
-| ES-AUTH_JWT_DOMAIN     |                                                              | {$project_name}.us.auth0.com                     |
-| ES-AUTH_JWT_AUDIENCE   | This is the identifier a client uses when requesting a token from the auth provider.  It is a URI only (identifier only), not an actual URL (i.e. no requests are made to it) | https://pointw.com/{$project_name}               |
+|------------------------| ------------------------------------------------------------ | ------------------------------------------------ |
+| AUTH_ADD_BASIC         | When enabled, allows a basic authentication scheme with root/password | No                                               |
+| AUTH_ROOT_PASSWORD     | When AUTH_ADD_BASIC is enabled, this is the password the root user uses to gain access to the API. | password                                         |
+| AUTH_REALM             | Appears in the `WWW-Authenticate` header in unauthorized requests. | {$project_name}.pointw.com                       |
+| AUTH_JWT_DOMAIN        |                                                              | {$project_name}.us.auth0.com                     |
+| AUTH_JWT_AUDIENCE      | This is the identifier a client uses when requesting a token from the auth provider.  It is a URI only (identifier only), not an actual URL (i.e. no requests are made to it) | https://pointw.com/{$project_name}               |
 | AUTH0_API_AUDIENCE     | When {$project_name} requests a token to use the Auth0 API, this is the audience for the token. | https://{$project_name}.us.auth0.com/api/v2/     |
 | AUTH0_API_BASE_URL     | The base of the Auth0 API                                    | https://{$project_name}.us.auth0.com/api/v2      |
 | AUTH0_CLAIMS_NAMESPACE | If you configure Auth0 to insert additional claims, use this value as a namespace (prefix). | https://pointw.com/{$project_name}               |
