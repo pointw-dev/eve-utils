@@ -49,7 +49,7 @@ def create(resource_name, no_common):
 
 
 @commands.command(name='list', help='List the resources in the domain.')
-def list():
+def list_resources():
     resources_list = get_resource_list()
     for resource in resources_list:
         print('- ' + resource)

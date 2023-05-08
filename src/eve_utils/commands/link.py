@@ -32,8 +32,8 @@ def create(parent, child, as_parent_ref):
 
 # TODO: refactor/SLAP
 @commands.command(name='list', help='List the relationships amongst the resources.')
-@click.option('--plant_uml', '-p', is_flag=True, help='output the rels in PlantUML class notation')
-def list(plant_uml):
+@click.option('output', '--format', '-f', type=click.Choice(['english', 'json', 'python_dict', 'plant_uml']), default='english', help='Choose the output format of the relationships list')
+def list_rels(output):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
@@ -42,7 +42,18 @@ def list(plant_uml):
 
     rels = eve_utils.parent_child_relations()
 
-    if plant_uml:
+    if output == 'english':
+        for rel in rels:
+            print(rel)
+            for item in rels[rel].get('parents', []):
+                print(f'- belong to a {item}')
+            for item in rels[rel].get('children', []):
+                print(f'- have {item}')
+    elif output == 'json':
+        print(json.dumps(rels, indent=4, default=list))
+    elif output == 'python_dict':
+        print(rels)
+    elif output == 'plant_uml':
         print('@startuml')
         print('hide <<resource>> circle')
         print('hide <<remote>> circle')
@@ -70,16 +81,7 @@ def list(plant_uml):
                     item = item.split(':')[1]
                     print(f'{item} ||--o{{ {rel}')
         print('@enduml')
-    else:
-        for rel in rels:
-            print(rel)
-            for item in rels[rel].get('parents', []):
-                print(f'- belong to a {item}')
-            for item in rels[rel].get('children', []):
-                print(f'- have {item}')
 
-        print()
-        print(json.dumps(rels, indent=4, default=str))
 
 
 @commands.command(name='remove', help='(not yet implemented)')

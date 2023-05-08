@@ -65,7 +65,7 @@ def create(integration, name, prefix):
 
 
 @commands.command(name='list', help='(not yet implemented)')
-def list():
+def list_integrations():
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:

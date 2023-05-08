@@ -165,19 +165,19 @@ To see the add-ins available. they are listed as Options when you type:
 The add-ins are:
 
 | Add in               | Description                                                 |
-| -------------------- | ----------------------------------------------------------- |
-| -g, --add_git        | Initialize a local git repository                           |
-| -d, --add_docker     | Add Dockerfile and supporting files                         |
-| -a, --add_auth       | add authorization class and supporting files                |
-| -v, --add_validation | add custom validation class that you can extend             |
-| -w, --add_web_socket | add web socket and supporting files                         |
-| -s, --add_serverless | EXPERIMENTAL: add serverless framework and supporting files |
+|----------------------| ----------------------------------------------------------- |
+| -g, --add-git        | Initialize a local git repository                           |
+| -d, --add-docker     | Add Dockerfile and supporting files                         |
+| -a, --add-auth       | add authorization class and supporting files                |
+| -v, --add-validation | add custom validation class that you can extend             |
+| -w, --add-websocket  | add web socket and supporting files                         |
+| -s, --add-serverless | EXPERIMENTAL: add serverless framework and supporting files |
 
 > NOTE: You will find more details on each add-in in the next section.
 
 You can mix and match these add-ins, e.g.,
 
-`eve-utils api create foobar --add_docker --add_git`
+`eve-utils api create foobar --add-docker --add-git`
 
 This is the same as
 
@@ -187,7 +187,7 @@ If you want all add-ins, the easiest way is:
 
 `eve-utils api create foobar -davwsg`
 
-NOTE: when you select --add_git, it will always be added last as it performs the initial commit for you.  This way all the add-ins that are installed first will be part of the commit.
+NOTE: when you select --add-git, it will always be added last as it performs the initial commit for you.  This way all the add-ins that are installed first will be part of the commit.
 
 #### addin
 
@@ -195,7 +195,7 @@ If you didn't select an add-in when you created the API, you can always select i
 
 In other words...
 
-`eve-utils api create foobar --add_validation`
+`eve-utils api create foobar --add-validation`
 
 ...is the same as...
 
@@ -203,18 +203,18 @@ In other words...
 eve-utils api create foobar
 ...
 ...
-eve-utils api addin --add_validation
+eve-utils api addin --add-validation
 ```
 
 ...no matter how much time passes between those two statements.
 
 All of the add-ins were introduced in the section above.  This section provides more details:
 
-##### --add_git
+##### --add-git
 
 details
 
-##### --add_docker
+##### --add-docker
 
 * Adds the following files:
   `Dockerfile``
@@ -225,12 +225,12 @@ details
 
   ...
 
-##### --add_auth
+##### --add-auth
 
 * Adds a folder named ``auth`` with modules to add authorization to your API (docs to come)
   * NOTE: the only supported IdP is [Auth0](https://auth0.com/) at the moment, but it will be fairly easy to manually tweak to use any OAuth2 JWT issuer. (I have used a forked [Glewlwyd](https://github.com/babelouest/glewlwyd) with very minimal changes)
 
-##### --add_validation
+##### --add-validation
 
 * adds a folder named `validation` with a module that adds custom validator to `EveService`.  Use this to extend custom validations.  It comes with two validations:
 
@@ -266,14 +266,14 @@ details
       }
       ```
 
-##### --add_web_socket
+##### --add-websocket
 
-* Define other events/listeners, emitters/senders in `web_socket/__init__.py` - feel free to remove the default stuff you see there
-* There is a test client at `{{BASE_API_URL}}/_ws` (which you can remove in `web_socket/__init__.py` by removing the `/_ws/chat` route)
+* Define other events/listeners, emitters/senders in `websocket/__init__.py` - feel free to remove the default stuff you see there
+* There is a test client at `{{BASE_API_URL}}/_ws` (which you can remove in `websocket/__init__.py` by removing the `/_ws/chat` route)
   * This is useful to see how to configure the Javascript socket.io client to connect to the web socket now running in the API
   * It is also useful to test messages - the chat app merely re-emits what it receives
 
-##### --add_serverless
+##### --add-serverless
 
 * Adds the following files:
 
@@ -558,8 +558,8 @@ HAL media type
   40x - docker
   401 - docker already installed
   
-  50x - web_socket
-  501 - web_socket already installed
+  50x - websocket
+  501 - websocket already installed
   
   60x - serverless
   601 - serverless already added
@@ -573,6 +573,8 @@ HAL media type
   
   80x - link
   801 - link already exists
+  802 - local resource does not exist
+  803 - both parent and child of a link cannot be remote (at least one must be local)
   
   90x - integration
   901 - integration already exists

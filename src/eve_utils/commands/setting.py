@@ -11,7 +11,7 @@ def create():
 
 
 @commands.command(name='list', help='(not yet implemented)')
-def list():
+def list_settings():
     click.echo('list')
 
 

@@ -70,13 +70,18 @@ class LinkAdder:
             source.write(new_tree.code)
 
     def _link_already_exists(self):
-        if self.remote_parent or self.remote_child:
-            print('WARNING: Cannot yet ensure this is not a duplicate for remote links - skipping duplicate link check.')
-            return False  # i.e. link doesn't exist, even though it actually might
         rels = eve_utils.parent_child_relations()
-        if self.parents in rels and "children" in rels[self.parents]:
-            if self.children in rels[self.parents]["children"]:
+
+        if 'children' in rels.get(self.parents, {}):
+            needle = 'remote:' + self.children if self.remote_child else self.children
+            if needle in rels[self.parents]['children']:
                 return True  # i.e. link does exist
+
+        if self.remote_parent and 'parents' in rels.get(self.children, {}):
+            needle = 'remote:' + self.parent
+            if needle in rels[self.children]['parents']:
+                return True
+
         return False  # i.e. link does not exist
 
     def _list_missing_resources(self):
