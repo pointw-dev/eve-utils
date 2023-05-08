@@ -9,7 +9,7 @@ from . import SETTINGS
 from .auth_handlers import basic, bearer, bearer_challenge
 
 AUTH_PARSER.add_handler('Bearer', bearer, bearer_challenge, realm=f'{SETTINGS["AUTH_REALM"]}')
-if SETTINGS.is_enabled('AUTH_ADD_BASIC'):
+if SETTINGS.has_enabled('AUTH_ADD_BASIC'):
     AUTH_PARSER.add_handler('Basic', basic, realm=f'{SETTINGS["AUTH_REALM"]}')
 
 

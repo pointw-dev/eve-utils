@@ -44,6 +44,11 @@ def _log_request(resource, request, payload):
     LOG.debug(f'Request for {resource}: {request} [{payload.status_code}] '
               f'{request.values} {payload.data} [{request.headers}]')
 
+    # was...
+    # LOG.info(f"{payload.status_code} {request.method} {request.base_url}")
+    # LOG.debug(f"{request.values} {payload.data} [{request.headers}]")
+    # LOG.debug(f"{request.url_root}, {request.path}, {request.query_string}")
+
 
 @trace
 def _get_logging_config():

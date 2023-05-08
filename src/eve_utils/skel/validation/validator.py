@@ -87,10 +87,9 @@ class EveValidator(Validator):
 
         collection = get_db()[resource]
         query = {
-            field: re.compile('^' + re.escape(value) + '$', re.IGNORECASE)
+            field: re.compile('^' + re.escape(value) + '$', re.IGNORECASE),
+            parent_ref_field: ObjectId(parent_ref) if parent_ref else None
         }
-
-        query[parent_ref_field] = ObjectId(parent_ref) if parent_ref else None
 
         prior = collection.find_one(query)
         if prior and unique_to_parent:
@@ -100,7 +99,18 @@ class EveValidator(Validator):
                 message = f'/{resource} already has an item whose {field} is {prior_field}'
             self._error(field, message)
 
+    @trace
+    def _validate_remote_relation(self, remote_relation, field, value):
+        """
+        The rule's arguments are validated against this schema:
+        {'allow_unknown': True}
+        """
+        if not remote_relation:
+            return
+
+    #
     # ISO type definitions
+    #
     @trace
     def _validate_type_iso_date(self, date_value):
         is_valid = True

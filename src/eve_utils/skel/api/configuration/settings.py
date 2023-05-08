@@ -69,7 +69,7 @@ class Settings():
                                      becomes 
                                   prefix == ES, setting_name == INSTANCE_NAME
                                   
-      is_enabled              A value is considered "enabled" if it begins with Y, T, or E          
+      has_enabled             A value is considered "enabled" if it begins with Y, T, or E
                               i.e. the following means a setting (if it exists) is enabled:
                               - 'Yes' or 'yes' or 'Y' or 'y'
                               - 'True' or 'true' or 'T' or 't'
@@ -156,7 +156,7 @@ class Settings():
             for prefix in self.settings:
                 self._dump_prefix(prefix, callback)
                 
-    def is_enabled(self, setting_name, prefix=None):
+    def has_enabled(self, setting_name, prefix=None):
         value = self.get(setting_name, prefix)
         
         return value[0].upper() in 'YTE' if value else False
@@ -250,9 +250,9 @@ if __name__ == '__main__':
 
     print('==========\n')
     
-    print(f'is ES_TRACE_LOGGING enabled? {settings.is_enabled("ES_TRACE_LOGGING")}')
-    print(f'is ES_ADD_ECHO enabled? {settings.is_enabled("ES_ADD_ECHO")}')
-    print(f'IS ES_NOT_CREATED enabled {settings.is_enabled("ES_NOT_CREATED")}')
+    print(f'is ES_TRACE_LOGGING enabled? {settings.has_enabled("ES_TRACE_LOGGING")}')
+    print(f'is ES_ADD_ECHO enabled? {settings.has_enabled("ES_ADD_ECHO")}')
+    print(f'IS ES_NOT_CREATED enabled {settings.has_enabled("ES_NOT_CREATED")}')
 
     print('==========\n')
 

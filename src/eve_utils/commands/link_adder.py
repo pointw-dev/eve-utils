@@ -47,6 +47,9 @@ class LinkAdder:
             source.write(new_tree.code)
 
     def _add_to_domain_init(self):
+        if self.remote_parent:
+            return
+
         with open('domain/__init__.py', 'r') as source:
             tree = parse_module(source.read())
 
@@ -96,10 +99,13 @@ class LinkAdder:
 
         missing = self._list_missing_resources()
         if missing:
-            raise LinkAdderException(802, f'missing resource: {missing}')
+            raise LinkAdderException(802, f'missing local resource: {missing}')
 
         if self.remote_parent and self.remote_child:
             raise LinkAdderException(803, 'Both parent and child cannot be remote')
+
+    def _ensure_validation_addin_is_installed(self):
+        pass
 
     def execute(self):
         self._validate()
@@ -110,6 +116,9 @@ class LinkAdder:
             f'to {"remote " if self.remote_child else ""}{self.children} (children)'
         )
 
+        if self.remote_parent:
+            self._ensure_validation_addin_is_installed()
+
         # update parent code
         if not self.remote_parent:
             self._add_links_to_parent_hooks()
@@ -117,7 +126,7 @@ class LinkAdder:
         # update child code
         if not self.remote_child:
             self._add_to_domain_init()
-            self._add_to_domain_child()
+            self._add_to_domain_child()  # TODO: finish this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             self._add_links_to_child_hooks()
 
 

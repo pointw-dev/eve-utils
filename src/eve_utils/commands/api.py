@@ -24,12 +24,12 @@ def commands():
 
 
 def addin_params(func):
-    @click.option('--add_git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
-    @click.option('--add_docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container', flag_value='n/a')
-    @click.option('--add_auth', '-a', is_flag=True, help='add authorization class and supporting files', flag_value='n/a')
-    @click.option('--add_validation', '-v', is_flag=True, help='add custom validation class that you can extend', flag_value='n/a')
-    @click.option('--add_web_socket', '-w', is_flag=True, help='add web socket and supporting files', flag_value='n/a')
-    @click.option('--add_serverless', '-s', is_flag=True, help='add serverless framework and supporting files', flag_value='n/a')
+    @click.option('--add-git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
+    @click.option('--add-docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container', flag_value='n/a')
+    @click.option('--add-auth', '-a', is_flag=True, help='add authorization class and supporting files', flag_value='n/a')
+    @click.option('--add-validation', '-v', is_flag=True, help='add custom validation class that you can extend', flag_value='n/a')
+    @click.option('--add-websocket', '-w', is_flag=True, help='add web socket and supporting files', flag_value='n/a')
+    @click.option('--add-serverless', '-s', is_flag=True, help='add serverless framework and supporting files', flag_value='n/a')
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -104,14 +104,14 @@ def _create_api(project_name):
 def _add_addins(kwargs):
     settings = eve_utils.jump_to_api_folder()
     for keyword in [kw for kw in kwargs.keys() if kwargs[kw]]:
-        addin = keyword[4:]  # remove "add_"
-        if addin == 'git':
+        addin_name = keyword[4:]  # remove "add-"
+        if addin_name == 'git':
             continue
-        if addin in settings:
-            print(f"{addin} is already there")
+        if addin_name in settings:
+            print(f"{addin_name} is already there")
             return
-        print(f'===== adding {addin}')
-        addin_module = importlib.import_module(f'eve_utils.addins.{addin}')
+        print(f'===== adding {addin_name}')
+        addin_module = importlib.import_module(f'eve_utils.addins.{addin_name}')
         add = getattr(addin_module, 'add')
         if kwargs[keyword] == 'n/a':
             add()
@@ -119,5 +119,5 @@ def _add_addins(kwargs):
             add(kwargs[keyword])
 
     if kwargs['add_git']:
-        print(f'===== adding git')
+        print('===== adding git')
         addins.git.add(kwargs['add_git'])

@@ -3,11 +3,11 @@
    in either aws, azure, or google cloud
 
 Usage:
-    add_serverless [-h|--help] api_name
+    add-serverless [-h|--help] api_name
       NOTE: Run this in the folder above the API project folder
 
 Examples:
-    add_serverless my-api
+    add-serverless my-api
 
 License:
     MIT License
@@ -182,7 +182,7 @@ def add():
         sys.exit(603)
 
     os.chdir(f"./{settings['project_name']}")
-    eve_utils.install_packages(['dnspython'], 'add_serverless')
+    eve_utils.install_packages(['dnspython'], 'add-serverless')
 
     if not ensure_node_initialized():
         sys.exit(604)

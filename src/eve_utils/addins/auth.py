@@ -2,10 +2,10 @@
 """Adds authorization module to the API project.
 
 Usage:
-    add_auth
+    add-auth
 
 Examples:
-    add_auth
+    add-auth
 
 License:
     MIT License
@@ -66,7 +66,7 @@ def add():
         sys.exit(201)
 
     eve_utils.copy_skel(settings['project_name'], 'auth')
-    eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add_auth')
+    eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add-auth')
     # eve_negotiable_auth also installs authparser and pyparsing    
     # cryptography also installs cffi, pycparser
     # requests also installs certifi, chardet, idna, urllib3

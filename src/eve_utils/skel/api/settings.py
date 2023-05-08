@@ -5,7 +5,7 @@ import domain
 from configuration import SETTINGS
 
 
-if SETTINGS.is_enabled('ES_MONGO_ATLAS'):
+if SETTINGS.has_enabled('ES_MONGO_ATLAS'):
     MONGO_URI = f'mongodb+srv://{SETTINGS.get("ES_MONGO_USERNAME")}:{SETTINGS.get("ES_MONGO_PASSWORD")}@{SETTINGS["ES_MONGO_HOST"]}/{SETTINGS["ES_MONGO_DBNAME"]}?retryWrites=true&w=majority'
 else:
     MONGO_HOST = SETTINGS.get('ES_MONGO_HOST')

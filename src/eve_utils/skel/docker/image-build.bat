@@ -12,7 +12,7 @@ if not "x%1"=="x" docker tag %LATESTIMAGE% %repos%:%1
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
 @FOR /F "delims=" %%s IN ('powershell -command "((get-item env:'GITBRANCH').Value.ToLower()) -replace '/','-'"') DO @set GITBRANCH=%%s
-if not "%GITBRANCH%"=="" docker tag %LATESTIMAGE% %repos%:%GITBRANCH%
+if not "%GITBRANCH%"==" " docker tag %LATESTIMAGE% %repos%:%GITBRANCH%
 
 : if "x%2"=="xN" goto end
 : if "x%2"=="xn" goto end

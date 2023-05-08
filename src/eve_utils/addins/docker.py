@@ -2,10 +2,10 @@
 """Adds files to facilitate building the API as a docker container
 
 Usage:
-    add_docker
+    add-docker
 
 Examples:
-    add_docker
+    add-docker
 
 License:
     MIT License

@@ -4,11 +4,11 @@
 If you provide a remote path, this will also add the remote to the local repository 
 then push the code
 Usage:
-    add_git [=remote]
+    add-git [=remote]
 
 Examples:
-    add_git
-    add_git=http://github.com/myaccount/myrepos.git
+    add-git
+    add-git=http://github.com/myaccount/myrepos.git
 
 License:
     MIT License

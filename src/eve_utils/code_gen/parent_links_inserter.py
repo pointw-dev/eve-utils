@@ -24,30 +24,33 @@ class ParentLinksInserter(CSTTransformer):
         )
 
     def _get_href_value(self):
-        return BinaryOperation(
-            # href to REMOTE child
-            left=BinaryOperation(
-                left=SimpleString(f'\'{{SETTINGS["ES_API_GATEWAY"]}}/{self.adder.children}?where={{"_id":"\''),
-                operator=Add(
-                    whitespace_before=SimpleWhitespace(' '),
-                    whitespace_after=SimpleWhitespace(' ')
+        return FormattedString(
+            parts=[
+                FormattedStringExpression(
+                    expression=Call(
+                        func=Name('get_href_from_gateway'),
+                        args=[
+                            Arg(SimpleString(f"'{self.adder.children}'"))
+                        ]
+                    )
                 ),
-                right=Subscript(
-                    value=Name('person'),
-                    slice=[
-                        SubscriptElement(
-                            slice=Index(SimpleString("'_id'"))
-                        )
-                    ],
-                    lbracket=LeftSquareBracket(),
-                    rbracket=RightSquareBracket()
-                )
-            ),
-            operator=Add(
-                whitespace_before=SimpleWhitespace(' '),
-                whitespace_after=SimpleWhitespace(' ')
-            ),
-            right=SimpleString('\'"}\''),
+                FormattedStringText(f'?where=%7B%22_{self.adder.parent}_ref%22:%22'),
+                FormattedStringExpression(
+                    expression=Subscript(
+                        value=Name(self.adder.parent),
+                        slice=[
+                            SubscriptElement(
+                                slice=Index(SimpleString("'_id'"))
+                            )
+                        ],
+                        lbracket=LeftSquareBracket(),
+                        rbracket=RightSquareBracket()
+                    ),
+                ),
+                FormattedStringText('%22%7D')
+            ],
+            start='f"',
+            end='"'
         ) if self.adder.remote_child else [
             FormattedStringText(f'/{self.adder.parents}/'),
             FormattedStringExpression(
@@ -67,7 +70,7 @@ class ParentLinksInserter(CSTTransformer):
                 }
             or this if the child is remote to hooks.parents:_add_remote_children_links()
                 parent['_links']['children'] = {
-                    'href': '{SETTINGS["ES_API_GATEWAY"]}/children?where={"_id":"' + parent['_id'] + '"}',
+                    'href': "{get_href_from_gateway('parents')}?where={"_parent_ref":"' + parent['_id'] + '"}',
                     'title': 'children'
                 }
         """

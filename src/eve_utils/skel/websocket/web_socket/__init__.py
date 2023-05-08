@@ -4,7 +4,7 @@ from log_trace.decorators import trace
 from flask_socketio import send, emit
 
 
-LOG = logging.getLogger('web_socket')
+LOG = logging.getLogger('websocket')
 SOCKET = None
 
 
@@ -14,7 +14,7 @@ def initialize(app, socket):
     SOCKET = socket
 
     @app.route('/_ws')
-    def web_socket():
+    def websocket():
         return render_template('ws.html', sync_mode=socket.async_mode)
 
     # TODO: remove this route (and templates/chat.html) after testing to confirm sockets are working

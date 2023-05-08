@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import json
+import glob
 from distutils.dir_util import copy_tree, remove_tree
 
 from . import addins
@@ -42,15 +43,11 @@ def install_packages(packages, command):
     with open('requirements.txt', 'a') as f:
         f.write(f'\n# start: added by {command}\n')
         for package in packages:
-            out = subprocess.check_output([sys.executable, "-m", "pip", "install", package]).decode('utf-8')
+            subprocess.check_output([sys.executable, "-m", "pip", "install", package]).decode('utf-8')
+            out = subprocess.check_output([sys.executable, "-m", "pip", "freeze"]).decode('utf-8')
             for line in out.split('\n'):
-                if line.startswith(trigger):
-                    installed_packages = line[len(trigger):].split(' ')
-
-                    for installed_package in installed_packages:
-                        if package in installed_package:
-                            hyphen = installed_package.rfind('-')
-                            f.write(f'{installed_package[:hyphen]}=={installed_package[hyphen+1:]}\n')
+                if package in line:
+                    f.write(f'{line}\n')
 
         f.write(f'# end: added by {command}\n')
 
@@ -122,6 +119,43 @@ def remove_if_exists(folder):
         remove_tree(folder)
 
 
+def _add_remote_relations(rels):
+    try:
+        settings = jump_to_api_folder('src/{project_name}/hooks')
+    except RuntimeError:
+        print('This command must be run in an eve_service API folder structure')
+        sys.exit(1)
+
+    files = [file for file in glob.glob('*.py') if not file.startswith('_')]
+
+    for file in files:
+        resource = file.split('.')[0]  # TODO: replace with more elegant basename or something
+        with open(file, 'r') as f:
+            lines = f.readlines()
+
+        listening = ''
+        for line in lines:
+            if line.startswith('def _add_remote_'):
+                listening = line.split('_')[3]
+                if listening == 'parent':
+                    listening = 'parents'
+                continue
+            elif line.startswith('def '):
+                listening = ''
+                continue
+
+            if listening and '_links' in line:
+                remote = line.split("'")[3]
+                singular, plural = commands.singplu.get_pair(remote)
+                remote = 'remote:' + (singular if listening == 'parents' else plural)
+                if resource not in rels:
+                    rels[resource] = {}
+                if listening not in rels[resource]:
+                    rels[resource][listening] = set()
+
+                rels[resource][listening].add(remote)
+
+
 def parent_child_relations():
     try:
         settings = jump_to_api_folder('src/{project_name}/domain')
@@ -166,6 +200,9 @@ def parent_child_relations():
             if 'parents' not in rels[children]:
                 rels[children]['parents'] = set()
             rels[children]['parents'].add(parent)
+
+    _add_remote_relations(rels)
+
     return rels
 
 

@@ -2,6 +2,9 @@ import logging
 from flask import jsonify, make_response
 from flask import current_app, request
 from . import log_setup
+from pymongo import MongoClient
+from pymongo.errors import ServerSelectionTimeoutError, OperationFailure
+from configuration import SETTINGS
 
 LOG = logging.getLogger('utils')
 
@@ -12,6 +15,12 @@ unauthorized_message = {
         "code": 401
     }
 }
+
+
+def is_mongo_running():
+    mongoClient = MongoClient(
+        "mongodb://usernameMongo:passwordMongo@localhost:27017/?authMechanism=DEFAULT&authSource=database_name",
+        serverSelectionTimeoutMS=500)
 
 
 def get_db():

@@ -45,7 +45,7 @@ def _configure_logger():
         }
     }
 
-    if SETTINGS.is_enabled('ES_LOG_TO_FOLDER'):
+    if SETTINGS.has_enabled('ES_LOG_TO_FOLDER'):
         log_folder = f'/var/log/{secure_filename(api_name)}'
         if not os.path.exists(log_folder):
             os.makedirs(log_folder)
@@ -76,7 +76,7 @@ def _configure_logger():
         logging_config['root']['handlers'] += ['all', 'warn', 'error']
 
     smtp_warnings = []
-    if SETTINGS.is_enabled('ES_SEND_ERROR_EMAILS'):
+    if SETTINGS.has_enabled('ES_SEND_ERROR_EMAILS'):
         requires = ['ES_SMTP_HOST', 'ES_SMTP_PORT', 'ES_ERROR_EMAIL_RECIPIENTS', 'ES_ERROR_EMAIL_FROM']
         good_to_go = True
         for item in requires:
@@ -112,7 +112,7 @@ def _configure_logger():
     if smtp_warnings:
         for warning in smtp_warnings:
             LOG.warning(warning)
-    elif SETTINGS.is_enabled('ES_SEND_ERROR_EMAILS'):  # TODO: can this be moved up to logging_config setup?
+    elif SETTINGS.has_enabled('ES_SEND_ERROR_EMAILS'):  # TODO: can this be moved up to logging_config setup?
         instance_name = SETTINGS.get('ES_INSTANCE_NAME')
         email_format = f'''%(levelname)s sent from {api_name} instance "{instance_name}" (hostname: {socket.gethostname()})
 

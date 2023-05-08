@@ -38,8 +38,8 @@ SETTINGS.create('ES', {
 
 # optional settings...
 SETTINGS.create('ES', 'BASE_URL', is_optional=True)
-SETTINGS.create('ES', 'API_GATEWAY', is_optional=True)
-SETTINGS.create('ES', 'API_GATEWAY_NAME', is_optional=True)
+SETTINGS.create('ES', 'GATEWAY_URL', is_optional=True)
+SETTINGS.create('ES', 'NAME_ON_GATEWAY', is_optional=True)
 SETTINGS.create('ES', 'URL_PREFIX', is_optional=True)
 SETTINGS.create('ES', 'CACHE_CONTROL', is_optional=True)
 SETTINGS.create('ES', 'CACHE_EXPIRES', is_optional=True, default_value=0)
@@ -49,7 +49,7 @@ SETTINGS.create('ES', 'MONGO_AUTH_SOURCE', is_optional=True)
 SETTINGS.create('ES', 'MEDIA_BASE_URL', is_optional=True)
 SETTINGS.create('ES', 'PUBLIC_RESOURCES', is_optional=True)
 
-if SETTINGS.is_enabled('ES_SEND_ERROR_EMAILS'):
+if SETTINGS.has_enabled('ES_SEND_ERROR_EMAILS'):
     SETTINGS.create('ES', 'SMTP_PORT', default_value=25)
     SETTINGS.create('ES', 'SMTP_HOST', is_optional=True)
     SETTINGS.create('ES', 'ERROR_EMAIL_RECIPIENTS', is_optional=True)

@@ -44,13 +44,17 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
 
     def make_parent_ref(self):
         """ Adds the following to domain/children.py's SCHEMA:
-            '_parent_ref': {
-                'type': 'objectid',
-                'data_relation': {
-                    'resource': 'parents',
-                    'embeddable': True
+                '_parent_ref': {
+                    'type': 'objectid',
+                    'data_relation': {
+                        'resource': 'parents',
+                        'embeddable': True
+                    }
                 }
-            }
+            or if parent is remote:
+                '_parent_remote_id': {
+                    'type': 'objectid'
+                }
         """
 
         type_element = DictElement(
@@ -66,6 +70,7 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
             )
         )
 
+    # TODO: refactor the following...
         resource_element = DictElement(
             key=SimpleString("'resource'"),
             whitespace_after_colon=SimpleWhitespace(' '),
@@ -84,6 +89,20 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
             whitespace_after_colon=SimpleWhitespace(' '),
             value=Name('True')
         )
+
+        gateway_element = DictElement(
+            key=SimpleString("'gateway'"),
+            whitespace_after_colon=SimpleWhitespace(' '),
+            value=SimpleString(f"'{self.adder.parents}'"),
+            comma=Comma(
+                whitespace_after=ParenthesizedWhitespace(
+                    first_line=eve_utils.code_gen.TWNL,
+                    indent=True,
+                    last_line=SimpleWhitespace('            ')
+                )
+            ),
+        )
+
 
         data_relation_element = DictElement(
             key=SimpleString("'data_relation'"),
@@ -110,13 +129,42 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
             )
         )
 
+        remote_relation_element = DictElement(
+            key=SimpleString("'remote_relation'"),
+            whitespace_after_colon=SimpleWhitespace(' '),
+            value=Dict(
+                elements=[
+                    gateway_element,
+                    embeddable_element
+                ],
+                lbrace=LeftCurlyBrace(
+                    whitespace_after=ParenthesizedWhitespace(
+                        first_line=eve_utils.code_gen.TWNL,
+                        indent=True,
+                        last_line=SimpleWhitespace('            ')
+                    ),
+                ),
+                rbrace=RightCurlyBrace(
+                    whitespace_before=ParenthesizedWhitespace(
+                        first_line=eve_utils.code_gen.TWNL,
+                        indent=True,
+                        last_line=SimpleWhitespace('        ')
+                    )
+                )
+            )
+        )
+
+
+        elements =[type_element]
+        if self.adder.remote_parent:
+            elements.append(remote_relation_element)
+        else:
+            elements.append(data_relation_element)
+
         return DictElement(
             key=SimpleString(f"'{self.adder.parent_ref}'"),
             value=Dict(
-                elements=[
-                    type_element,
-                    data_relation_element,
-                ],
+                elements=elements,
                 lbrace=LeftCurlyBrace(
                     whitespace_after=ParenthesizedWhitespace(
                         first_line=eve_utils.code_gen.TWNL,

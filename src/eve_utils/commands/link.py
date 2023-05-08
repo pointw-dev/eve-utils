@@ -1,3 +1,4 @@
+import json
 import sys
 import click
 from .link_adder import LinkAdder, LinkAdderException
@@ -44,14 +45,30 @@ def list(plant_uml):
     if plant_uml:
         print('@startuml')
         print('hide <<resource>> circle')
+        print('hide <<remote>> circle')
         print('hide members ')
+        print()
+        print('skinparam class {')
+        print('    BackgroundColor<<remote>> LightBlue')
+        print('}')
         print()
         for rel in rels:
             print(f'class {rel} <<resource>>')
+            for item in rels[rel]:
+                for member in rels[rel][item]:
+                    if member.startswith('remote:'):
+                        target = member.split(':')[1]
+                        print(f'class {target} <<remote>>')
         print()
         for rel in rels:
             for item in rels[rel].get('children', []):
+                if item.startswith('remote:'):
+                    item = item.split(':')[1]
                 print(f'{rel} ||--o{{ {item}')
+            for item in rels[rel].get('parents', []):
+                if item.startswith('remote:'):
+                    item = item.split(':')[1]
+                    print(f'{item} ||--o{{ {rel}')
         print('@enduml')
     else:
         for rel in rels:
@@ -60,6 +77,9 @@ def list(plant_uml):
                 print(f'- belong to a {item}')
             for item in rels[rel].get('children', []):
                 print(f'- have {item}')
+
+        print()
+        print(json.dumps(rels, indent=4, default=str))
 
 
 @commands.command(name='remove', help='(not yet implemented)')

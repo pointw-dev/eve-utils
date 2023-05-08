@@ -8,16 +8,17 @@ class ChildLinksInserter(CSTTransformer):
         self.adder = adder
 
     def leave_FunctionDef(self, original_node, updated_node):
-        if (not original_node.name.value == f'_add_links_to_{self.adder.child}') and (not original_node.name.value == 'add_hooks'):
+        method_name = '_add_remote_parent_links' if self.adder.remote_parent else f'_add_links_to_{self.adder.child}'
+        if not original_node.name.value == method_name and (not original_node.name.value == 'add_hooks'):
             return original_node
 
         new_body = []
         for item in original_node.body.body:
             new_body.append(item)
 
-        if original_node.name.value == f'_add_links_to_{self.adder.child}':
+        if original_node.name.value == method_name:
             new_body.append(self.make_parent_link())
-        if original_node.name.value == 'add_hooks':
+        if original_node.name.value == 'add_hooks' and not self.adder.remote_parent:
             new_body.extend(self.add_rel_hooks())
 
         return updated_node.with_changes(
@@ -46,8 +47,71 @@ class ChildLinksInserter(CSTTransformer):
                         'href': '/children',
                         'title': 'children'
                     }
+            or this if the parent is remote to hooks.children:_add_remote_parent_links()
+                if '_parent_ref' in child:
+                    child['_links']['parent'] = {  # not literally 'parent' here, rather the name of the parent resource
+                        'href': '{get_href_from_gateway('parents')"]}/{child[_parent_ref]}",
+                        'title': 'parent_children'
+                    }
 
         """
+
+        if self.adder.remote_parent:
+            href = FormattedString(
+                parts=[
+                    FormattedStringExpression(
+                        expression=Call(
+                            func=Name('get_href_from_gateway'),
+                            args=[
+                                Arg(SimpleString(f"'{self.adder.parents}'"))
+                            ]
+                        )
+                    ),
+                    FormattedStringText('/'),
+                    FormattedStringExpression(
+                        expression=Subscript(
+                            value=Name(self.adder.child),
+                            slice=[
+                                SubscriptElement(
+                                    slice=Index(SimpleString(f"'_{self.adder.parent}_ref'"))
+                                )
+                            ],
+                            lbracket=LeftSquareBracket(),
+                            rbracket=RightSquareBracket()
+                        )
+                    )
+                ],
+                start='f"',
+                end='"'
+            )
+            additional_link = eve_utils.code_gen.get_link_statement_line(
+                resource=self.adder.child,
+                rel=self.adder.parents,
+                href=href,
+                title=f'{self.adder.parent}_{self.adder.children}'
+            )
+
+            return If(
+                test=Comparison(
+                    left=SimpleString(f"'_{self.adder.parent}_ref'"),
+                    comparisons=[
+                        ComparisonTarget(
+                            operator=In(
+                                whitespace_before=SimpleWhitespace(' '),
+                                whitespace_after=SimpleWhitespace(' ')
+                            ),
+                            comparator=Name(self.adder.child)
+                        )
+                    ]
+                ),
+                body=IndentedBlock(
+                    body=[
+                        additional_link
+                    ],
+                    header=eve_utils.code_gen.TWNL),
+                orelse=None,
+                whitespace_before_test=SimpleWhitespace(' ')
+            )
 
         condition = Call(
             func=Attribute(

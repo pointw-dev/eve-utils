@@ -123,8 +123,13 @@ def create_resource_hook_file(singular, plural):
 hooks.{plural}
 This module defines functions to add link relations to {plural}.
 """
+import logging
 import json
 from log_trace.decorators import trace
+from configuration import SETTINGS
+from utils.gateway import get_href_from_gateway
+
+LOG = logging.getLogger('hooks.{plural}')
 
 
 @trace
@@ -161,6 +166,7 @@ def _add_links_to_{singular}({singular}):
         base_url = ''
         
     _add_remote_children_links({singular})
+    _add_remote_parent_links({singular})
 
     {singular}['_links']['self'] = {{
         'href': f"{{base_url}}/{plural}/{{{singular}['_id']}}",
@@ -170,10 +176,18 @@ def _add_links_to_{singular}({singular}):
     
 @trace
 def _add_remote_children_links({singular}):
-    if not SETTINGS['ES_API_GATEWAY']:
+    if not SETTINGS['ES_GATEWAY_URL']:
         return
         
-    # eve-utils adds remote links here:    
+    # == do not edit this method above this line ==    
+
+    
+@trace
+def _add_remote_parent_links({singular}):
+    if not SETTINGS['ES_GATEWAY_URL']:
+        return
+        
+    # == do not edit this method above this line ==    
 ''')
 
 

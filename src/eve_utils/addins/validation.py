@@ -11,10 +11,10 @@ This also adds two new validation rules
       prevent whichever is second from being inserted.
 
 Usage:
-    add_val
+    add-validation
 
 Examples:
-    add_val
+    add-validation
 
 License:
     MIT License
@@ -71,7 +71,7 @@ def add():
         sys.exit(301)
 
     eve_utils.copy_skel(settings['project_name'], 'validation')
-    eve_utils.install_packages(['isodate'], 'add_validation')
+    eve_utils.install_packages(['isodate'], 'add-validation')
     wire_up_service()
 
     print('validation module added')

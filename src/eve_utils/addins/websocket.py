@@ -2,10 +2,10 @@
 """Adds web socket functionality to API
 
 Usage:
-    add_web_socket
+    add-websocket
 
 Examples:
-    add_web_socket
+    add-websocket
 
 License:
     MIT License
@@ -48,11 +48,11 @@ def modify_eve_service():
             if 'from flask_cors import CORS' in line:
                 f.write(line)
                 f.write('from flask_socketio import SocketIO\n')
-                f.write('import web_socket\n')
+                f.write('import websocket\n')
             elif 'hooks.add_hooks(self._app)' in line:
                 f.write(line)
                 f.write("        self._socket = SocketIO(self._app, async_mode=None, path='/_ws/socket.io', cors_allowed_origins='*')\n")
-                f.write("        web_socket.initialize(self._app, self._socket)\n")
+                f.write("        websocket.initialize(self._app, self._socket)\n")
             elif 'self._app.run' in line:
                 f.write("            self._socket.run(self._app, host='0.0.0.0', port=SETTINGS.get('ES_API_PORT'), allow_unsafe_werkzeug=True)\n")
             else:
@@ -66,10 +66,10 @@ def add():
         print('This command must be run in an eve_service API folder structure')
         sys.exit(1)
 
-    if os.path.exists('./web_socket'):
-        print('web_socket has already been added')
+    if os.path.exists('./websocket'):
+        print('websocket has already been added')
         sys.exit(501)
 
     modify_eve_service()
-    eve_utils.copy_skel(settings['project_name'], 'web_socket', '.')
-    eve_utils.install_packages(['Flask-SocketIO'], 'add_web_socket')
+    eve_utils.copy_skel(settings['project_name'], 'websocket', '.')
+    eve_utils.install_packages(['Flask-SocketIO'], 'add-websocket')
