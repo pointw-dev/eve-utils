@@ -15,12 +15,12 @@ class LinkAdder:
     def __init__(self, parent, child, as_parent_ref):
         self.remote_parent = self.remote_child = False
 
-        if ':' in parent:
-            parent = parent.split(':')[1]
+        if parent.startswith(eve_utils.REMOTE_PREFIX):
+            parent = parent[len(eve_utils.REMOTE_PREFIX):]
             self.remote_parent = True
 
-        if ':' in child:
-            child = child.split(':')[1]
+        if child.startswith(eve_utils.REMOTE_PREFIX):
+            child = child[len(eve_utils.REMOTE_PREFIX):]
             self.remote_child = True
 
         self.parent, self.parents = get_pair(parent)  # TODO: validate, safe name, etc.
@@ -71,12 +71,12 @@ class LinkAdder:
         rels = eve_utils.parent_child_relations()
 
         if 'children' in rels.get(self.parents, {}):
-            needle = 'remote:' + self.children if self.remote_child else self.children
+            needle = eve_utils.REMOTE_PREFIX + self.children if self.remote_child else self.children
             if needle in rels[self.parents]['children']:
                 return True  # i.e. link does exist
 
         if self.remote_parent and 'parents' in rels.get(self.children, {}):
-            needle = 'remote:' + self.parent
+            needle = eve_utils.REMOTE_PREFIX + self.parent
             if needle in rels[self.children]['parents']:
                 return True
 
@@ -118,6 +118,7 @@ class LinkAdder:
 
         if self.remote_parent:
             eve_utils.commands.api._add_addins({'add_validation': 'n/a'}, silent=True)
+            eve_utils.jump_to_api_folder('src/{project_name}')
 
         # update parent code
         if not self.remote_parent:

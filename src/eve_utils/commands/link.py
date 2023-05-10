@@ -10,10 +10,10 @@ def commands():
     pass
 
 
-@commands.command(name='create', help='Create a parent/child link between two resources.')
-@click.argument('parent', metavar='<parent>')
-@click.argument('child', metavar='<child>')
-@click.option('--as_parent_ref', '-p', is_flag=True, help='change name of related ref to "parent" (instead of the name of the parent)')
+@commands.command(name='create', help='Create a parent/child link between two resources.  If one of the resources is in the domain of a different EveService, add "remote:" in front of the name of that resource.')
+@click.argument('parent', metavar='<parent|remote:parent>')
+@click.argument('child', metavar='<child|remote:child>')
+@click.option('--as_parent_ref', '-p', is_flag=True, help='Change name of related ref to "parent" (instead of the name of the parent).')
 def create(parent, child, as_parent_ref):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
@@ -67,21 +67,20 @@ def list_rels(output):
             print(f'class {rel} <<resource>>')
             for item in rels[rel]:
                 for member in rels[rel][item]:
-                    if member.startswith('remote:'):
-                        target = member.split(':')[1]
+                    if member.startswith(eve_utils.REMOTE_PREFIX):
+                        target = member[len(eve_utils.REMOTE_PREFIX):]
                         print(f'class {target} <<remote>>')
         print()
         for rel in rels:
             for item in rels[rel].get('children', []):
-                if item.startswith('remote:'):
-                    item = item.split(':')[1]
+                if item.startswith(eve_utils.REMOTE_PREFIX):
+                    item = item[len(eve_utils.REMOTE_PREFIX):]
                 print(f'{rel} ||--o{{ {item}')
             for item in rels[rel].get('parents', []):
-                if item.startswith('remote:'):
-                    item = item.split(':')[1]
+                if item.startswith(eve_utils.REMOTE_PREFIX):
+                    item = item[len(eve_utils.REMOTE_PREFIX):]
                     print(f'{item} ||--o{{ {rel}')
         print('@enduml')
-
 
 
 @commands.command(name='remove', help='(not yet implemented)')

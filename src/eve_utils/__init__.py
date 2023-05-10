@@ -9,6 +9,7 @@ from . import addins
 from . import commands
 from . import code_gen
 
+REMOTE_PREFIX = 'remote:'
 
 def jump_to_api_folder(path=None):
     keep_going = True
