@@ -43,6 +43,7 @@ from eve_utils.code_gen import AuthorizationInserter
 # TODO: script getting default values (e.g. client keys)
 # TODO: provide non Auth0
 
+
 def wire_up_service():
     with open('eve_service.py', 'r') as source:
         tree = parse_module(source.read())
@@ -54,22 +55,20 @@ def wire_up_service():
         source.write(new_tree.code)
 
 
-def add():
+def add(silent=False):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1, silent)
 
     if os.path.exists('./auth'):
-        print('auth has already been added')
-        sys.exit(201)
+        eve_utils.escape('auth has already been added', 201, silent)
 
-    eve_utils.copy_skel(settings['project_name'], 'auth')
+    eve_utils.copy_skel(settings['project_name'], 'auth', silent=silent)
     eve_utils.install_packages(['eve-negotiable-auth', 'PyJWT', 'cryptography', 'requests'], 'add-auth')
     # eve_negotiable_auth also installs authparser and pyparsing    
     # cryptography also installs cffi, pycparser
     # requests also installs certifi, chardet, idna, urllib3
     wire_up_service()
     
-    print('auth modules added')
+    return eve_utils.escape('auth modules added', 0, silent)

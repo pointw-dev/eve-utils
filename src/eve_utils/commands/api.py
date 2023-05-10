@@ -101,23 +101,26 @@ def _create_api(project_name):
     eve_utils.replace_project_name(project_name, '.')
 
 
-def _add_addins(kwargs):
+def _add_addins(which_addins, silent=False):
     settings = eve_utils.jump_to_api_folder()
-    for keyword in [kw for kw in kwargs.keys() if kwargs[kw]]:
+    for keyword in [kw for kw in which_addins.keys() if which_addins[kw]]:
         addin_name = keyword[4:]  # remove "add-"
         if addin_name == 'git':
             continue
-        if addin_name in settings:
-            print(f"{addin_name} is already there")
+        settings_addins = settings.get('addins', {})
+        if addin_name in settings_addins:
+            if not silent: print(f"{addin_name} is already there")
             return
-        print(f'===== adding {addin_name}')
+        settings_addins[addin_name] = which_addins[keyword]
+        eve_utils.add_to_settings('addins', settings_addins)
+        if not silent: print(f'=== adding {addin_name}')
         addin_module = importlib.import_module(f'eve_utils.addins.{addin_name}')
         add = getattr(addin_module, 'add')
-        if kwargs[keyword] == 'n/a':
-            add()
+        if which_addins[keyword] == 'n/a':
+            add(silent)
         else:
-            add(kwargs[keyword])
+            add(which_addins[keyword], silent)
 
-    if kwargs['add_git']:
-        print('===== adding git')
-        addins.git.add(kwargs['add_git'])
+    if which_addins.get('add_git', False):
+        if not silent: print('===== adding git')
+        addins.git.add(which_addins['add_git'])

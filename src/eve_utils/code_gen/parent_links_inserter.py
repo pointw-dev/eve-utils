@@ -34,7 +34,7 @@ class ParentLinksInserter(CSTTransformer):
                         ]
                     )
                 ),
-                FormattedStringText(f'?where=%7B%22_{self.adder.parent}_ref%22:%22'),
+                FormattedStringText(f'/{self.adder.parent}/'),
                 FormattedStringExpression(
                     expression=Subscript(
                         value=Name(self.adder.parent),
@@ -46,8 +46,7 @@ class ParentLinksInserter(CSTTransformer):
                         lbracket=LeftSquareBracket(),
                         rbracket=RightSquareBracket()
                     ),
-                ),
-                FormattedStringText('%22%7D')
+                )
             ],
             start='f"',
             end='"'
@@ -70,7 +69,7 @@ class ParentLinksInserter(CSTTransformer):
                 }
             or this if the child is remote to hooks.parents:_add_remote_children_links()
                 parent['_links']['children'] = {
-                    'href': "{get_href_from_gateway('parents')}?where={"_parent_ref":"' + parent['_id'] + '"}',
+                    'href': "{get_href_from_gateway('children')}/parents/parent['_id']/children',
                     'title': 'children'
                 }
         """

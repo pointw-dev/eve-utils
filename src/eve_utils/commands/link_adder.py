@@ -1,12 +1,13 @@
 import os
-import os
 from libcst import parse_module
+
 from .singplu import get_pair
 from eve_utils.code_gen import \
     ChildLinksInserter, \
     ParentLinksInserter, \
     DomainChildrenDefinitionInserter, \
     DomainRelationsInserter
+
 import eve_utils
 
 
@@ -47,9 +48,6 @@ class LinkAdder:
             source.write(new_tree.code)
 
     def _add_to_domain_init(self):
-        if self.remote_parent:
-            return
-
         with open('domain/__init__.py', 'r') as source:
             tree = parse_module(source.read())
 
@@ -99,7 +97,7 @@ class LinkAdder:
         return rtn
 
     def _validate(self):
-        if self._link_already_exists():  # TODO this doesn't work if one is remote
+        if self._link_already_exists():
             raise LinkAdderException(801, 'This link already exists')
 
         missing = self._list_missing_resources()
@@ -108,9 +106,6 @@ class LinkAdder:
 
         if self.remote_parent and self.remote_child:
             raise LinkAdderException(803, 'Both parent and child cannot be remote')
-
-    def _ensure_validation_addin_is_installed(self):
-        pass
 
     def execute(self):
         self._validate()
@@ -122,7 +117,7 @@ class LinkAdder:
         )
 
         if self.remote_parent:
-            self._ensure_validation_addin_is_installed()
+            eve_utils.commands.api._add_addins({'add_validation': 'n/a'}, silent=True)
 
         # update parent code
         if not self.remote_parent:
@@ -131,7 +126,7 @@ class LinkAdder:
         # update child code
         if not self.remote_child:
             self._add_to_domain_init()
-            self._add_to_domain_child()  # TODO: finish this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            self._add_to_domain_child()
             self._add_links_to_child_hooks()
 
 

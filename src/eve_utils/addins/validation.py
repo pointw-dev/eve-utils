@@ -51,27 +51,25 @@ import eve_utils
 def wire_up_service():
     with open('eve_service.py', 'r') as source:
         tree = parse_module(source.read())
-    
+
     inserter = ValidationInserter()
     new_tree = tree.visit(inserter)
-    
+
     with open('eve_service.py', 'w') as source:
         source.write(new_tree.code)
-        
-        
-def add():
+
+
+def add(silent=False):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1, silent)
 
     if os.path.exists('./validation'):
-        print('validation has already been added')
-        sys.exit(301)
+        return eve_utils.escape('validation has already been added', 301, silent)
 
-    eve_utils.copy_skel(settings['project_name'], 'validation')
+    eve_utils.copy_skel(settings['project_name'], 'validation', silent=silent)
     eve_utils.install_packages(['isodate'], 'add-validation')
     wire_up_service()
 
-    print('validation module added')
+    return eve_utils.escape('validation module added', 0, silent)

@@ -1,40 +1,15 @@
 """
-hooks.logs
-This module defines functions to log requests, and to manage log verbosity.
+hooks.gateway
+This module defines hooks the request chain to the appropriate gateway utils
 """
 import logging
-import json
-from flask import current_app as app
-# from flask import abort, make_response, jsonify, request as flask_request
 from log_trace.decorators import trace
-# from utils import make_error_response
+from utils.gateway import _handle_post_from_remote, _embed_remote_parent_resource
 
-LOG = logging.getLogger('hooks.logs')
+LOG = logging.getLogger('hooks.gateway')
 
 
 @trace
 def add_hooks(app):
     app.on_post_GET += _embed_remote_parent_resource
-
-
-@trace
-def _embed_remote_parent_resource(resource, request, payload):
-    embed_key = 'embedded'
-    if embed_key not in request.args:
-        return
-    embeddable = json.loads(request.args[embed_key])
-    for field in embeddable:
-        if embeddable[field]:
-            definition = app.config['DOMAIN'][resource]['schema'][field]
-            remote_relation = definition.get('remote_relation', {})
-            if remote_relation.get('embeddable', False):
-                response = json.loads(payload.data)
-                response[field] = {
-                    'remote_id': response[field],
-                    'embedded': {
-                        'name': 'Stellantis',
-                        'address': '123 Chrysler Way'
-                    }
-                }
-                payload.data = json.dumps(response)
-
+    app.on_pre_POST += _handle_post_from_remote

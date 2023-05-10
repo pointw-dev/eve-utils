@@ -61,12 +61,20 @@ class DomainRelationsInserter(CSTTransformer):
 
     def make_domain_relation(self):
         """ Adds the following to domain/__init__.py's DOMAIN_RELATIONS:
-            'parents_children': {
-                'schema': children.SCHEMA,
-                'url': 'parents/<regex("[a-f0-9]{24}"):_parent_ref>/children',
-                'resource_title': 'children',
-                'datasource': {'source': 'children'}
-            }
+                'parents_children': {
+                    'schema': children.SCHEMA,
+                    'url': 'parents/<regex("[a-f0-9]{24}"):_parent_ref>/children',
+                    'resource_title': 'children',
+                    'datasource': {'source': 'children'}
+                }
+            or if remote parent
+                'parents_children': {
+                    'schema': children.SCHEMA,
+                    'url': 'children/parent/<regex("[a-f0-9]{24}"):_parent_ref>',
+                    'resource_title': 'children',
+                    'datasource': {'source': 'children'}
+                }
+
         """
 
         return DictElement(
@@ -86,8 +94,10 @@ class DomainRelationsInserter(CSTTransformer):
                     self.get_dict_element(
                         key='url',
                         value=SimpleString(
-                            f'\'{self.adder.parents}/<regex("[a-f0-9]{{24}}"):'
-                            f'{self.adder.parent_ref}>/{self.adder.children}\''
+                            f'\'{self.adder.children}/{self.adder.parent}/'
+                            f'<regex("[a-f0-9]{{24}}"):{self.adder.parent_ref}>\'' if self.adder.remote_parent else
+                            f'\'{self.adder.parents}/<regex("[a-f0-9]{{24}}"):{self.adder.parent_ref}>'
+                            f'/{self.adder.children}\''
                         ),
                         with_comma=True
                     ),

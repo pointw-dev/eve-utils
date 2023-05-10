@@ -36,16 +36,16 @@ import sys
 from distutils.dir_util import copy_tree
 import eve_utils
 
-def add():
+
+def add(silent=False):
     try:
         settings = eve_utils.jump_to_api_folder('src')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1, silent)
 
     if os.path.exists('./Dockerfile'):
-        print('docker has already been added')
-        sys.exit(401)
+        return eve_utils.escape('docker has already been added', 401, silent)
 
-    eve_utils.copy_skel(settings['project_name'], 'docker', '.')
+    eve_utils.copy_skel(settings['project_name'], 'docker', '.', silent=silent)
     eve_utils.replace_project_name(settings['project_name'], '.')
+    return 0

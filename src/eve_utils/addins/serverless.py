@@ -35,14 +35,13 @@ License:
 
 import os
 import sys
-import sys
 import click
 from subprocess import Popen, PIPE
 import eve_utils
 
 
-def warning():
-    print('''
+def warning(silent=False):
+    if not silent: print('''
 NOTE: this feature is still under development - use at your own risk!
 
 *** DO NOT USE THIS UNLESS YOU KNOW WHAT YOU ARE DOING ***
@@ -84,7 +83,7 @@ def run_process(cmd):
     return exit_code, out, err
 
 
-def is_node_installed():
+def is_node_installed(silent=False):
     exit_code, out, err = run_process('node -v')
 
     try:
@@ -93,10 +92,10 @@ def is_node_installed():
         major_version = 0
 
     if exit_code:
-        print('node.js is not installed.\nPlease install and try again.')
+        if not silent: print('node.js is not installed.\nPlease install and try again.')
         return False
     elif major_version < 10:
-        print('node.js is installed, version must be greater than v10 (yours is {out}).\nPlease upgrade and try again.')
+        if not silent: print('node.js is installed, version must be greater than v10 (yours is {out}).\nPlease upgrade and try again.')
         return False
 
     # TODO: is any of this even required given a proper installation of node.js?
@@ -108,84 +107,83 @@ def is_node_installed():
         major_version = 0
 
     if exit_code:
-        print('npm is not installed.\nPlease install and try again.')
+        if not silent: print('npm is not installed.\nPlease install and try again.')
         return False
     elif major_version < 0:
         # UNREACHABLE: is there a minimun npm version required by serverlesss?
-        print('npm is installed, version must be greater than XX (yours is {out}).\nPlease upgrade and try again.')
+        if not silent: print('npm is installed, version must be greater than XX (yours is {out}).\nPlease upgrade and try again.')
         return False
 
 
     return True
 
 
-def ensure_serverless_is_installed():
+def ensure_serverless_is_installed(silent=False):
     exit_code, out, err = run_process('sls -v')
 
     if not exit_code:  # TODO: serverless is installed, but should we check version?
         return True
 
-    print('installing serverless framework')
+    if not silent: print('installing serverless framework')
     exit_code, out, err = run_process('npm install -g serverless')
 
     if exit_code:
-        print('Something went wrong installing serverless.')
+        if not silent: print('Something went wrong installing serverless.')
         return False
 
 
-def ensure_node_initialized():
+def ensure_node_initialized(silent=False):
     if os.path.exists('./package.json'):
         return True
 
-    print('running npm init')
+    if not silent: print('running npm init')
     exit_code, out, err = run_process('npm init -f')
 
     if exit_code:
-        print('Something went wrong running npm init.')
+        if not silent: print('Something went wrong running npm init.')
         return False
 
     return True
 
 
-def ensure_serverless_plugins_installed():
-    print('Installing serverless plugins')
+def ensure_serverless_plugins_installed(silent=False):
+    if not silent: print('Installing serverless plugins')
     exit_code, out, err = run_process('npm install --save-dev serverless-wsgi serverless-python-requirements serverless-domain-manager')
 
     if exit_code:
-        print('Something went wrong installing serverless plugins.')
+        if not silent: print('Something went wrong installing serverless plugins.')
         return False
 
     return True
 
 
-def add():
-    warning()
+def add(silent=False):
+    warning(silent)
 
     try:
         settings = eve_utils.jump_to_api_folder('src')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
-        
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1, silent)
+
     if os.path.exists('./serverless.py'):
-        print('serverless has already been added')
-        sys.exit(601)
+        return eve_utils.escape('serverless has already been added', 601, silent)
 
-        
-    eve_utils.copy_skel(settings['project_name'], 'serverless', '.')
+    eve_utils.copy_skel(settings['project_name'], 'serverless', '.', silent=silent)
     eve_utils.replace_project_name(settings['project_name'], '.')
-    
-    if not is_node_installed():
-        sys.exit(602)
 
-    if not ensure_serverless_is_installed():
-        sys.exit(603)
+    if not is_node_installed(silent):
+        return eve_utils.escape('', 602, silent)
+
+    if not ensure_serverless_is_installed(silent):
+        return eve_utils.escape('', 603, silent)
 
     os.chdir(f"./{settings['project_name']}")
     eve_utils.install_packages(['dnspython'], 'add-serverless')
 
-    if not ensure_node_initialized():
-        sys.exit(604)
+    if not ensure_node_initialized(silent):
+        return eve_utils.escape('', 604, silent)
 
-    if not ensure_serverless_plugins_installed():
-        sys.exit(605)
+    if not ensure_serverless_plugins_installed(silent):
+        return eve_utils.escape('', 605, silent)
+
+    return 0

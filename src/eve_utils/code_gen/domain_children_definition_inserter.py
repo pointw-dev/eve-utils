@@ -91,7 +91,7 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
         )
 
         gateway_element = DictElement(
-            key=SimpleString("'gateway'"),
+            key=SimpleString("'rel'"),
             whitespace_after_colon=SimpleWhitespace(' '),
             value=SimpleString(f"'{self.adder.parents}'"),
             comma=Comma(

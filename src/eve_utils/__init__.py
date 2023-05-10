@@ -36,6 +36,19 @@ def jump_to_api_folder(path=None):
     return settings
 
 
+def add_to_settings(key, value):
+    try:
+        settings = jump_to_api_folder()
+    except RuntimeError:
+        return escape('This command must be run in an eve_service API folder structure', 1)
+
+    settings[key] = value
+
+    with open('.eve-utils', 'w') as f:
+        to_write = json.dumps(settings) + '\n'
+        f.write(to_write)
+
+
 def install_packages(packages, command):
     trigger = 'Successfully installed '
     subprocess.check_output([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
@@ -52,8 +65,8 @@ def install_packages(packages, command):
         f.write(f'# end: added by {command}\n')
 
 
-def copy_skel(project_name, skel_folder, target_folder=None, replace=None):
-    print(f'Adding {skel_folder} to {project_name} API')
+def copy_skel(project_name, skel_folder, target_folder=None, replace=None, silent=False):
+    if not silent: print(f'Adding {skel_folder} to {project_name} API')
 
     source = os.path.join(os.path.dirname(__file__), f'skel/{skel_folder}')
     destination = skel_folder if not target_folder else target_folder
@@ -206,3 +219,8 @@ def parent_child_relations():
     return rels
 
 
+def escape(message, code, silent=False):
+    if silent:
+        return code
+    print(message)
+    sys.exit(code)

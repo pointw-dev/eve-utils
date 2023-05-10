@@ -59,17 +59,15 @@ def modify_eve_service():
                 f.write(line)
 
 
-def add():
+def add(silent=False):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1, silent)
 
     if os.path.exists('./websocket'):
-        print('websocket has already been added')
-        sys.exit(501)
+        return eve_utils.escape('websocket has already been added', 501, silent)
 
     modify_eve_service()
-    eve_utils.copy_skel(settings['project_name'], 'websocket', '.')
+    eve_utils.copy_skel(settings['project_name'], 'websocket', '.', silent=silent)
     eve_utils.install_packages(['Flask-SocketIO'], 'add-websocket')

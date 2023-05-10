@@ -1,5 +1,7 @@
 import logging
 import requests
+from flask import current_app as app
+from log_trace.decorators import trace
 from requests.exceptions import ConnectionError
 import json
 from configuration import SETTINGS
@@ -69,3 +71,63 @@ def get_href_from_gateway(rel):
     # TODO: document how curies work, and how they are used to manage rel collisions - esp. for the non-business rels
     #  e.g. _logging, _settings, etc.
     return REGISTRATIONS.get('_links', {}).get(rel, {}).get('href', '')  # TODO: robustify
+
+
+def _handle_post_from_remote(resource, request):
+    if 'where' not in request.args:
+        return
+    where = json.loads(request.args['where'])  # ASSERT: is json format, etc.
+    if not len(where) == 1:
+        return
+    field = list(where.keys())[0]
+    remote_id = where[field]
+    definition = app.config['DOMAIN'][resource]['schema'][field]
+    remote_relation = definition.get('remote_relation', {})
+    if not remote_relation:
+        return
+
+    j = json.loads(request.get_data())  # ASSERT: is json format, etc
+    j[field] = remote_id
+    request._cached_data = json.dumps(j).encode('utf-8')
+
+
+@trace
+def _embed_remote_parent_resource(resource, request, payload):
+    embed_key = 'embedded'
+    if embed_key not in request.args:
+        return
+    embeddable = json.loads(request.args[embed_key])
+    for field in embeddable:
+        if embeddable[field]:
+            definition = app.config['DOMAIN'][resource]['schema'][field]
+            remote_relation = definition.get('remote_relation', {})
+            rel = remote_relation.get('rel')
+            if rel and remote_relation.get('embeddable', False):
+                response = json.loads(payload.data)
+                if field in response:
+                    response[field] = _get_embedded_resource(response[field], rel)
+                elif '_items' in response:
+                    for item in response['_items']:
+                        if field in item:
+                            item[field] = _get_embedded_resource(item[field], rel)
+
+                payload.data = json.dumps(response)
+
+
+@trace
+def _get_embedded_resource(remote_id, rel):
+    if not SETTINGS['ES_GATEWAY_URL']:
+        return
+
+    url = f'{get_href_from_gateway(rel)}/{remote_id}'
+    response = requests.get(url)
+    # ASSERT: ok
+
+    return {
+        "_remote": {
+            "id": remote_id,
+            "rel": rel,
+            "href": url
+        },
+        **response.json()
+    }

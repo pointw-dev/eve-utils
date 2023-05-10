@@ -57,7 +57,7 @@ def create(integration, name, prefix):
         'integration': name,
         'prefix': prefix.upper() if prefix else name.upper()
     }
-    eve_utils.copy_skel(settings['project_name'], f'integration/{integration}', target_folder=f'integration/{name}', replace=replace)
+    eve_utils.copy_skel(settings['project_name'], f'integration/{integration}', target_folder=f'integration/{name}', replace=replace, silent=silent)
     with open(f'./integration/__init__.py', 'a') as f:
         f.write(f'from . import {name}\n')
     # TODO: handle settings/prefix

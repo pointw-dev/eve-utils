@@ -41,29 +41,26 @@ from shutil import copyfile
 import eve_utils
 
 
-def add(remote):
+def add(remote, silence=False):
     try:
         settings = eve_utils.jump_to_api_folder()
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1, silence)
 
     if os.path.isdir('./.git'):
-        print('git has already been added')
-        sys.exit(101)
+        return eve_utils.escape('git has already been added', 101, silence)
 
     skel = os.path.join(os.path.dirname(eve_utils.__file__), 'skel')
     gitignore_filename = os.path.join(skel, 'git/.gitignore')
     copyfile(gitignore_filename, './.gitignore')
     eve_utils.replace_project_name(settings['project_name'], '.')
     
-    
-    silent = ' > /dev/null 2> /dev/null'
+    silence = ' > /dev/null 2> /dev/null'
     if platform.system() == 'Windows':
-        silent = ' > nul 2> nul'
+        silence = ' > nul 2> nul'
 
     os.system('git init --quiet')
-    os.system(f'git add . --all {silent}')
+    os.system(f'git add . --all {silence}')
     os.system('git commit -m "Initial commit" --quiet')
     os.system('git branch -M main')
     os.system('git status')
@@ -72,4 +69,4 @@ def add(remote):
         result = os.system(f'git remote add origin {remote}')
         os.system('git push -u origin main')
     
-    
+    return 0
