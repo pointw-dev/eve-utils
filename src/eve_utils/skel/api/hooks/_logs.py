@@ -41,13 +41,15 @@ def add_hooks(app):
 def _log_request(resource, request, payload):
     """Event hook to log all requests."""
     LOG.info(f'Request for {resource}: {request} [{payload.status_code}]')
-    LOG.debug(f'Request for {resource}: {request} [{payload.status_code}] '
-              f'{request.values} {payload.data} [{request.headers}]')
-
-    # was...
-    # LOG.info(f"{payload.status_code} {request.method} {request.base_url}")
-    # LOG.debug(f"{request.values} {payload.data} [{request.headers}]")
-    # LOG.debug(f"{request.url_root}, {request.path}, {request.query_string}")
+    request_headers = f'{request.headers}'.replace('\n','\n  ').rstrip()
+    request_data = json.dumps(json.loads(request.data if request.data else "\"\""))
+    response_headers = f'{payload.headers}'.replace('\n','\n  ').rstrip()
+    response_data = json.dumps(json.loads(payload.data if payload.data else "\"\""))
+    LOG.debug(f'\n-request.values:\n  {request.values.to_dict()}\n'
+              f'-request.headers:\n  {request_headers}\n'
+              f'-request.data:\n  {request_data}\n'
+              f'-response.headers:\n  {response_headers}\n'
+              f'-payload.data:\n  {response_data}\n')
 
 
 @trace
