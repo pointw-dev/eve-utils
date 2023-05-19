@@ -37,10 +37,8 @@ def _tidy_post_links(resource, request, payload):
         if '_items' in document:
             for item in document['_items']:
                 _remove_unnecessary_links(links=item.get('_links', {}))
-                _remove_regex_from_href(links=item.get('_links', {}))
         else:
             _remove_unnecessary_links(links=document.get('_links', {}))
-            _remove_regex_from_href(links=document.get('_links', {}))
 
         if 'pretty' in request.args:
             payload.data = json.dumps(document, indent=4)
@@ -53,14 +51,14 @@ def _fix_links(resource, request, payload):
     if payload.status_code in [200, 201]:
         document = json.loads(payload.data)
 
-        if resource is None:
-            _rewrite_schema_links(links=document.get('_links', {}))
+        if resource is None and '_links' in document:
+            document['_links'] = _rewrite_schema_links(links=document.get('_links', {}))
         else:
             if '_items' in document:
                 for item in document['_items']:
                     _process_item_links(links=item.get('_links', {}))
             else:
-                _add_parent_link(links=document.get('_links', {}), resource=resource)  # TODO: document s/b document.get('_links', {}) ???
+                _add_parent_link(links=document.get('_links', {}), resource=resource)
             _process_item_links(links=document.get('_links', {}))
 
         payload.data = json.dumps(document, indent=4 if 'pretty' in request.args else None)
@@ -97,7 +95,7 @@ def _add_missing_slashes(link):
 
 @trace
 def _insert_base_url(link):
-    base_url = SETTINGS.get('ES_BASE_URL') or ''
+    base_url = SETTINGS.get('ES_BASE_URL', '')
     if link['href'].startswith('/'):
         link['href'] = f'{base_url}{link["href"]}'
 
@@ -114,22 +112,17 @@ def _rewrite_schema_links(links):
     if not links or 'child' not in links or len(links) != 1:
         return
 
-    base_url = SETTINGS.get('ES_BASE_URL') or ''
-
     old = links['child']
     del links['child']
-    new_links = _create_new_schema_links(base_url, old)
-    links = new_links
 
+    base_url = SETTINGS.get('ES_BASE_URL', '')
 
-@trace
-def _create_new_schema_links(base_url, old_links):
     new_links = {
         'self': {'href': f'{base_url}/', 'title': 'endpoints'},
         'logging': {'href': f'{base_url}/_logging', 'title': 'logging'}
     }
 
-    for link in old_links:
+    for link in old:
         if '<' in link['href'] or link['title'] == '_schema':
             continue
 

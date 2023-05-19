@@ -2,6 +2,7 @@ import logging
 from flask import jsonify, make_response
 from flask import current_app, request
 from . import log_setup
+from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError, OperationFailure
 from configuration import SETTINGS
@@ -15,6 +16,19 @@ unauthorized_message = {
         "code": 401
     }
 }
+
+
+def get_id_field(collection_name):
+    return current_app.config['DOMAIN'][collection_name]['id_field']
+
+
+def get_resource_id(collection_name, resource):
+    id_field = get_id_field(collection_name)
+    rtn = resource.get(id_field, None)
+    if not rtn:
+        record = get_db()[collection_name].find_one({"_id":ObjectId(resource['_id'])})
+        rtn = record[id_field]
+    return rtn
 
 
 def is_mongo_running():

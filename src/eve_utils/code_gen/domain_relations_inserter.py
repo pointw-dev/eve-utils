@@ -93,11 +93,22 @@ class DomainRelationsInserter(CSTTransformer):
                     ),
                     self.get_dict_element(
                         key='url',
-                        value=SimpleString(
-                            f'\'{self.adder.children}/{self.adder.parent}/'
-                            f'<regex("[a-f0-9]{{24}}"):{self.adder.parent_ref}>\'' if self.adder.remote_parent else
-                            f'\'{self.adder.parents}/<regex("[a-f0-9]{{24}}"):{self.adder.parent_ref}>'
-                            f'/{self.adder.children}\''
+                        value=FormattedString(
+                            parts=[
+                                FormattedStringText(f'{self.adder.children}/{self.adder.parent}/<regex("'),
+                                FormattedStringExpression(expression=Name('OBJECT_ID_REGEX')),
+                                FormattedStringText(f'"):{self.adder.parent_ref}>')
+                            ],
+                            start='f"',
+                            end='"'
+                        ) if self.adder.remote_parent else FormattedString(
+                            parts=[
+                                FormattedStringText(f'{self.adder.parents}/<regex("'),
+                                FormattedStringExpression(expression=Name('OBJECT_ID_REGEX')),
+                                FormattedStringText(f'"):{self.adder.parent_ref}>/{self.adder.children}')
+                            ],
+                            start="f'",
+                            end="'"
                         ),
                         with_comma=True
                     ),

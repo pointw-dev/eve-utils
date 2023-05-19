@@ -35,29 +35,32 @@ class ParentLinksInserter(CSTTransformer):
                     )
                 ),
                 FormattedStringText(f'/{self.adder.parent}/'),
-                FormattedStringExpression(
-                    expression=Subscript(
-                        value=Name(self.adder.parent),
-                        slice=[
-                            SubscriptElement(
-                                slice=Index(SimpleString("'_id'"))
-                            )
-                        ],
-                        lbracket=LeftSquareBracket(),
-                        rbracket=RightSquareBracket()
-                    ),
-                )
+                FormattedStringExpression(expression=Name(f'{self.adder.parent}_id')),
+
+                # FormattedStringExpression(
+                #     expression=Subscript(
+                #         value=Name(self.adder.parent),
+                #         slice=[
+                #             SubscriptElement(
+                #                 slice=Index(SimpleString("'_id'"))
+                #             )
+                #         ],
+                #         lbracket=LeftSquareBracket(),
+                #         rbracket=RightSquareBracket()
+                #     ),
+                # )
             ],
             start='f"',
             end='"'
         ) if self.adder.remote_child else [
             FormattedStringText(f'/{self.adder.parents}/'),
-            FormattedStringExpression(
-                expression=Subscript(
-                    value=Name(f'{self.adder.parent}'),
-                    slice=[SubscriptElement(slice=Index(SimpleString('"_id"')))]
-                )
-            ),
+            FormattedStringExpression(expression=Name(f'{self.adder.parent}_id')),
+            # FormattedStringExpression(
+            #     expression=Subscript(
+            #         value=Name(f'{self.adder.parent}'),
+            #         slice=[SubscriptElement(slice=Index(SimpleString('"_id"')))]
+            #     )
+            # ),
             FormattedStringText(f'/{self.adder.children}')
         ]
 

@@ -4,6 +4,7 @@ import signal
 from eve_service import EveService
 from utils import is_mongo_running
 
+
 def stop_api(signum, frame):  # pylint: disable=unused-argument
     """ Catches SIGTERM and issues SIGINT """
     if signum == signal.SIGTERM:

@@ -137,11 +137,10 @@ class Settings():
             self.prefix_descriptions[prefix] = ''
         self.prefix_descriptions[prefix] = description
 
-    def get(self, setting_name, prefix=None, default_value=None):
+    def get(self, setting_name, default_value=None):
         self._set_from_environment()
         setting_name = setting_name.upper()
-        if not prefix:
-            prefix, setting_name = self._parse_setting_name(setting_name)
+        prefix, setting_name = self._parse_setting_name(setting_name)
 
         return self.settings.get(prefix, {}).get(setting_name, default_value)
 

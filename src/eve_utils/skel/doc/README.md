@@ -101,37 +101,56 @@ POST {child_collection_url}  -d child_data
 
 ### URL Templates
 
-Typically a client application follows a link rel's `href` blindly (never parse an `href`!).  But when given a URL template, the client application can build its own URL.  In general a URL template is a partial `href` containing a placeholder which the client application replaces with some other field value.  See the `policy` rel in this example:
+Typically, a client application follows a link rel's `href` blindly.  But when given a URI template [[RFC6570](https://datatracker.ietf.org/doc/html/rfc6570)], the client application builds its own URL by expanding the template.  A URL template is a partial `href` containing placeholders which the client application replaces with some other values.  See the `policy` rel in this example:
 
 ```json
 {
-   "name": "Bob",
-   "policy_number": "A7394",
-   "_links": {
-   		"self": {
-   			"href": "/members/1234"
-   		},
-   		"policy": {
-   			"href": "/policies/{policy_number}"
-   		}
-   }
+    "name": "Bob", 
+    "policy_number": "A7394",
+    "_links": {
+        "self": {
+            "href": "/members/1234"
+        },
+        "policy": {
+            "href": "/policies/{policyNumber}",
+            "templated": true
+        }
+    }
 }
 ```
 
-`{$project_name}` does not provide URL templates at this time.  In practice it is sometimes safe to use "assumed" templates to build URLs, as long as they are confirmed to remain valid with each API release.  Assumed URL templates are usually easy to fix when they break, as the new hrefs will be available in the API itself.
-
+`{$project_name}` provides URL templates for all collections by way of its `item` rel [[RFC6573](https://datatracker.ietf.org/doc/html/rfc6573)].
+```json
+{
+    "_items": [
+      ...
+      ...
+    ], 
+    "_links": {
+        "self": {
+            "href": "/some-collection"
+        },
+        "item": {
+            "href": "/come-collection/{id}",
+            "templated": true
+        }
+    }
+}
+```
 
 ## Link Relations
 
-Here are the link relations that form the "contract" provided by `{$project_name}`
+Here are the link relations provided by `{$project_name}`
 
 ### navigation affordances
+IANA standard [link relations](https://www.iana.org/assignments/link-relations/link-relations.xhtml) [[RFC8288](https://datatracker.ietf.org/doc/html/rfc8288.html)]: 
 
 * **self** - sometimes when an item appears in a collection, not all of its fields are populated.  GET this rel to fetch the complete record.  Also useful to GET self to check if there has been an update since last GET
-* *parent - ignore this rel*
+* *parent - not yet implemeted - ignore this rel*
 * **next** - when GETting a collection by page, this rel takes you to the next page
 * **prev** - when GETting a collection by page, this rel takes you to the previous page
 * **last** - when GETting a collection by page, this rel takes you to the last page
+* **item** - when GETting a collection, this rel provides a URI template to take you to a member of the collection, usually by expanding the template with an id. 
 * **collection** - the collection this resource belongs to (applies to collections and items)
 
 ### api config affordances

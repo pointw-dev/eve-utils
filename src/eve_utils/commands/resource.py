@@ -125,8 +125,10 @@ This module defines functions to add link relations to {plural}.
 """
 import logging
 import json
+from flask import current_app
 from log_trace.decorators import trace
 from configuration import SETTINGS
+from utils import get_resource_id, get_id_field
 from utils.gateway import get_href_from_gateway
 
 LOG = logging.getLogger('hooks.{plural}')
@@ -156,20 +158,31 @@ def _post_{plural}(request, payload):
 def _add_links_to_{plural}_collection({plural}_collection):
     for {singular} in {plural}_collection['_items']:
         _add_links_to_{singular}({singular})
+        
+    if '_links' in {plural}_collection:
+        base_url = SETTINGS.get('ES_BASE_URL', '')
+
+        id_field = get_id_field('{plural}')
+        if id_field.startswith('_'):
+            id_field = id_field[1:]        
+                
+        {plural}_collection['_links']['item'] = {{
+            'href': f'{{base_url}}/{plural}/{{{{{{id_field}}}}}}',
+            'title': '{singular}',
+            'templated': True
+        }}
 
 
 @trace
 def _add_links_to_{singular}({singular}):
-    base_url = SETTINGS.get('ES_BASE_URL')
+    base_url = SETTINGS.get('ES_BASE_URL', '')
+    {singular}_id = get_resource_id('{plural}', {singular})
 
-    if base_url == None:
-        base_url = ''
-        
     _add_remote_children_links({singular})
     _add_remote_parent_links({singular})
 
     {singular}['_links']['self'] = {{
-        'href': f"{{base_url}}/{plural}/{{{singular}['_id']}}",
+        'href': f"{{base_url}}/{plural}/{{{singular}_id}}",
         'title': '{singular}'
     }}
 
