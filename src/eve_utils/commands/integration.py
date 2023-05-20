@@ -30,9 +30,8 @@ def create(integration, name, prefix):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
-        
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
     if integration == 'empty' and name is None:
         print('You must supply a name when choosing the "empty" integration.')
         sys.exit(902)
@@ -69,9 +68,8 @@ def list_integrations():
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
-        
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
     if not os.path.exists('integration'):
         print('No integrations have been added')
         sys.exit(0)

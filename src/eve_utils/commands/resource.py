@@ -12,10 +12,7 @@ import eve_utils
 
 def resource_already_exists(resource_name):
     resources_list = get_resource_list()
-    if resource_name in resources_list:
-        return True
-    eve_utils.jump_to_api_folder('src/{project_name}')
-    return False
+    return resource_name in resources_list
 
 
 @click.group(name='resource', help='Manage the resources that make up the domain of the service.')
@@ -31,8 +28,7 @@ def create(resource_name, no_common):
     try:
         eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
     singular, plural = get_pair(resource_name)
     add_common = not no_common
@@ -42,6 +38,10 @@ def create(resource_name, no_common):
         print('This resource already exist')
         sys.exit(701)
     else:
+        # resource_already_exists() jumps to a different folder, need to jump back.
+        # No need to try/except - we know we're in an API folder
+        eve_utils.jump_to_api_folder('src/{project_name}')
+
         create_resource_domain_file(plural, add_common)
         insert_domain_definition(plural)
         create_resource_hook_file(singular, plural)
@@ -59,8 +59,7 @@ def get_resource_list():
     try:
         eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
     files = glob.glob('./*.py')
     resources = []

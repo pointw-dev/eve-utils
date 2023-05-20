@@ -11,6 +11,7 @@ from . import code_gen
 
 REMOTE_PREFIX = 'remote:'
 
+
 def jump_to_api_folder(path=None):
     keep_going = True
     while keep_going:
@@ -137,8 +138,7 @@ def _add_remote_relations(rels):
     try:
         settings = jump_to_api_folder('src/{project_name}/hooks')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return escape('This command must be run in an eve_service API folder structure', 1)
 
     files = [file for file in glob.glob('*.py') if not file.startswith('_')]
 
@@ -174,8 +174,7 @@ def parent_child_relations():
     try:
         settings = jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return escape('This command must be run in an eve_service API folder structure', 1)
 
     with open('__init__.py', 'r') as f:
         lines = f.readlines()

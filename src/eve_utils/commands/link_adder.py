@@ -83,8 +83,12 @@ class LinkAdder:
         return False  # i.e. link does not exist
 
     def _list_missing_resources(self):
+        try:
+            eve_utils.jump_to_api_folder('src/{project_name}/domain')
+        except RuntimeError:
+            return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
         rtn = ''
-        eve_utils.jump_to_api_folder('src/{project_name}/domain')
         if not self.remote_parent and not os.path.exists(f'./{self.parents}.py'):
             rtn += self.parents
 
@@ -108,9 +112,12 @@ class LinkAdder:
             raise LinkAdderException(803, 'Both parent and child cannot be remote')
 
     def execute(self):
-        self._validate()
-        eve_utils.jump_to_api_folder('src/{project_name}')
+        try:
+            eve_utils.jump_to_api_folder('src/{project_name}')
+        except RuntimeError:
+            return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
+        self._validate()
         print(
             f'Creating link rel from {"remote " if self.remote_parent else ""}{self.parent} (parent) '
             f'to {"remote " if self.remote_child else ""}{self.children} (children)'
@@ -118,8 +125,8 @@ class LinkAdder:
 
         if self.remote_parent:
             eve_utils.commands.api._add_addins({'add_validation': 'n/a'}, silent=True)
-            eve_utils.jump_to_api_folder('src/{project_name}')
 
+        eve_utils.jump_to_api_folder('src/{project_name}')
         # update parent code
         if not self.remote_parent:
             self._add_links_to_parent_hooks()

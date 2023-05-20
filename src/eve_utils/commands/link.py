@@ -18,8 +18,7 @@ def create(parent, child, as_parent_ref):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
     adder = LinkAdder(parent, child, as_parent_ref)
 
@@ -37,8 +36,7 @@ def list_rels(output):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
-        print('This command must be run in an eve_service API folder structure')
-        sys.exit(1)
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
     rels = eve_utils.parent_child_relations()
 

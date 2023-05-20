@@ -102,7 +102,11 @@ def _create_api(project_name):
 
 
 def _add_addins(which_addins, silent=False):
-    settings = eve_utils.jump_to_api_folder()
+    try:
+        settings = eve_utils.jump_to_api_folder()
+    except RuntimeError:
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1, silent)
+
     for keyword in [kw for kw in which_addins.keys() if which_addins[kw]]:
         addin_name = keyword[4:]  # remove "add-"
         settings_addins = settings.get('addins', {})
