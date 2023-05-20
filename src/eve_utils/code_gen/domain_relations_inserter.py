@@ -99,8 +99,8 @@ class DomainRelationsInserter(CSTTransformer):
                                 FormattedStringExpression(expression=Name('OBJECT_ID_REGEX')),
                                 FormattedStringText(f'"):{self.adder.parent_ref}>')
                             ],
-                            start='f"',
-                            end='"'
+                            start="f'",
+                            end="'"
                         ) if self.adder.remote_parent else FormattedString(
                             parts=[
                                 FormattedStringText(f'{self.adder.parents}/<regex("'),

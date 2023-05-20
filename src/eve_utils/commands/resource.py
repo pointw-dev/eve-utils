@@ -191,7 +191,8 @@ def _add_links_to_{singular}({singular}):
 def _add_remote_children_links({singular}):
     if not SETTINGS['ES_GATEWAY_URL']:
         return
-        
+    {singular}_id = get_resource_id('{plural}', {singular})
+
     # == do not edit this method above this line ==    
 
     
@@ -199,7 +200,8 @@ def _add_remote_children_links({singular}):
 def _add_remote_parent_links({singular}):
     if not SETTINGS['ES_GATEWAY_URL']:
         return
-        
+    {singular}_id = get_resource_id('{plural}', {singular})
+
     # == do not edit this method above this line ==    
 ''')
 

@@ -40,7 +40,8 @@ def add_hooks(app):
 @trace
 def _log_request(resource, request, payload):
     """Event hook to log all requests."""
-    LOG.info(f'Request for {resource}: {request} [{payload.status_code}]')
+    requested = resource if resource else 'root'
+    LOG.info(f'Request for {requested}: {request} [{payload.status_code}]')
     request_headers = f'{request.headers}'.replace('\n','\n  ').rstrip()
     request_data = json.dumps(json.loads(request.data if request.data else "\"\""))
     response_headers = f'{payload.headers}'.replace('\n','\n  ').rstrip()
