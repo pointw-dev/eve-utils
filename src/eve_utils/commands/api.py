@@ -54,6 +54,14 @@ def addin(**kwargs):
     _add_addins(kwargs)
 
 
+@commands.command(cls=OptionalFlags, name='version', short_help="View or set the version number of the API, man")
+@click.option('new_version', '--set-version', is_flag=True, flag_value="n/a",
+              help="set the version number (e.g. --set-version=1.0.0)", metavar="<new-version>")
+def version(new_version):
+    """View or set the version number of the API"""
+    _show_or_set_version(new_version)
+
+
 def _create_api(project_name):
     # TODO: ensure folder is empty? or at least warn if not?
     current_dir = os.getcwd()
@@ -128,3 +136,34 @@ def _add_addins(which_addins, silent=False):
 
     if which_addins.get('add_git', False):
         addins.git.add(which_addins['add_git'], silent)
+
+
+def _show_or_set_version(new_version):
+    if new_version == 'n/a':
+        return eve_utils.escape('The value for --set-version is not correct (e.g. --set-version=1.0.0)', 11)
+
+    try:
+        settings = eve_utils.jump_to_api_folder('src/{project_name}/configuration')
+    except RuntimeError:
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
+    filename = '__init__.py'
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+
+    moded = ''
+    starts_with = 'VERSION = '
+
+    for line in lines:
+        if line.startswith(starts_with):
+            print(line.rstrip().lstrip())
+            line = f"{starts_with}{new_version}\n"
+
+        moded += line
+
+    if new_version:
+        print(f'- set to: {new_version}\n')
+        with open(filename, 'w') as f:
+            f.write(moded)
+    else:
+        print('- unchanged\n')

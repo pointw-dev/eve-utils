@@ -545,6 +545,7 @@ HAL media type
 
 * eve-utils errorlevels / exit codes:
   1 - not run in API folder structure
+* 11 - --set-version value not specified correctly
 
   10x - git
   101 - git already added
