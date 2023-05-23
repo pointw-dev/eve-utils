@@ -305,11 +305,15 @@ intro
 
 * NOTE: resources in Eve are collections, so eve-utils names resources as plural by convention,
 
-  * i.e. if you enter mkresource **dog** it will create an endpoint named **/dogs**
+  * i.e. if you enter eu resource create **dog** it will create an endpoint named **/dogs**
 
   * eve-utils rely on the [inflect](https://pypi.org/project/inflect/) library for pluralization, which is very accurate but can make mistakes
 
   * If you want to specify the singular and plural names of a resource use "singular,plural" e.g.  
+
+#### check
+
+* shows the singular and plural forms of the resource eve-utils will infer  
 
 #### list
 
@@ -393,6 +397,10 @@ details
 intro
 
 #### create
+
+details
+
+#### attach
 
 details
 

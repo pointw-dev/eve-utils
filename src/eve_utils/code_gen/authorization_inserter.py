@@ -10,7 +10,7 @@ class AuthorizationInserter(CSTTransformer):
 
     def leave_Module(self, original_node, updated_node):
         """ Adds to the top of eve_service.py the following:
-                from auth.es_auth import EveAuthorization
+                from auth.authorization import EveServiceAuthorization
         """
 
         addition = SimpleStatementLine(
@@ -19,11 +19,11 @@ class AuthorizationInserter(CSTTransformer):
                     module=Attribute(
                         value=Name('auth'),
                         dot=Dot(),
-                        attr=Name('es_auth')
+                        attr=Name('authorization')
                     ),
                     names=[
                         ImportAlias(
-                            name=Name('EveAuthorization')
+                            name=Name('EveServiceAuthorization')
                         )
                     ],
                     whitespace_after_from=SimpleWhitespace(' '),
@@ -43,11 +43,11 @@ class AuthorizationInserter(CSTTransformer):
 
     def leave_Assign(self, original_node, updated_node):
         """ Adds the following kwarg to eve_service.py:EveService:__init__() self._app = Eve(...) assignment:
-                auth=EveAuthorization
+                auth=EveServiceAuthorization
         """
 
         addition = Arg(
-            value=Name('EveAuthorization'),
+            value=Name('EveServiceAuthorization'),
             equal=AssignEqual(
                 whitespace_before=SimpleWhitespace(''),
                 whitespace_after=SimpleWhitespace('')

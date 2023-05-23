@@ -13,9 +13,9 @@ if SETTINGS.has_enabled('AUTH_ADD_BASIC'):
     AUTH_PARSER.add_handler('Basic', basic, realm=f'{SETTINGS["AUTH_REALM"]}')
 
 
-class EveAuthorization(NegotiableAuth):
+class EveServiceAuthorization(NegotiableAuth):
     def __init__(self):
-        super(EveAuthorization, self).__init__()
+        super(EveServiceAuthorization, self).__init__()
 
     def process_claims(self, claims, allowed_roles, resource, method):
         authorized = 'user' in claims

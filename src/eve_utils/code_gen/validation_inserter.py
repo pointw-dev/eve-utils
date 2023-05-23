@@ -8,7 +8,7 @@ class ValidationInserter(CSTTransformer):
 
     def leave_Module(self, original_node, updated_node):
         """ Adds to the top of eve_service.py the following:
-                from validation.validator import EveValidator
+                from validation.validator import EveServiceValidator
         """
         addition = SimpleStatementLine(
             body=[
@@ -20,7 +20,7 @@ class ValidationInserter(CSTTransformer):
                     ),
                     names=[
                         ImportAlias(
-                            name=Name('EveValidator')
+                            name=Name('EveServiceValidator')
                         ),
                     ],
                     whitespace_after_from=SimpleWhitespace(' '),
@@ -40,11 +40,11 @@ class ValidationInserter(CSTTransformer):
 
     def leave_Assign(self, original_node, updated_node):
         """ Adds the following kwarg to eve_service.py:EveService:__init__() self._app = Eve(...) assignment:
-                validator=EveValidator
+                validator=EveServiceValidator
         """
 
         addition = Arg(
-            value=Name('EveValidator'),
+            value=Name('EveServiceValidator'),
             equal=AssignEqual(
                 whitespace_before=SimpleWhitespace(''),
                 whitespace_after=SimpleWhitespace('')

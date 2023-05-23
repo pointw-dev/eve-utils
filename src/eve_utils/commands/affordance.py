@@ -1,4 +1,6 @@
 import os
+import re
+import glob
 import click
 from libcst import parse_module
 
@@ -14,7 +16,7 @@ def commands():
 
 
 @commands.command(cls=OptionalFlags, name='create',
-                  help='Creates an affordance, adds a route, and _links to a resource')
+                  short_help='Creates an affordance, adds a route, and _links to a resource')
 @click.argument('affordance_name', metavar='<name>')
 @click.argument('resource_name', metavar='<resource>')
 @click.option('folder', '--folder', is_flag=True, flag_value='root', help='Which folder to put this affordance in.')
@@ -60,7 +62,7 @@ def create(affordance_name, resource_name, folder):
     _add_affordance_resource(affordance_name, folder, resource_name)
 
 
-@commands.command(cls=OptionalFlags, name='attach', help='(not yet implemented)')
+@commands.command(cls=OptionalFlags, name='attach', short_help='(not yet implemented)')
 @click.argument('affordance_name', metavar='<name>')
 @click.argument('resource_name', metavar='<resource>')
 @click.option('folder', '--folder', is_flag=True, flag_value='root', help='Which folder to put this affordance in.')
@@ -84,6 +86,20 @@ def list_affordances():
 
     if not os.path.exists('affordances'):
         click.echo('There are no affordances')
+        return
+
+    os.chdir('affordances')
+    files = glob.glob('*/*.py')
+    for filename in files:
+        with open(filename, 'r') as f:
+            contents = f.read()
+        if 'def add_affordance(app):' in contents:
+            affordance = filename.replace('\\', '.').replace('/', '.')[:-3]
+            attaches = re.findall(r'@app\.route\(\"\/(.*?)\/', contents)
+            click.echo(f'- affordances.{affordance}')
+            click.echo('   attached to:')
+            for attached in attaches:
+                click.echo(f'   - {attached}')
 
 
 @commands.command(name='remove', help='(not yet implemented)')

@@ -6,17 +6,27 @@ import logging
 import json
 import requests
 from log_trace.decorators import trace
-from auth import SETTINGS
+from configuration import SETTINGS
 
-LOG = logging.getLogger('auth0')
+LOG = logging.getLogger('{$integration}')
+
+SETTINGS.set_prefix_description('{$prefix}', 'Auth0 configuration')
+SETTINGS.create('{$prefix}', {
+    'API_AUDIENCE': 'https://{$project_name}.us.auth0.com/api/v2/',
+    'API_BASE_URL': 'https://{$project_name}.us.auth0.com/api/v2',
+    'CLAIMS_NAMESPACE': 'https://pointw.com/{$project_name}',
+    'TOKEN_ENDPOINT': 'https://{$project_name}.us.auth0.com/oauth/token',
+    'CLIENT_ID': '--your-client-id--',
+    'CLIENT_SECRET': '--your-client-secret--'
+})
 
 
 @trace
 def get_token():
-    token_url = SETTINGS['AUTH0_TOKEN_ENDPOINT']
-    client_id = SETTINGS['AUTH0_CLIENT_ID']
-    client_secret = SETTINGS['AUTH0_CLIENT_SECRET']
-    audience = SETTINGS['AUTH0_API_AUDIENCE']
+    token_url = SETTINGS['{$prefix}_TOKEN_ENDPOINT']
+    client_id = SETTINGS['{$prefix}_CLIENT_ID']
+    client_secret = SETTINGS['{$prefix}_CLIENT_SECRET']
+    audience = SETTINGS['{$prefix}_API_AUDIENCE']
 
     body = json.dumps({
         'client_id': client_id,
@@ -35,7 +45,7 @@ def get_token():
 
 @trace
 def get_users(token):
-    get_users_url = f'{SETTINGS["AUTH0_API_BASE_URL"]}/users'
+    get_users_url = f'{SETTINGS["{$prefix}_API_BASE_URL"]}/users'
     headers = {
         'Authorization': 'Bearer ' + token
     }
@@ -45,7 +55,7 @@ def get_users(token):
 
 @trace
 def get_user_roles(user_id, token):
-    get_roles_url = f'{SETTINGS["AUTH0_API_BASE_URL"]}/users/{user_id}/roles'
+    get_roles_url = f'{SETTINGS["{$prefix}_API_BASE_URL"]}/users/{user_id}/roles'
 
     headers = {
         'Authorization': 'Bearer ' + token
@@ -59,7 +69,7 @@ def get_user_roles(user_id, token):
 def add_user_roles(token, user_id, roles_to_add, remove=False):
     # TODO: refactor ugly bad handling
     # NOTE: role names are case sensitive
-    get_roles_url = f'{SETTINGS["AUTH0_API_BASE_URL"]}/roles'
+    get_roles_url = f'{SETTINGS["{$prefix}_API_BASE_URL"]}/roles'
     headers = {
         'Authorization': 'Bearer ' + token,
         'Content-type': 'application/json'
@@ -72,7 +82,7 @@ def add_user_roles(token, user_id, roles_to_add, remove=False):
         'roles': role_ids
     }
     if role_ids:
-        user_roles_url = f'{SETTINGS["AUTH0_API_BASE_URL"]}/users/{user_id}/roles'
+        user_roles_url = f'{SETTINGS["{$prefix}_API_BASE_URL"]}/users/{user_id}/roles'
         if remove:
             response = requests.delete(user_roles_url, headers=headers, data=json.dumps(request_body))
         else:
@@ -89,7 +99,7 @@ def add_user_roles(token, user_id, roles_to_add, remove=False):
 
 @trace
 def delete_user(token, user_id):
-    user_url = f'{SETTINGS["AUTH0_API_BASE_URL"]}/users/{user_id}'
+    user_url = f'{SETTINGS["{$prefix}_API_BASE_URL"]}/users/{user_id}'
     headers = {
         'Authorization': 'Bearer ' + token
     }

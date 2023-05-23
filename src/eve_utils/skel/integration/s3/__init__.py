@@ -1,5 +1,4 @@
 import logging
-import os
 import boto3
 from configuration import SETTINGS
 
@@ -17,13 +16,13 @@ botocore_log = logging.getLogger('botocore')
 botocore_log.setLevel(logging.ERROR)
 
 S3 = boto3.client('s3',
-                  aws_access_key_id=SETTINGS['S3_AWS_ACCESS_KEY_ID'],
-                  aws_secret_access_key=SETTINGS['S3_AWS_SECRET_ACCESS_KEY'],
-                  region_name=SETTINGS['S3_AWS_REGION']
+                  aws_access_key_id=SETTINGS['{$prefix}_AWS_ACCESS_KEY_ID'],
+                  aws_secret_access_key=SETTINGS['{$prefix}_AWS_SECRET_ACCESS_KEY'],
+                  region_name=SETTINGS['{$prefix}_AWS_REGION']
                   )
 
 
-def cancel_all_pending_uploads(bucket=SETTINGS['S3_BUCKET_NAME']):
+def cancel_all_pending_uploads(bucket=SETTINGS['{$prefix}_BUCKET_NAME']):
     pending_uploads = S3.list_multipart_uploads(Bucket=bucket)
     if 'Uploads' in pending_uploads:
         LOG.info(f'Aborting {len(pending_uploads["Uploads"])} uploads')
@@ -32,7 +31,7 @@ def cancel_all_pending_uploads(bucket=SETTINGS['S3_BUCKET_NAME']):
             S3.abort_multipart_upload(Bucket=bucket, Key=upload['Key'], UploadId=upload_id)
 
 
-def file_exists(filename, bucket=SETTINGS['S3_BUCKET_NAME']):
+def file_exists(filename, bucket=SETTINGS['{$prefix}_BUCKET_NAME']):
     response = S3.list_objects_v2(Bucket=bucket, Prefix=filename)
     if response:
         for obj in response.get('Contents', {}):
@@ -41,7 +40,7 @@ def file_exists(filename, bucket=SETTINGS['S3_BUCKET_NAME']):
     return False
 
 
-def start_multipart_upload(filename, bucket=SETTINGS['S3_BUCKET_NAME']):
+def start_multipart_upload(filename, bucket=SETTINGS['{$prefix}_BUCKET_NAME']):
     mpu = S3.create_multipart_upload(Bucket=bucket, Key=filename, ACL='public-read')
     return {
         'mpu': mpu,
@@ -86,6 +85,6 @@ def cancel_pending_upload(upload_context):
     return result
 
 
-def delete_assets(filename, bucket=SETTINGS['S3_BUCKET_NAME']):
+def delete_assets(filename, bucket=SETTINGS['{$prefix}_BUCKET_NAME']):
     result = S3.delete_object(Bucket=bucket, Key=filename)
     return result

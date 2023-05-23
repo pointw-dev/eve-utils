@@ -115,7 +115,7 @@ Defines the {resource} resource.
         'projection': {'_tenant': 0}
     },
     'additional_lookup': {
-        'url': 'regex("[\w]+")',  # pylint: disable=anomalous-backslash-in-string
+        'url': r'regex("[\w]+")',
         'field': 'name'
     }
 }

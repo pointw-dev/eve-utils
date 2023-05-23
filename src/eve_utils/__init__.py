@@ -227,6 +227,11 @@ def escape(message, code, silent=False):
     sys.exit(code)
 
 
+def urljoin(*parts):
+    trailing_slash = '/' if parts[-1].endswith('/') else ''
+    return "/".join([str(part).strip("/") for part in parts]) + trailing_slash
+
+
 def get_singular_plural(word):
     if ',' in word:
         # ASSERT word.count(',') == 1

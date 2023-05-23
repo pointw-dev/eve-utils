@@ -16,7 +16,7 @@ from log_trace.decorators import trace
 LOG = logging.getLogger('validator')
 
 
-class EveValidator(Validator):
+class EveServiceValidator(Validator):
     """Validator for custom types and validations."""
     @trace
     def _validate_unique_ignorecase(self, unique_ignorecase, field, value):

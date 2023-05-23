@@ -18,7 +18,7 @@ def commands():
 def addin_params(func):
     @click.option('--add-git', '-g',
                   is_flag=True,
-                  help='initiaialize local git repository (with optional remote)',
+                  help='initialize local git repository (with optional remote)',
                   flag_value='no remote',
                   metavar='[remote]')
     @click.option('--add-docker', '-d',
