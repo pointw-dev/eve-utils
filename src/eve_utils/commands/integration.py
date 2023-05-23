@@ -11,14 +11,19 @@ def commands():
 
 def _get_integrations():
     integrations_folder = os.path.join(os.path.dirname(eve_utils.__file__), 'skel/integration')
-    integrations =  [name for name in os.listdir(integrations_folder) ]
+    integrations = [name for name in os.listdir(integrations_folder) ]
     return integrations
 
 
 @commands.command(name='create', short_help=f'Create an external integration to the service.')
 @click.argument('integration', type=click.Choice(_get_integrations(), case_sensitive=False), metavar='<integration>')
-@click.option('--name', '-n', help='Set or change the name of the integration.  If you do not supply a name, the name of the integration will be used (e.g. s3).  If you choose "empty" you must supply a name.', metavar='[name]')
-@click.option('--prefix', '-p', help='Set the prefix used in settings this integration may require.', metavar='[prefix]')
+@click.option('--name', '-n',
+              help='Set or change the name of the integration.  If you do not supply a name, the name of '
+                   'the integration will be used (e.g. s3).  If you choose "empty" you must supply a name.',
+              metavar='[name]')
+@click.option('--prefix', '-p',
+              help='Set the prefix used in settings this integration may require.',
+              metavar='[prefix]')
 def create(integration, name, prefix):
     """
     Create an external integration to the service.
@@ -56,7 +61,9 @@ def create(integration, name, prefix):
         'integration': name,
         'prefix': prefix.upper() if prefix else name.upper()
     }
-    eve_utils.copy_skel(settings['project_name'], f'integration/{integration}', target_folder=f'integration/{name}', replace=replace, silent=silent)
+    eve_utils.copy_skel(settings['project_name'], f'integration/{integration}',
+                        target_folder=f'integration/{name}',
+                        replace=replace)
     with open(f'./integration/__init__.py', 'a') as f:
         f.write(f'from . import {name}\n')
     # TODO: handle settings/prefix

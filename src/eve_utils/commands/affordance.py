@@ -3,7 +3,6 @@ import click
 from libcst import parse_module
 
 from .optional_flags import OptionalFlags
-from .singplu import get_pair
 import eve_utils
 
 from ..code_gen.affordance_inserter import AffordanceInserter
@@ -75,7 +74,16 @@ def attach(affordance_name, resource_name, folder):
 
 @commands.command(name='list', help='(not yet implemented)')
 def list_affordances():
-    click.echo('list')
+    """
+    Lists affordances previously created
+    """
+    try:
+        eve_utils.jump_to_api_folder('src/{project_name}')
+    except RuntimeError:
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
+    if not os.path.exists('affordances'):
+        click.echo('There are no affordances')
 
 
 @commands.command(name='remove', help='(not yet implemented)')
@@ -84,7 +92,7 @@ def remove():
 
 
 def _write_affordance_file(affordance_name, resource_name):
-    singular, plural = get_pair(resource_name)
+    singular, plural = eve_utils.get_singular_plural(resource_name)
     bracketed_id = f'{{{singular}_id}}'
     with open(f'{affordance_name}.py', 'w') as file:
         file.write(f'''"""
@@ -122,7 +130,7 @@ def _do_{affordance_name}({singular}_id):
 
 
 def _add_affordance_resource(affordance_name, folder, resource):
-    singular, plural = get_pair(resource)
+    singular, plural = eve_utils.get_singular_plural(resource)
     with open(f'hooks/{plural}.py', 'r') as source:
         tree = parse_module(source.read())
 

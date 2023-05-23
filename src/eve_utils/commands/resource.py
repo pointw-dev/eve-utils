@@ -1,18 +1,10 @@
-import os
 import sys
 import click
-import itertools
 import glob
 from pathlib import Path
 from libcst import *
-from .singplu import get_pair
 from eve_utils.code_gen import DomainDefinitionInserter, HooksInserter
 import eve_utils
-
-
-def resource_already_exists(resource_name):
-    resources_list = get_resource_list()
-    return resource_name in resources_list
 
 
 @click.group(name='resource', help='Manage the resources that make up the domain of the service.')
@@ -30,32 +22,51 @@ def create(resource_name, no_common):
     except RuntimeError:
         return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
-    singular, plural = get_pair(resource_name)
+    singular, plural = eve_utils.get_singular_plural(resource_name)
     add_common = not no_common
 
     print(f'Creating {plural} resource')
-    if resource_already_exists(plural):
-        print('This resource already exist')
-        sys.exit(701)
+    if _resource_already_exists(plural):
+        eve_utils.escape('This resource already exist', 701)
     else:
         # resource_already_exists() jumps to a different folder, need to jump back.
         # No need to try/except - we know we're in an API folder
         eve_utils.jump_to_api_folder('src/{project_name}')
 
-        create_resource_domain_file(plural, add_common)
-        insert_domain_definition(plural)
-        create_resource_hook_file(singular, plural)
-        insert_hooks(plural)
+        _create_resource_domain_file(plural, add_common)
+        _insert_domain_definition(plural)
+        _create_resource_hook_file(singular, plural)
+        _insert_hooks(plural)
+
+
+@commands.command(name='check', help='See what the singular/plural of the resource will be.')
+@click.argument('resource_name', metavar='<name>')
+def create(resource_name):
+    """<name> of the resource to create"""
+    singular, plural = eve_utils.get_singular_plural(resource_name)
+    click.echo(f'You entered {resource_name}')
+    click.echo(f'- singular: {singular}')
+    click.echo(f'- plural:   {plural}')
 
 
 @commands.command(name='list', help='List the resources in the domain.')
 def list_resources():
-    resources_list = get_resource_list()
+    resources_list = _get_resource_list()
     for resource in resources_list:
         print('- ' + resource)
 
 
-def get_resource_list():
+@commands.command(name='remove', help='(not yet implemented)')
+def remove():
+    click.echo('remove')
+
+
+def _resource_already_exists(resource_name):
+    resources_list = _get_resource_list()
+    return resource_name in resources_list
+
+
+def _get_resource_list():
     try:
         eve_utils.jump_to_api_folder('src/{project_name}/domain')
     except RuntimeError:
@@ -71,12 +82,7 @@ def get_resource_list():
     return resources
 
 
-@commands.command(name='remove', help='(not yet implemented)')
-def remove():
-    click.echo('remove')
-
-
-def create_resource_domain_file(resource, add_common):
+def _create_resource_domain_file(resource, add_common):
     with open(f'domain/{resource}.py', 'w') as file:
         file.write(f'''"""
 Defines the {resource} resource.
@@ -116,7 +122,7 @@ Defines the {resource} resource.
 ''')
 
 
-def create_resource_hook_file(singular, plural):
+def _create_resource_hook_file(singular, plural):
     with open(f'hooks/{plural}.py', 'w') as file:
         file.write(f'''"""
 hooks.{plural}
@@ -205,7 +211,7 @@ def _add_remote_parent_links({singular}):
 ''')
 
 
-def insert_domain_definition(resource):
+def _insert_domain_definition(resource):
     with open('domain/__init__.py', 'r') as source:
         tree = parse_module(source.read())
 
@@ -216,7 +222,7 @@ def insert_domain_definition(resource):
         source.write(new_tree.code)
 
 
-def insert_hooks(resource):
+def _insert_hooks(resource):
     with open('hooks/__init__.py', 'r') as source:
         tree = parse_module(source.read())
 

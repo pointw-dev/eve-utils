@@ -10,10 +10,14 @@ def commands():
     pass
 
 
-@commands.command(name='create', help='Create a parent/child link between two resources.  If one of the resources is in the domain of a different EveService, add "remote:" in front of the name of that resource.')
+@commands.command(name='create',
+                  help='Create a parent/child link between two resources.  If one of the resources is in the '
+                       'domain of a different EveService, add "remote:" in front of the name of that resource.')
 @click.argument('parent', metavar='<parent|remote:parent>')
 @click.argument('child', metavar='<child|remote:child>')
-@click.option('--as_parent_ref', '-p', is_flag=True, help='Change name of related ref to "parent" (instead of the name of the parent).')
+@click.option('--as_parent_ref', '-p',
+              is_flag=True,
+              help='Change name of related ref to "parent" (instead of the name of the parent).')
 def create(parent, child, as_parent_ref):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
@@ -31,7 +35,10 @@ def create(parent, child, as_parent_ref):
 
 # TODO: refactor/SLAP
 @commands.command(name='list', help='List the relationships amongst the resources.')
-@click.option('output', '--format', '-f', type=click.Choice(['english', 'json', 'python_dict', 'plant_uml']), default='english', help='Choose the output format of the relationships list')
+@click.option('output', '--format', '-f',
+              type=click.Choice(['english', 'json', 'python_dict', 'plant_uml']),
+              default='english',
+              help='Choose the output format of the relationships list')
 def list_rels(output):
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}/domain')

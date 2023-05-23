@@ -1,7 +1,6 @@
 import os
 from libcst import parse_module
 
-from .singplu import get_pair
 from eve_utils.code_gen import \
     ChildLinksInserter, \
     ParentLinksInserter, \
@@ -23,8 +22,8 @@ class LinkAdder:
             child = child[len(eve_utils.REMOTE_PREFIX):]
             self.remote_child = True
 
-        self.parent, self.parents = get_pair(parent)  # TODO: validate, safe name, etc.
-        self.child, self.children = get_pair(child)  # TODO: validate, safe name, etc.
+        self.parent, self.parents = eve_utils.get_singular_plural(parent)  # TODO: validate, safe name, etc.
+        self.child, self.children = eve_utils.get_singular_plural(child)  # TODO: validate, safe name, etc.
         self.parent_ref = '_parent_ref' if as_parent_ref else f'_{parent}_ref'
 
     def _add_links_to_child_hooks(self):

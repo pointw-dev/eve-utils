@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import inflect
 import json
 import glob
 from distutils.dir_util import copy_tree, remove_tree
@@ -160,7 +161,7 @@ def _add_remote_relations(rels):
 
             if listening and '_links' in line:
                 remote = line.split("'")[3]
-                singular, plural = commands.singplu.get_pair(remote)
+                singular, plural = get_singular_plural(remote)
                 remote = 'remote:' + (singular if listening == 'parents' else plural)
                 if resource not in rels:
                     rels[resource] = {}
@@ -199,8 +200,8 @@ def parent_child_relations():
         if line.startswith("        'resource_title':"):
             child = line.split("'")[3]
             parent = rel_name.replace(f"_{child}", "")
-            parent, parents = commands.singplu.get_pair(parent)
-            child, children = commands.singplu.get_pair(child)
+            parent, parents = get_singular_plural(parent)
+            child, children = get_singular_plural(child)
 
             if parents not in rels:
                 rels[parents] = {}
@@ -224,3 +225,21 @@ def escape(message, code, silent=False):
         return code
     print(message)
     sys.exit(code)
+
+
+def get_singular_plural(word):
+    if ',' in word:
+        # ASSERT word.count(',') == 1
+        a = word.split(',')
+        return a[0], a[1]
+
+    p = inflect.engine()
+
+    singular = word if not p.singular_noun(word) else p.singular_noun(word)
+    plural = word if p.singular_noun(word) else p.plural_noun(word)
+
+    if singular == plural:  # in case of words like moose, fish
+        plural = plural + 's'
+
+    return singular, plural
+

@@ -8,7 +8,7 @@ from . import affordance
 from . import endpoint
 from . import setting
 from . import run
-from . import singplu
+
 
 @click.group()
 @click.version_option(package_name='eve-utils')

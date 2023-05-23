@@ -1,9 +1,10 @@
-import os
 import click
+
 
 @click.group(name='endpoint', help='Manage non-resource endpoints.')
 def commands():
     pass
+
 
 @commands.command(name='create', help='(not yet implemented)')
 def create():

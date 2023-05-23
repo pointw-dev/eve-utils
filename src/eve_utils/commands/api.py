@@ -10,27 +10,36 @@ from eve_utils import addins
 import eve_utils
 
 
-def api_already_exist():
-    try:
-        eve_utils.jump_to_api_folder()
-        return True
-    except RuntimeError:
-        return False
-
-
 @click.group(name='api', help='Create and manage the API service itself.')
 def commands():
     pass
 
 
 def addin_params(func):
-    @click.option('--add-git', '-g', is_flag=True, help='initiaialize local git repository (with optional remote)', flag_value='no remote', metavar='[remote]')
-    @click.option('--add-docker', '-d', is_flag=True, help='add Dockerfile and supporting files to deploy the API as a container', flag_value='n/a')
-    @click.option('--add-auth', '-a', is_flag=True, help='add authorization class and supporting files', flag_value='n/a')
-    @click.option('--add-validation', '-v', is_flag=True, help='add custom validation class that you can extend', flag_value='n/a')
-    @click.option('--add-websocket', '-w', is_flag=True, help='add web socket and supporting files', flag_value='n/a')
-    @click.option('--add-serverless', '-s', is_flag=True, help='add serverless framework and supporting files', flag_value='n/a')
-
+    @click.option('--add-git', '-g',
+                  is_flag=True,
+                  help='initiaialize local git repository (with optional remote)',
+                  flag_value='no remote',
+                  metavar='[remote]')
+    @click.option('--add-docker', '-d',
+                  is_flag=True,
+                  help='add Dockerfile and supporting files to deploy the API as a container',
+                  flag_value='n/a')
+    @click.option('--add-auth', '-a',
+                  is_flag=True, help='add authorization class and supporting files',
+                  flag_value='n/a')
+    @click.option('--add-validation', '-v',
+                  is_flag=True,
+                  help='add custom validation class that you can extend',
+                  flag_value='n/a')
+    @click.option('--add-websocket', '-w',
+                  is_flag=True,
+                  help='add web socket and supporting files',
+                  flag_value='n/a')
+    @click.option('--add-serverless', '-s',
+                  is_flag=True,
+                  help='add serverless framework and supporting files',
+                  flag_value='n/a')
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
@@ -62,12 +71,20 @@ def version(new_version):
     _show_or_set_version(new_version)
 
 
+def _api_already_exist():
+    try:
+        eve_utils.jump_to_api_folder()
+        return True
+    except RuntimeError:
+        return False
+
+
 def _create_api(project_name):
     # TODO: ensure folder is empty? or at least warn if not?
     current_dir = os.getcwd()
     if project_name == '.':
         project_name = os.path.basename(os.getcwd())
-    if api_already_exist():
+    if _api_already_exist():
       click.echo("Please run in a folder that does not already contain an API service")
       return
     os.chdir(current_dir)
@@ -151,7 +168,7 @@ def _show_or_set_version(new_version):
     with open(filename, 'r') as f:
         lines = f.readlines()
 
-    moded = ''
+    modified = ''
     starts_with = 'VERSION = '
 
     for line in lines:
@@ -159,11 +176,11 @@ def _show_or_set_version(new_version):
             print(line.rstrip().lstrip())
             line = f"{starts_with}{new_version}\n"
 
-        moded += line
+        modified += line
 
     if new_version:
         print(f'- set to: {new_version}\n')
         with open(filename, 'w') as f:
-            f.write(moded)
+            f.write(modified)
     else:
         print('- unchanged\n')

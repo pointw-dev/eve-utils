@@ -1,9 +1,10 @@
-import os
 import click
+
 
 @click.group(name='setting', help='Manage the configuration/settings of the service and its addins.')
 def commands():
     pass
+
 
 @commands.command(name='create', help='(not yet implemented)')
 def create():

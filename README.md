@@ -309,6 +309,8 @@ intro
 
   * eve-utils rely on the [inflect](https://pypi.org/project/inflect/) library for pluralization, which is very accurate but can make mistakes
 
+  * If you want to specify the singular and plural names of a resource use "singular,plural" e.g.  
+
 #### list
 
 details

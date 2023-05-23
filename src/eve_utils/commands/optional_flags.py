@@ -5,7 +5,8 @@ class OptionalFlags(click.Command):
     def parse_args(self, ctx, args):        
         """ Translate any flag `--opt=value` as flag `--opt` with changed flag_value=value """
         # filter flags
-        flags = [o for o in self.params if isinstance(o, click.Option) and o.is_flag and not isinstance(o.flag_value, bool)]
+        flags = [o for o in self.params if isinstance(o, click.Option)
+                 and o.is_flag and not isinstance(o.flag_value, bool)]
         prefixes = {p: o for o in flags for p in o.opts if p.startswith('--')}
         for i, flag in enumerate(args):
             flag = flag.split('=')
