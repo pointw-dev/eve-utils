@@ -1,9 +1,15 @@
-import sys
+import os
 import click
 import glob
 from pathlib import Path
 from libcst import *
-from eve_utils.code_gen import DomainDefinitionInserter, HooksInserter
+from eve_utils.code_gen import \
+    DomainDefinitionInserter, \
+    HooksInserter, \
+    DomainDefinitionRemover, \
+    HooksRemover, \
+    ParentReferenceRemover, \
+    ChildLinksRemover
 import eve_utils
 
 
@@ -12,22 +18,29 @@ def commands():
     pass
 
 
-@commands.command(name='create', help='Create a new resource and add it to the domain.')
+@commands.command(name='create', short_help='Create a new resource and add it to the domain.')
 @click.argument('resource_name', metavar='<name>')
 @click.option('--no_common', '-c', is_flag=True, help='Do not add common fields to this resource')
 def create(resource_name, no_common):
-    """<name> of the resource to create"""
+    """Create a new resource and add it to the domain.
+
+    <name> of the resource to create.  Enter either singular or plural and eve_utils will choose the other. Or enter both singular and plural separted by a comma.
+
+           e.g. if you enter "cactus" eve-utils mistakenly believes that is the plural of "cactu" so enter "cactus,cactuses" or "cactus,cacti" to override eve-util's decision"""
     try:
         eve_utils.jump_to_api_folder('src/{project_name}')
     except RuntimeError:
         return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
     singular, plural = eve_utils.get_singular_plural(resource_name)
+    if _is_resource_name_is_invalid(singular, plural):
+        return eve_utils.escape(f'The resource name ({resource_name}) is invalid', 701)
+
     add_common = not no_common
 
     print(f'Creating {plural} resource')
     if _resource_already_exists(plural):
-        eve_utils.escape('This resource already exist', 701)
+        eve_utils.escape('This resource already exist', 702)
     else:
         # resource_already_exists() jumps to a different folder, need to jump back.
         # No need to try/except - we know we're in an API folder
@@ -39,14 +52,20 @@ def create(resource_name, no_common):
         _insert_hooks(plural)
 
 
-@commands.command(name='check', help='See what the singular/plural of the resource will be.')
+@commands.command(name='check', short_help='See what the singular/plural of the resource will be.')
 @click.argument('resource_name', metavar='<name>')
-def create(resource_name):
-    """<name> of the resource to create"""
+def check(resource_name):
+    """See what the singular or plural of a resource name will be
+
+    <name> of the resource to check.  Enter singular or plural to see what eve-utils will choose for the other."""
+
     singular, plural = eve_utils.get_singular_plural(resource_name)
     click.echo(f'You entered {resource_name}')
     click.echo(f'- singular: {singular}')
     click.echo(f'- plural:   {plural}')
+
+    click.echo(f'A resource named {plural} ' +
+               ('already exists' if _resource_already_exists(plural) else 'does not exist'))
 
 
 @commands.command(name='list', help='List the resources in the domain.')
@@ -57,13 +76,36 @@ def list_resources():
 
 
 @commands.command(name='remove', help='(not yet implemented)')
-def remove():
-    click.echo('remove')
+@click.argument('resource_name', metavar='<name>')
+def remove(resource_name):
+    try:
+        eve_utils.jump_to_api_folder('src/{project_name}')
+    except RuntimeError:
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
+    singular, plural = eve_utils.get_singular_plural(resource_name)
+    if _is_resource_name_is_invalid(singular, plural):
+        return eve_utils.escape(f'The resource name ({resource_name}) is invalid', 701)
+
+    if not _resource_already_exists(plural):
+        eve_utils.escape('This resource does not exist', 703)
+
+    eve_utils.jump_to_api_folder('src/{project_name}')
+    _remove_domain_definition(plural)
+    _remove_hooks(plural)
+    _delete_resource_files(plural)
+    _remove_references_from_children(plural)
+    _remove_child_links(plural)
 
 
 def _resource_already_exists(resource_name):
     resources_list = _get_resource_list()
     return resource_name in resources_list
+
+
+def _is_resource_name_is_invalid(singular, plural):
+    # TODO: check validity of names
+    return False
 
 
 def _get_resource_list():
@@ -231,3 +273,70 @@ def _insert_hooks(resource):
 
     with open('hooks/__init__.py', 'w') as source:
         source.write(new_tree.code)
+
+
+def _remove_domain_definition(resource):
+    with open(f'domain/__init__.py', 'r') as source:
+        tree = parse_module(source.read())
+
+    remover = DomainDefinitionRemover(resource)
+    new_tree = tree.visit(remover)
+
+    with open('domain/__init__.py', 'w') as source:
+        source.write(new_tree.code)
+
+
+def _remove_hooks(resource):
+    with open(f'hooks/__init__.py', 'r') as source:
+        tree = parse_module(source.read())
+
+    remover = HooksRemover(resource)
+    new_tree = tree.visit(remover)
+
+    with open('hooks/__init__.py', 'w') as source:
+        source.write(new_tree.code)
+
+
+def _delete_resource_files(resource):
+    domain_filename = f'domain/{resource}.py'
+    hooks_filename = f'hooks/{resource}.py'
+
+    eve_utils.remove_file_if_exists(domain_filename)
+    eve_utils.remove_file_if_exists(hooks_filename)
+
+    domain_file_exists = os.path.exists(domain_filename)
+    hooks_file_exists = os.path.exists(hooks_filename)
+
+    if domain_file_exists or hooks_file_exists:
+        which = ''
+        which += domain_filename if domain_file_exists else ''
+        if hooks_file_exists:
+            which += ', ' if which else ''
+            which += hooks_filename
+        eve_utils.escape(f'Could not delete resource files: {which}', 704)
+
+
+def _remove_references_from_children(resource):
+    files = glob.glob('domain/*.py')
+    for filename in [file for file in files if not (file.startswith('domain/_') or file.startswith('domain\\_'))]:
+        with open(filename, 'r') as source:
+            tree = parse_module(source.read())
+
+        remover = ParentReferenceRemover(resource)
+        new_tree = tree.visit(remover)
+
+        with open(filename, 'w') as source:
+            source.write(new_tree.code)
+
+
+def _remove_child_links(resource):
+    files = glob.glob('hooks/*.py')
+    for filename in [file for file in files if not (file.startswith('hooks/_') or file.startswith('hooks\\_'))]:
+        with open(filename, 'r') as source:
+            tree = parse_module(source.read())
+
+        remover = ChildLinksRemover(resource)
+        new_tree = tree.visit(remover)
+
+        with open(filename, 'w') as source:
+            source.write(new_tree.code)

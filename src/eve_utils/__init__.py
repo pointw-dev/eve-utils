@@ -80,7 +80,7 @@ def copy_skel(project_name, skel_folder, target_folder=None, replace=None, silen
     copy_tree(source, destination)
 
     # TODO: can the following remove_tree calls be obviated if skel is packaged differently?
-    remove_if_exists(os.path.join(destination, '__pycache__'))
+    remove_folder_if_exists(os.path.join(destination, '__pycache__'))
     
     if replace is None:
         replace = {}
@@ -130,7 +130,12 @@ def replace_project_name(project_name, folder=None):
               print(f'Skipping unprocessable file: {dname}/{fname}')
 
 
-def remove_if_exists(folder):
+def remove_file_if_exists(filename):
+    if os.path.exists(filename):
+        os.remove(filename)
+
+
+def remove_folder_if_exists(folder):
     if os.path.exists(folder):
         remove_tree(folder)
 

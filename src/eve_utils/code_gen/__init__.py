@@ -8,6 +8,10 @@ from .child_links_inserter import ChildLinksInserter
 from .parent_links_inserter import ParentLinksInserter
 from .domain_children_definition_inserter import DomainChildrenDefinitionInserter
 from .domain_relations_inserter import DomainRelationsInserter
+from .domain_definition_remover import DomainDefinitionRemover
+from .hooks_remover import HooksRemover
+from .parent_reference_remover import ParentReferenceRemover
+from .child_links_remover import ChildLinksRemover
 
 
 TWNL = TrailingWhitespace(newline=Newline())
@@ -26,9 +30,9 @@ def insert_import(original_body, addition):
     state = 'on-top'
     for item in original_body:
         if state == 'on-top':
-            if hasattr(item, 'body') and hasattr(item.body, '__iter__') and type(item.body[0]).__name__ in ['Import', 'ImportFrom', 'Expr']:
-                pass
-            else:
+            if not hasattr(item, 'body') \
+                    or not hasattr(item.body, '__iter__') \
+                    or type(item.body[0]).__name__ not in ['Import', 'ImportFrom', 'Expr']:
                 state = 'in-position'
 
         if state == 'in-position':

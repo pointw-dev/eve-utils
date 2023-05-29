@@ -114,13 +114,13 @@ def _create_api(project_name):
     copy_tree(api_folder, project_name)
 
     # TODO: can the following remove_tree calls be obviated if skel is packaged differently?
-    eve_utils.remove_if_exists(os.path.join('scripts', '__pycache__'))
-    eve_utils.remove_if_exists(os.path.join(project_name, '__pycache__'))
-    eve_utils.remove_if_exists(os.path.join(project_name, 'configuration', '__pycache__'))
-    eve_utils.remove_if_exists(os.path.join(project_name, 'domain', '__pycache__'))
-    eve_utils.remove_if_exists(os.path.join(project_name, 'hooks', '__pycache__'))
-    eve_utils.remove_if_exists(os.path.join(project_name, 'log_trace', '__pycache__'))
-    eve_utils.remove_if_exists(os.path.join(project_name, 'utils', '__pycache__'))
+    eve_utils.remove_folder_if_exists(os.path.join('scripts', '__pycache__'))
+    eve_utils.remove_folder_if_exists(os.path.join(project_name, '__pycache__'))
+    eve_utils.remove_folder_if_exists(os.path.join(project_name, 'configuration', '__pycache__'))
+    eve_utils.remove_folder_if_exists(os.path.join(project_name, 'domain', '__pycache__'))
+    eve_utils.remove_folder_if_exists(os.path.join(project_name, 'hooks', '__pycache__'))
+    eve_utils.remove_folder_if_exists(os.path.join(project_name, 'log_trace', '__pycache__'))
+    eve_utils.remove_folder_if_exists(os.path.join(project_name, 'utils', '__pycache__'))
 
     os.chdir('..')
     eve_utils.replace_project_name(project_name, '.')

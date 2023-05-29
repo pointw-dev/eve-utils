@@ -298,3 +298,8 @@ for each brand in brands.body._items...
   Note: when using query strings with curly brackets, they must be urlencoded before sending to an AWS API Gateway. 
 
 * https://docs.python-eve.org/en/stable/features.html#embedded-resource-serialization
+
+### X-Total-Count
+
+* This is handy for HEAD requests when client wants to know items count without retrieving response body. 
+* An example use case is to get the count of unread posts using where query without loading posts themselves.

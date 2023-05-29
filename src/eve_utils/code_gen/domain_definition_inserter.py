@@ -38,14 +38,9 @@ class DomainDefinitionInserter(CSTTransformer):
             body=new_body
         )
 
-    def visit_SimpleStatementLine(self, node):
-        if not isinstance(node.body[0], Assign):
+    def visit_Assign(self, node):
+        if not node.targets[0].target.value == 'DOMAIN_DEFINITIONS':
             return False
-
-        if not node.body[0].targets[0].target.value == 'DOMAIN_DEFINITIONS':
-            return False
-
-        return True
 
     def leave_Dict(self, original_node, updated_node):
         """ Adds the following to domain/__init_.py's DOMAIN_DEFINITIONS:

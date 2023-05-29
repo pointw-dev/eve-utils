@@ -74,7 +74,7 @@ def attach(affordance_name, resource_name, folder):
     click.echo(f'Attaching affordances.{folder + "." if folder else ""}{affordance_name} to {resource_name}')
 
 
-@commands.command(name='list', help='(not yet implemented)')
+@commands.command(name='list', help='List the affordances in the API')
 def list_affordances():
     """
     Lists affordances previously created

@@ -43,7 +43,8 @@ class DomainRelationsInserter(CSTTransformer):
 
         return updated_node.with_changes(value=relations)
 
-    def get_dict_element(self, key, value, with_comma=False):
+    @staticmethod
+    def get_dict_element(key, value, with_comma=False):
         kwargs = {
             'key': SimpleString(f"'{key}'"),
             'whitespace_after_colon': SimpleWhitespace(' '),

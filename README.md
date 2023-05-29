@@ -580,7 +580,10 @@ HAL media type
   605 - serverless plugin not installed
   
   70x - resource
-  701 - resource already exists
+  701 - resource name invalid 
+  702 - resource already exists
+  703 - resource does not exist
+  704 - could not delete resource files
   
   80x - link
   801 - link already exists
