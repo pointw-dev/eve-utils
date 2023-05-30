@@ -252,4 +252,3 @@ def get_singular_plural(word):
         plural = plural + 's'
 
     return singular, plural
-

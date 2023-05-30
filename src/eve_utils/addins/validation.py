@@ -41,22 +41,12 @@ License:
 """
 
 import os
-import sys
-import itertools
-from libcst import *
 from eve_utils.code_gen import ValidationInserter
 import eve_utils
 
 
 def wire_up_service():
-    with open('eve_service.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = ValidationInserter()
-    new_tree = tree.visit(inserter)
-
-    with open('eve_service.py', 'w') as source:
-        source.write(new_tree.code)
+    ValidationInserter().transform('eve_service.py')
 
 
 def add(silent=False):

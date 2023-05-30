@@ -1,7 +1,8 @@
 from libcst import *
+from .file_transformer import FileTransformer
 
 
-class DomainDefinitionRemover(CSTTransformer):
+class DomainResourceRemover(FileTransformer):
     def __init__(self, resource):
         super().__init__()
         self.resource = resource

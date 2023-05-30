@@ -1,9 +1,10 @@
 import itertools
 from libcst import *
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class HooksInserter(CSTTransformer):
+class HooksInserter(FileTransformer):
     def __init__(self, resource):
         super().__init__()
         self.resource = resource

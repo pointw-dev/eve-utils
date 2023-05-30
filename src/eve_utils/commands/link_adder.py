@@ -1,5 +1,4 @@
 import os
-from libcst import parse_module
 
 from eve_utils.code_gen import \
     ChildLinksInserter, \
@@ -11,7 +10,7 @@ import eve_utils
 
 
 class LinkAdder:
-    def __init__(self, parent, child, as_parent_ref):
+    def __init__(self, parent, child, as_parent_ref=False):
         self.remote_parent = self.remote_child = False
 
         if parent.startswith(eve_utils.REMOTE_PREFIX):
@@ -26,47 +25,7 @@ class LinkAdder:
         self.child, self.children = eve_utils.get_singular_plural(child)  # TODO: validate, safe name, etc.
         self.parent_ref = '_parent_ref' if as_parent_ref else f'_{parent}_ref'
 
-    def _add_links_to_child_hooks(self):
-        with open(f'hooks/{self.children}.py', 'r') as source:
-            tree = parse_module(source.read())
-
-        inserter = ChildLinksInserter(self)
-        new_tree = tree.visit(inserter)
-
-        with open(f'hooks/{self.children}.py', 'w') as source:
-            source.write(new_tree.code)
-
-    def _add_links_to_parent_hooks(self):
-        with open(f'hooks/{self.parents}.py', 'r') as source:
-            tree = parse_module(source.read())
-
-        inserter = ParentLinksInserter(self)
-        new_tree = tree.visit(inserter)
-
-        with open(f'hooks/{self.parents}.py', 'w') as source:
-            source.write(new_tree.code)
-
-    def _add_to_domain_init(self):
-        with open('domain/__init__.py', 'r') as source:
-            tree = parse_module(source.read())
-
-        inserter = DomainRelationsInserter(self)
-        new_tree = tree.visit(inserter)
-
-        with open('domain/__init__.py', 'w') as source:
-            source.write(new_tree.code)
-
-    def _add_to_domain_child(self):
-        with open(f'domain/{self.children}.py', 'r') as source:
-            tree = parse_module(source.read())
-
-        inserter = DomainChildrenDefinitionInserter(self)
-        new_tree = tree.visit(inserter)
-
-        with open(f'domain/{self.children}.py', 'w') as source:
-            source.write(new_tree.code)
-
-    def _link_already_exists(self):
+    def link_already_exists(self):
         rels = eve_utils.parent_child_relations()
 
         if 'children' in rels.get(self.parents, {}):
@@ -100,7 +59,7 @@ class LinkAdder:
         return rtn
 
     def _validate(self):
-        if self._link_already_exists():
+        if self.link_already_exists():
             raise LinkAdderException(801, 'This link already exists')
 
         missing = self._list_missing_resources()
@@ -128,13 +87,13 @@ class LinkAdder:
         eve_utils.jump_to_api_folder('src/{project_name}')
         # update parent code
         if not self.remote_parent:
-            self._add_links_to_parent_hooks()
+            ParentLinksInserter(self).transform(f'hooks/{self.parents}.py', )
 
         # update child code
         if not self.remote_child:
-            self._add_to_domain_init()
-            self._add_to_domain_child()
-            self._add_links_to_child_hooks()
+            DomainRelationsInserter(self).transform('domain/__init__.py', )
+            DomainChildrenDefinitionInserter(self).transform(f'domain/{self.children}.py')
+            ChildLinksInserter(self).transform(f'hooks/{self.children}.py')
 
 
 class LinkAdderException(Exception):

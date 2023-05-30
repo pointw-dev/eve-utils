@@ -2,7 +2,6 @@ import os
 import re
 import glob
 import click
-from libcst import parse_module
 from .command_help_order import CommandHelpOrder
 from .optional_flags import OptionalFlags
 from eve_utils.code_gen import AffordanceInserter
@@ -205,13 +204,4 @@ def add_link({singular}):
 
 def _add_affordance_resource(affordance_name, folder, resource):
     singular, plural = eve_utils.get_singular_plural(resource)
-    with open(f'hooks/{plural}.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = AffordanceInserter(affordance_name, folder, singular, plural)
-    new_tree = tree.visit(inserter)
-
-    with open(f'hooks/{plural}.py', 'w') as source:
-        source.write(new_tree.code)
-
-
+    AffordanceInserter(affordance_name, folder, singular, plural).transform(f'hooks/{plural}.py')

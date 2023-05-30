@@ -1,8 +1,9 @@
 from libcst import *
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class DomainChildrenDefinitionInserter(CSTTransformer):
+class DomainChildrenDefinitionInserter(FileTransformer):
     def __init__(self, adder):
         super().__init__()
         self.adder = adder
@@ -15,7 +16,6 @@ class DomainChildrenDefinitionInserter(CSTTransformer):
             return False
 
         return True
-
 
     def leave_Assign(self, original_node, updated_node):
         new_elements = []

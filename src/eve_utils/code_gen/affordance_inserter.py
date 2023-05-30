@@ -1,10 +1,11 @@
 import itertools
 from libcst import *
 import libcst.matchers as m
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class AffordanceInserter(CSTTransformer):
+class AffordanceInserter(FileTransformer):
     def __init__(self, affordance_name, folder, singular, plural):
         super().__init__()
         self.affordance_name = affordance_name

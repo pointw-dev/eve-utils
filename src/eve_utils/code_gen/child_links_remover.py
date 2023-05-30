@@ -1,7 +1,9 @@
 from libcst import *
+from .file_transformer import FileTransformer
+import eve_utils
 
 
-class ChildLinksRemover(CSTTransformer):
+class ChildLinksRemover(FileTransformer):
     def __init__(self, resource):
         super().__init__()
         self.resource = resource

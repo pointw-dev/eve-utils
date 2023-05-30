@@ -1,9 +1,10 @@
 import itertools
 from libcst import *
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class DomainDefinitionInserter(CSTTransformer):
+class DomainDefinitionInserter(FileTransformer):
     def __init__(self, resource):
         super().__init__()
         self.resource = resource

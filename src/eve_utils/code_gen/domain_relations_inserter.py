@@ -1,8 +1,9 @@
 from libcst import *
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class DomainRelationsInserter(CSTTransformer):
+class DomainRelationsInserter(FileTransformer):
     def __init__(self, adder):
         super().__init__()
         self.adder = adder

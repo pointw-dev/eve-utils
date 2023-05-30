@@ -9,8 +9,10 @@ from .parent_links_inserter import ParentLinksInserter
 from .domain_children_definition_inserter import DomainChildrenDefinitionInserter
 from .domain_relations_inserter import DomainRelationsInserter
 from .affordance_inserter import  AffordanceInserter
-from .domain_definition_remover import DomainDefinitionRemover
+from .domain_resource_remover import DomainResourceRemover
+from .domain_relations_remover import DomainRelationsRemover
 from .hooks_remover import HooksRemover
+from .parent_links_remover import ParentLinksRemover
 from .parent_reference_remover import ParentReferenceRemover
 from .child_links_remover import ChildLinksRemover
 

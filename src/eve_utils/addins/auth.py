@@ -32,11 +32,6 @@ License:
 """
 
 import os
-import sys
-import argparse
-import itertools
-from libcst import *
-import importlib
 import eve_utils
 from eve_utils.code_gen import AuthorizationInserter
 
@@ -45,14 +40,7 @@ from eve_utils.code_gen import AuthorizationInserter
 
 
 def wire_up_service():
-    with open('eve_service.py', 'r') as source:
-        tree = parse_module(source.read())
-    
-    inserter = AuthorizationInserter()
-    new_tree = tree.visit(inserter)
-    
-    with open('eve_service.py', 'w') as source:
-        source.write(new_tree.code)
+    AuthorizationInserter().transform('eve_service.py', )
 
 
 def add(silent=False):

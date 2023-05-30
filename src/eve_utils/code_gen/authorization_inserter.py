@@ -1,10 +1,9 @@
-import itertools
 from libcst import *
-# from eve_utils.code_gen import insert_import
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class AuthorizationInserter(CSTTransformer):
+class AuthorizationInserter(FileTransformer):
     def __init__(self):
         super().__init__()
 

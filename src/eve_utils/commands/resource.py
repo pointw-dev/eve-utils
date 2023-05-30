@@ -2,12 +2,11 @@ import os
 import click
 import glob
 from pathlib import Path
-from libcst import *
 from .command_help_order import CommandHelpOrder
 from eve_utils.code_gen import \
     DomainDefinitionInserter, \
     HooksInserter, \
-    DomainDefinitionRemover, \
+    DomainResourceRemover, \
     HooksRemover, \
     ParentReferenceRemover, \
     ChildLinksRemover
@@ -265,47 +264,19 @@ def _add_remote_parent_links({singular}):
 
 
 def _insert_domain_definition(resource):
-    with open('domain/__init__.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = DomainDefinitionInserter(resource)
-    new_tree = tree.visit(inserter)
-
-    with open('domain/__init__.py', 'w') as source:
-        source.write(new_tree.code)
+    DomainDefinitionInserter(resource).transform('domain/__init__.py')
 
 
 def _insert_hooks(resource):
-    with open('hooks/__init__.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    inserter = HooksInserter(resource)
-    new_tree = tree.visit(inserter)
-
-    with open('hooks/__init__.py', 'w') as source:
-        source.write(new_tree.code)
+    HooksInserter(resource).transform('hooks/__init__.py',)
 
 
 def _remove_domain_definition(resource):
-    with open(f'domain/__init__.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    remover = DomainDefinitionRemover(resource)
-    new_tree = tree.visit(remover)
-
-    with open('domain/__init__.py', 'w') as source:
-        source.write(new_tree.code)
+    DomainResourceRemover(resource).transform('domain/__init__.py')
 
 
 def _remove_hooks(resource):
-    with open(f'hooks/__init__.py', 'r') as source:
-        tree = parse_module(source.read())
-
-    remover = HooksRemover(resource)
-    new_tree = tree.visit(remover)
-
-    with open('hooks/__init__.py', 'w') as source:
-        source.write(new_tree.code)
+    HooksRemover(resource).transform('hooks/__init__.py')
 
 
 def _delete_resource_files(resource):
@@ -330,24 +301,10 @@ def _delete_resource_files(resource):
 def _remove_references_from_children(resource):
     files = glob.glob('domain/*.py')
     for filename in [file for file in files if not (file.startswith('domain/_') or file.startswith('domain\\_'))]:
-        with open(filename, 'r') as source:
-            tree = parse_module(source.read())
-
-        remover = ParentReferenceRemover(resource)
-        new_tree = tree.visit(remover)
-
-        with open(filename, 'w') as source:
-            source.write(new_tree.code)
+        ParentReferenceRemover(resource).transform(filename)
 
 
 def _remove_child_links(resource):
     files = glob.glob('hooks/*.py')
     for filename in [file for file in files if not (file.startswith('hooks/_') or file.startswith('hooks\\_'))]:
-        with open(filename, 'r') as source:
-            tree = parse_module(source.read())
-
-        remover = ChildLinksRemover(resource)
-        new_tree = tree.visit(remover)
-
-        with open(filename, 'w') as source:
-            source.write(new_tree.code)
+        ChildLinksRemover(resource).transform(filename)

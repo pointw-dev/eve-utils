@@ -1,8 +1,9 @@
 from libcst import *
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class ParentLinksInserter(CSTTransformer):
+class ParentLinksInserter(FileTransformer):
     def __init__(self, adder):
         super().__init__()
         self.adder = adder

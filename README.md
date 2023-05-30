@@ -589,6 +589,7 @@ HAL media type
   801 - link already exists
   802 - local resource does not exist
   803 - both parent and child of a link cannot be remote (at least one must be local)
+  804 - link does not exist
   
   90x - integration
   901 - integration already exists

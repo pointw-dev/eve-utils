@@ -3,6 +3,7 @@ import sys
 import click
 from .command_help_order import CommandHelpOrder
 from .link_adder import LinkAdder, LinkAdderException
+from eve_utils.code_gen import ChildLinksRemover, ParentReferenceRemover, DomainRelationsRemover
 import eve_utils
 
 
@@ -97,9 +98,25 @@ def list_rels(output):
 @commands.command(name='remove',
                   short_help='(not yet implemented)',
                   help_priority=3)
-def remove():
-    click.echo('remove')
-    # domain/__init__.py - remove parents_children from DOMAIN_RELATIONS
-    # domain/children.py - remove _parent_ref (i.e. data_relation / remote_relation)
-    # hooks/parents.py - remove assignment from _add_links_to_parent()
-    # hooks/children.py - remove AugAdd x 3 from add_hooks(), if thingy from _add_links_to_child()
+@click.argument('parent', metavar='<parent|remote:parent>')
+@click.argument('child', metavar='<child|remote:child>')
+def remove(parent, child):
+    try:
+        eve_utils.jump_to_api_folder('src/{project_name}')
+    except RuntimeError:
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
+    parent, parents = eve_utils.get_singular_plural(parent)
+    child, children = eve_utils.get_singular_plural(child)
+    adder = LinkAdder(parent, child)
+    if not adder.link_already_exists():
+        eve_utils.escape(f'There is no link from {parent} to {children}', 804)
+    click.echo(f'Removing link from {parent} to {children}')
+    # if _is_resource_name_is_invalid(singular, plural):
+    #     return eve_utils.escape(f'The resource name ({resource_name}) is invalid', 701)
+
+    eve_utils.jump_to_api_folder('src/{project_name}')
+    DomainRelationsRemover(parents, children).transform('domain/__init__.py')
+    ParentReferenceRemover(parents).transform(f'domain/{children}.py')
+    ChildLinksRemover(parents).transform(f'hooks/{children}.py')
+    ChildLinksRemover(children).transform(f'hooks/{parents}.py')

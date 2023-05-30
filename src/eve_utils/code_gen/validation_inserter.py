@@ -1,8 +1,9 @@
 from libcst import *
+from .file_transformer import FileTransformer
 import eve_utils
 
 
-class ValidationInserter(CSTTransformer):
+class ValidationInserter(FileTransformer):
     def __init__(self):
         super().__init__()
 
