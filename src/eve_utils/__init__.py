@@ -10,8 +10,6 @@ from . import addins
 from . import commands
 from . import code_gen
 
-REMOTE_PREFIX = 'remote:'
-
 
 def jump_to_api_folder(path=None):
     keep_going = True
@@ -138,91 +136,6 @@ def remove_file_if_exists(filename):
 def remove_folder_if_exists(folder):
     if os.path.exists(folder):
         remove_tree(folder)
-
-
-def _add_remote_relations(rels):
-    try:
-        settings = jump_to_api_folder('src/{project_name}/hooks')
-    except RuntimeError:
-        return escape('This command must be run in an eve_service API folder structure', 1)
-
-    files = [file for file in glob.glob('*.py') if not file.startswith('_')]
-
-    for file in files:
-        resource = file.split('.')[0]  # TODO: replace with more elegant basename or something
-        with open(file, 'r') as f:
-            lines = f.readlines()
-
-        listening = ''
-        for line in lines:
-            if line.startswith('def _add_remote_'):
-                listening = line.split('_')[3]
-                if listening == 'parent':
-                    listening = 'parents'
-                continue
-            elif line.startswith('def '):
-                listening = ''
-                continue
-
-            if listening and '_links' in line:
-                remote = line.split("'")[3]
-                singular, plural = get_singular_plural(remote)
-                remote = 'remote:' + (singular if listening == 'parents' else plural)
-                if resource not in rels:
-                    rels[resource] = {}
-                if listening not in rels[resource]:
-                    rels[resource][listening] = set()
-
-                rels[resource][listening].add(remote)
-
-
-def parent_child_relations():
-    try:
-        settings = jump_to_api_folder('src/{project_name}/domain')
-    except RuntimeError:
-        return escape('This command must be run in an eve_service API folder structure', 1)
-
-    with open('__init__.py', 'r') as f:
-        lines = f.readlines()
-
-    listening = False
-    rels = {}
-    for line in lines:
-        if 'DOMAIN_RELATIONS' in line:
-            listening = True
-            continue
-
-        if not listening:
-            continue
-
-        if line.startswith('}'):
-            break
-
-        if line.startswith("    '"):
-            rel_name = line.split("'")[1]
-            continue
-
-        if line.startswith("        'resource_title':"):
-            child = line.split("'")[3]
-            parent = rel_name.replace(f"_{child}", "")
-            parent, parents = get_singular_plural(parent)
-            child, children = get_singular_plural(child)
-
-            if parents not in rels:
-                rels[parents] = {}
-            if 'children' not in rels[parents]:
-                rels[parents]['children'] = set()
-            rels[parents]['children'].add(children)
-
-            if children not in rels:
-                rels[children] = {}
-            if 'parents' not in rels[children]:
-                rels[children]['parents'] = set()
-            rels[children]['parents'].add(parent)
-
-    _add_remote_relations(rels)
-
-    return rels
 
 
 def escape(message, code, silent=False):
