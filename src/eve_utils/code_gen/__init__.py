@@ -8,6 +8,7 @@ from .child_links_inserter import ChildLinksInserter
 from .parent_links_inserter import ParentLinksInserter
 from .domain_children_definition_inserter import DomainChildrenDefinitionInserter
 from .domain_relations_inserter import DomainRelationsInserter
+from .affordance_inserter import  AffordanceInserter
 from .domain_definition_remover import DomainDefinitionRemover
 from .hooks_remover import HooksRemover
 from .parent_reference_remover import ParentReferenceRemover

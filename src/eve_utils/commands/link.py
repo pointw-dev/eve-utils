@@ -1,18 +1,22 @@
 import json
 import sys
 import click
+from .command_help_order import CommandHelpOrder
 from .link_adder import LinkAdder, LinkAdderException
 import eve_utils
 
 
-@click.group(name='link', help='Manage parent/child links amongst resources.')
+@click.group(name='link',
+             help='Manage parent/child links amongst resources.',
+             cls=CommandHelpOrder)
 def commands():
     pass
 
 
 @commands.command(name='create',
-                  help='Create a parent/child link between two resources.  If one of the resources is in the '
-                       'domain of a different EveService, add "remote:" in front of the name of that resource.')
+                  short_help='Create a parent/child link between two resources.  If one of the resources is in the '
+                       'domain of a different EveService, add "remote:" in front of the name of that resource.',
+                  help_priority=1)
 @click.argument('parent', metavar='<parent|remote:parent>')
 @click.argument('child', metavar='<child|remote:child>')
 @click.option('--as_parent_ref', '-p',
@@ -34,7 +38,9 @@ def create(parent, child, as_parent_ref):
 
 
 # TODO: refactor/SLAP
-@commands.command(name='list', help='List the relationships amongst the resources.')
+@commands.command(name='list',
+                  short_help='List the relationships amongst the resources.',
+                  help_priority=2)
 @click.option('output', '--format', '-f',
               type=click.Choice(['english', 'json', 'python_dict', 'plant_uml']),
               default='english',
@@ -88,6 +94,12 @@ def list_rels(output):
         print('@enduml')
 
 
-@commands.command(name='remove', help='(not yet implemented)')
+@commands.command(name='remove',
+                  short_help='(not yet implemented)',
+                  help_priority=3)
 def remove():
     click.echo('remove')
+    # domain/__init__.py - remove parents_children from DOMAIN_RELATIONS
+    # domain/children.py - remove _parent_ref (i.e. data_relation / remote_relation)
+    # hooks/parents.py - remove assignment from _add_links_to_parent()
+    # hooks/children.py - remove AugAdd x 3 from add_hooks(), if thingy from _add_links_to_child()

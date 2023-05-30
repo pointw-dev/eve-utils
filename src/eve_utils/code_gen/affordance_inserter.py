@@ -39,21 +39,26 @@ class AffordanceInserter(CSTTransformer):
         """ Adds the following to hooks/resource.py:add_hooks():
                 affordances.folder.add_affordance(app)
         """
+        method_prefix = Attribute(
+            value=Attribute(
+                value=Name('affordances'),
+                dot=Dot(),
+                attr=Name(self.folder)
+            ),
+            dot=Dot(),
+            attr=Name(self.affordance_name),
+        ) if self.folder else Attribute(
+            value=Name('affordances'),
+            dot=Dot(),
+            attr=Name(self.affordance_name)
+        )
         additions = {
             'add_hooks': SimpleStatementLine(
                 body=[
                     Expr(
                         value=Call(
                             func=Attribute(
-                                value=Attribute(
-                                    value=Attribute(
-                                        value=Name('affordances'),
-                                        dot=Dot(),
-                                        attr=Name(self.folder)
-                                    ),
-                                    dot=Dot(),
-                                    attr=Name(self.affordance_name),
-                                ),
+                                value=method_prefix,
                                 dot=Dot(),
                                 attr=Name('add_affordance'),
                             ),
@@ -68,15 +73,7 @@ class AffordanceInserter(CSTTransformer):
                     Expr(
                         value=Call(
                             func=Attribute(
-                                value=Attribute(
-                                    value=Attribute(
-                                        value=Name('affordances'),
-                                        dot=Dot(),
-                                        attr=Name(self.folder)
-                                    ),
-                                    dot=Dot(),
-                                    attr=Name(self.affordance_name),
-                                ),
+                                value=method_prefix,
                                 dot=Dot(),
                                 attr=Name('add_link'),
                             ),
@@ -93,7 +90,8 @@ class AffordanceInserter(CSTTransformer):
 
         new_body = []
 
-        for item in itertools.chain(updated_node.body.body, [additions[original_node.name.value]]):  # TODO: if addition is first, prepend with newline
+        for item in itertools.chain(updated_node.body.body, [
+            additions[original_node.name.value]]):  # TODO: if addition is first, prepend with newline
             new_body.append(item)
 
         return updated_node.with_changes(

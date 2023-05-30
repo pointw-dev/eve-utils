@@ -1,8 +1,7 @@
 import os
-import sys
 import click
-import eve_utils
 import platform
+import eve_utils
 
 
 @click.command(name='run', help='Launch the service.')

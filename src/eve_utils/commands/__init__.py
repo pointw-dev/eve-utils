@@ -8,11 +8,10 @@ from . import affordance
 from . import endpoint
 from . import setting
 from . import run
-
+from .command_help_order import CommandHelpOrder
 
 @click.group()
 @click.version_option(package_name='eve-utils')
-# @click.version_option()
 def main():
     pass
 

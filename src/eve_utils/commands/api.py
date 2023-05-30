@@ -5,12 +5,13 @@ import click
 from distutils.dir_util import copy_tree, remove_tree
 import importlib
 from shutil import copyfile
+from .command_help_order import CommandHelpOrder
 from .optional_flags import OptionalFlags
 from eve_utils import addins
 import eve_utils
 
 
-@click.group(name='api', help='Create and manage the API service itself.')
+@click.group(cls=CommandHelpOrder, name='api', help='Create and manage the API service itself.')
 def commands():
     pass
 
@@ -46,7 +47,10 @@ def addin_params(func):
     return wrapper
 
 
-@commands.command(cls=OptionalFlags, name='create', short_help="<name> or '.' to use the current folder's name")
+@commands.command(name='create',
+                  short_help="<name> or '.' to use the current folder's name",
+                  cls=OptionalFlags,
+                  help_priority=1)
 @click.argument('project_name', metavar='<name>')
 @addin_params
 def create(**kwargs):
@@ -56,16 +60,22 @@ def create(**kwargs):
     _add_addins(kwargs)
 
 
-@commands.command(cls=OptionalFlags, short_help="Add an addin to an already created API")
+@commands.command(name='addin',
+                  short_help='Add an addin to an already created API',
+                  cls=OptionalFlags,
+                  help_priority=2)
 @addin_params
 def addin(**kwargs):
     """Add an addin to an already created API"""
     _add_addins(kwargs)
 
 
-@commands.command(cls=OptionalFlags, name='version', short_help="View or set the version number of the API, man")
-@click.option('new_version', '--set-version', is_flag=True, flag_value="n/a",
-              help="set the version number (e.g. --set-version=1.0.0)", metavar="<new-version>")
+@commands.command(name='version',
+                  short_help='View or set the version number of the API, man',
+                  cls=OptionalFlags,
+                  help_priority=3)
+@click.option('new_version', '--set-version', is_flag=True, flag_value='n/a',
+              help='set the version number (e.g. --set-version=1.0.0)', metavar='<new-version>')
 def version(new_version):
     """View or set the version number of the API"""
     _show_or_set_version(new_version)
@@ -85,7 +95,7 @@ def _create_api(project_name):
     if project_name == '.':
         project_name = os.path.basename(os.getcwd())
     if _api_already_exist():
-      click.echo("Please run in a folder that does not already contain an API service")
+      click.echo('Please run in a folder that does not already contain an API service')
       return
     os.chdir(current_dir)
     click.echo(f'Creating {project_name} api')
@@ -136,7 +146,7 @@ def _add_addins(which_addins, silent=False):
         addin_name = keyword[4:]  # remove "add-"
         settings_addins = settings.get('addins', {})
         if addin_name in settings_addins:
-            if not silent: print(f"{addin_name} is already added.")
+            if not silent: print(f'{addin_name} is already added.')
             return
         settings_addins[addin_name] = which_addins[keyword]
         eve_utils.add_to_settings('addins', settings_addins)
@@ -174,7 +184,7 @@ def _show_or_set_version(new_version):
     for line in lines:
         if line.startswith(starts_with):
             print(line.rstrip().lstrip())
-            line = f"{starts_with}{new_version}\n"
+            line = f'{starts_with}{new_version}\n'
 
         modified += line
 

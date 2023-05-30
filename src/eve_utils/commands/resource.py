@@ -3,6 +3,7 @@ import click
 import glob
 from pathlib import Path
 from libcst import *
+from .command_help_order import CommandHelpOrder
 from eve_utils.code_gen import \
     DomainDefinitionInserter, \
     HooksInserter, \
@@ -13,12 +14,16 @@ from eve_utils.code_gen import \
 import eve_utils
 
 
-@click.group(name='resource', help='Manage the resources that make up the domain of the service.')
+@click.group(name='resource',
+             help='Manage the resources that make up the domain of the service.',
+             cls=CommandHelpOrder)
 def commands():
     pass
 
 
-@commands.command(name='create', short_help='Create a new resource and add it to the domain.')
+@commands.command(name='create',
+                  short_help='Create a new resource and add it to the domain.',
+                  help_priority=1)
 @click.argument('resource_name', metavar='<name>')
 @click.option('--no_common', '-c', is_flag=True, help='Do not add common fields to this resource')
 def create(resource_name, no_common):
@@ -52,30 +57,18 @@ def create(resource_name, no_common):
         _insert_hooks(plural)
 
 
-@commands.command(name='check', short_help='See what the singular/plural of the resource will be.')
-@click.argument('resource_name', metavar='<name>')
-def check(resource_name):
-    """See what the singular or plural of a resource name will be
-
-    <name> of the resource to check.  Enter singular or plural to see what eve-utils will choose for the other."""
-
-    singular, plural = eve_utils.get_singular_plural(resource_name)
-    click.echo(f'You entered {resource_name}')
-    click.echo(f'- singular: {singular}')
-    click.echo(f'- plural:   {plural}')
-
-    click.echo(f'A resource named {plural} ' +
-               ('already exists' if _resource_already_exists(plural) else 'does not exist'))
-
-
-@commands.command(name='list', help='List the resources in the domain.')
+@commands.command(name='list',
+                  short_help='List the resources in the domain.',
+                  help_priority=2)
 def list_resources():
     resources_list = _get_resource_list()
     for resource in resources_list:
         print('- ' + resource)
 
 
-@commands.command(name='remove', help='(not yet implemented)')
+@commands.command(name='remove',
+                  short_help='(not yet implemented)',
+                  help_priority=3)
 @click.argument('resource_name', metavar='<name>')
 def remove(resource_name):
     try:
@@ -96,6 +89,24 @@ def remove(resource_name):
     _delete_resource_files(plural)
     _remove_references_from_children(plural)
     _remove_child_links(plural)
+
+
+@commands.command(name='check',
+                  short_help='See what the singular/plural of the resource will be.',
+                  help_priority=4)
+@click.argument('resource_name', metavar='<name>')
+def check(resource_name):
+    """See what the singular or plural of a resource name will be
+
+    <name> of the resource to check.  Enter singular or plural to see what eve-utils will choose for the other."""
+
+    singular, plural = eve_utils.get_singular_plural(resource_name)
+    click.echo(f'You entered {resource_name}')
+    click.echo(f'- singular: {singular}')
+    click.echo(f'- plural:   {plural}')
+
+    click.echo(f'A resource named {plural} ' +
+               ('already exists' if _resource_already_exists(plural) else 'does not exist'))
 
 
 def _resource_already_exists(resource_name):

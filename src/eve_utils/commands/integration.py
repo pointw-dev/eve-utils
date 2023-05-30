@@ -1,10 +1,14 @@
 import os
 import sys
 import click
+from .command_help_order import CommandHelpOrder
 import eve_utils
 
 
-@click.group(name='integration', help='Manage integrations with external services.')
+
+@click.group(name='integration',
+             help='Manage integrations with external services.',
+             cls=CommandHelpOrder)
 def commands():
     pass
 
@@ -15,7 +19,9 @@ def _get_integrations():
     return integrations
 
 
-@commands.command(name='create', short_help=f'Create an external integration to the service.')
+@commands.command(name='create',
+                  short_help=f'Create an external integration to the service.',
+                  help_priority=1)
 @click.argument('integration', type=click.Choice(_get_integrations(), case_sensitive=False), metavar='<integration>')
 @click.option('--name', '-n',
               help='Set or change the name of the integration.  If you do not supply a name, the name of '
@@ -70,7 +76,9 @@ def create(integration, name, prefix):
     # TODO: ensure outer requirements.txt contains libraries required by the integration
 
 
-@commands.command(name='list', help='(not yet implemented)')
+@commands.command(name='list',
+                  short_help='(not yet implemented)',
+                  help_priority=2)
 def list_integrations():
     try:
         settings = eve_utils.jump_to_api_folder('src/{project_name}')
@@ -88,6 +96,8 @@ def list_integrations():
         print(f'- {integration}')
     
 
-@commands.command(name='remove', help='(not yet implemented)')
+@commands.command(name='remove',
+                  short_help='(not yet implemented)',
+                  help_priority=3)
 def remove():
     click.echo('remove')
