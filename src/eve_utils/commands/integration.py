@@ -5,7 +5,6 @@ from .command_help_order import CommandHelpOrder
 import eve_utils
 
 
-
 @click.group(name='integration',
              help='Manage integrations with external services.',
              cls=CommandHelpOrder)
@@ -77,7 +76,7 @@ def create(integration, name, prefix):
 
 
 @commands.command(name='list',
-                  short_help='(not yet implemented)',
+                  short_help='Lists the integrations that have been added.',
                   help_priority=2)
 def list_integrations():
     try:
@@ -94,10 +93,3 @@ def list_integrations():
         if integration.startswith('_'):
             continue
         print(f'- {integration}')
-    
-
-@commands.command(name='remove',
-                  short_help='(not yet implemented)',
-                  help_priority=3)
-def remove():
-    click.echo('remove')

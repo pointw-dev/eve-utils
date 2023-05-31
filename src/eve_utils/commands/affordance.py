@@ -4,7 +4,7 @@ import glob
 import click
 from .command_help_order import CommandHelpOrder
 from .optional_flags import OptionalFlags
-from eve_utils.code_gen import AffordanceInserter
+from eve_utils.code_gen import AffordanceInserter, AffordanceDetacher, AffordanceRemover, AffordanceImportRemover
 import eve_utils
 
 
@@ -45,7 +45,7 @@ def create(affordance_name, resource_name):
         return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
     # TODO: SLAP!
-    # TODO: Use LinkAdder pattern
+    # TODO: Use LinkManager pattern
     # TODO: refactor affordance/folder parse
     folder = None
     if '.' in affordance_name:
@@ -113,10 +113,30 @@ def list_affordances():
 
 
 @commands.command(name='remove',
-                  short_help='(not yet implemented)',
+                  short_help='Removes an affordance, or detaches it from a resource',
                   help_priority=3)
-def remove():
-    click.echo('remove')
+@click.argument('affordance_name', metavar='<name>')
+@click.argument('resource_name', metavar='<resource>', default='n/a')
+def remove(affordance_name, resource_name):
+    try:
+        eve_utils.jump_to_api_folder('src/{project_name}')
+    except RuntimeError:
+        return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
+
+    folder = None
+    if '.' in affordance_name:
+        # ASSERT: folder was not specified (else warn? abort?)
+        # ASSERT: only one dot in affordance_name
+        folder, affordance_name = affordance_name.split('.')
+
+    affordance = f'affordances.{folder + "." if folder else ""}{affordance_name}'  # TODO: this is in multiple places
+    if not os.path.exists(f'affordances{"/"+folder if folder else ""}/{affordance_name}.py'):  # TODO: this is in multiple places
+        return eve_utils.escape(f'{affordance} does not exist', 1002)
+
+    if resource_name == 'n/a':
+        _remove_affordance(affordance_name, folder)
+    else:
+        _detach_affordance(affordance_name, folder, resource_name)
 
 
 @commands.command(name='attach',
@@ -136,7 +156,7 @@ def attach(affordance_name, resource_name):
         return eve_utils.escape('This command must be run in an eve_service API folder structure', 1)
 
     # TODO: SLAP!
-    # TODO: Use LinkAdder pattern
+    # TODO: Use LinkManager pattern
     # TODO: refactor affordance/folder parse
     folder = None
     if '.' in affordance_name:
@@ -161,11 +181,13 @@ def attach(affordance_name, resource_name):
 
     with open(affordance_filename, 'w') as f:
         for line in lines:
+            if line == '    pass\n':
+                continue
             f.write(line)
             if line.startswith('def add_affordance('):
                 f.write(route)
                 f.write('\n')
-        f.write('\n\n')
+        f.write('\n')
         f.write(handler)
 
     _add_affordance_resource(affordance_name, folder, resource_name)
@@ -205,3 +227,22 @@ def add_link({singular}):
 def _add_affordance_resource(affordance_name, folder, resource):
     singular, plural = eve_utils.get_singular_plural(resource)
     AffordanceInserter(affordance_name, folder, singular, plural).transform(f'hooks/{plural}.py')
+
+
+def _detach_affordance(affordance_name, folder, resource_name):
+    singular, plural = eve_utils.get_singular_plural(resource_name)
+    affordance = f'affordances.{folder + "." if folder else ""}{affordance_name}'
+    click.echo(f'Detaching {affordance} from {resource_name}')
+    AffordanceDetacher(affordance_name, singular).transform(f'affordances{"/"+folder if folder else ""}/{affordance_name}.py')
+    AffordanceRemover(affordance_name, folder, singular).transform(f'hooks/{plural}.py')
+
+
+def _remove_affordance(affordance_name, folder):
+    affordance = f'affordances.{folder + "." if folder else ""}{affordance_name}'
+    click.echo(f'Removing {affordance}')
+    os.remove(f'affordances/{folder + "/" if folder else ""}{affordance_name}.py')
+    for filename in [file for file in glob.glob('hooks/*.py') if not (file.startswith('hooks/_') or file.startswith('hooks\\_'))]:
+        resource_name = filename[6:-3]
+        singular, plural = eve_utils.get_singular_plural(resource_name)
+        AffordanceRemover(affordance_name, folder, singular).transform(filename)
+    AffordanceImportRemover(affordance_name).transform(f'affordances/{folder + "/" if folder else ""}__init__.py')

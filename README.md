@@ -597,6 +597,7 @@ HAL media type
 
  100x - affordances
  1001 - affordance already exists
+ 1002 - affordance does not exist
   
   
   

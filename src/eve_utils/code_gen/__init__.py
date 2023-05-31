@@ -15,6 +15,9 @@ from .hooks_remover import HooksRemover
 from .parent_links_remover import ParentLinksRemover
 from .parent_reference_remover import ParentReferenceRemover
 from .child_links_remover import ChildLinksRemover
+from .affordance_detacher import AffordanceDetacher
+from .affordance_remover import AffordanceRemover
+from .affordance_import_remover import AffordanceImportRemover
 
 
 TWNL = TrailingWhitespace(newline=Newline())

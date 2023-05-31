@@ -91,8 +91,7 @@ class AffordanceInserter(FileTransformer):
 
         new_body = []
 
-        for item in itertools.chain(updated_node.body.body, [
-            additions[original_node.name.value]]):  # TODO: if addition is first, prepend with newline
+        for item in itertools.chain(updated_node.body.body, [additions[original_node.name.value]]):
             new_body.append(item)
 
         return updated_node.with_changes(
