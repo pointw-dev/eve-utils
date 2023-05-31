@@ -1,5 +1,4 @@
 import click
-
 from .command_help_order import CommandHelpOrder
 
 

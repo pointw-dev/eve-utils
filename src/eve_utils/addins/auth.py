@@ -32,8 +32,8 @@ License:
 """
 
 import os
-import eve_utils
 from eve_utils.code_gen import AuthorizationInserter
+import eve_utils
 
 # TODO: script getting default values (e.g. client keys)
 # TODO: provide non Auth0

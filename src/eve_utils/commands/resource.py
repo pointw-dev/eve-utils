@@ -66,7 +66,7 @@ def list_resources():
 
 
 @commands.command(name='remove',
-                  short_help='(not yet implemented)',
+                  short_help='Remove a resource',
                   help_priority=3)
 @click.argument('resource_name', metavar='<name>')
 def remove(resource_name):

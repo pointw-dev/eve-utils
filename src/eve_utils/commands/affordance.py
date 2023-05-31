@@ -140,7 +140,7 @@ def remove(affordance_name, resource_name):
 
 
 @commands.command(name='attach',
-                  short_help='(not yet implemented)',
+                  short_help='Attach an existing affordance to a resource',
                   cls=OptionalFlags,
                   help_priority=4)
 @click.argument('affordance_name', metavar='<name>')

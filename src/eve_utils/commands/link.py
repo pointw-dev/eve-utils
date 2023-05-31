@@ -96,7 +96,7 @@ def list_rels(output):
 
 
 @commands.command(name='remove',
-                  short_help='(not yet implemented)',
+                  short_help='Remove a link',
                   help_priority=3)
 @click.argument('parent', metavar='<parent|remote:parent>')
 @click.argument('child', metavar='<child|remote:child>')

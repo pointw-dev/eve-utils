@@ -34,7 +34,6 @@ License:
 """
 
 import os
-import sys
 import click
 from subprocess import Popen, PIPE
 import eve_utils

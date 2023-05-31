@@ -1,6 +1,5 @@
 import os
 import glob
-
 from eve_utils.code_gen import \
     ChildLinksInserter, \
     ParentLinksInserter, \
@@ -9,7 +8,6 @@ from eve_utils.code_gen import \
     ChildLinksRemover, \
     ParentReferenceRemover, \
     DomainRelationsRemover
-
 import eve_utils
 
 

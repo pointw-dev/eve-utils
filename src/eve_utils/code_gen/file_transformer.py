@@ -13,5 +13,3 @@ class FileTransformer(CSTTransformer):
 
         with open(filename, 'w') as source:
             source.write(new_tree.code)
-
-

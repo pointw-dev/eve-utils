@@ -35,7 +35,6 @@ License:
 """
 
 import os
-import sys
 import platform
 from shutil import copyfile
 import eve_utils

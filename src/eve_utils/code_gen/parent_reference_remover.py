@@ -1,6 +1,5 @@
 from libcst import *
 from .file_transformer import FileTransformer
-import eve_utils
 
 
 class ParentReferenceRemover(FileTransformer):

@@ -32,10 +32,6 @@ License:
 """
 
 import os
-import sys
-import sys
-import argparse
-from distutils.dir_util import copy_tree
 import eve_utils
 
 
