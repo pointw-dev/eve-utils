@@ -18,6 +18,9 @@ class EveServiceAuthorization(NegotiableAuth):
         super(EveServiceAuthorization, self).__init__()
 
     def process_claims(self, claims, allowed_roles, resource, method):
+        if method == 'HEAD':
+            return True
+
         authorized = 'user' in claims
         if not authorized:
             return False
